@@ -1,0 +1,32 @@
+{
+  "name": "kids-sound-match-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/generate-placeholders.mjs && vite",
+    "build": "tsc -b && vite build && node tools/check-release.mjs",
+    "build:test": "node tools/generate-placeholders.mjs && tsc -b && vite build --mode test",
+    "preview": "vite preview",
+    "test": "node tools/generate-placeholders.mjs && vitest run",
+    "typecheck": "tsc -b",
+    "placeholders": "node tools/generate-placeholders.mjs",
+    "photos": "node tools/add-photos.mjs",
+    "deploy:login": "npx --yes wrangler@4 login",
+    "deploy:setup": "npx --yes wrangler@4 pages project create kids-sound-match --production-branch main",
+    "deploy": "npm run build:test && npx --yes wrangler@4 pages deploy dist --project-name kids-sound-match --branch main --commit-dirty=true"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  }
+}

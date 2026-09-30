@@ -1,0 +1,17 @@
+{
+  "name": "Kids Sound Match",
+  "short_name": "Sound Match",
+  "description": "Animal sounds and names for children aged 1 to 4, in Arabic or English. No ads, no tracking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#FFF8EF",
+  "theme_color": "#FFF8EF",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

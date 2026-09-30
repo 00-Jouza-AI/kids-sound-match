@@ -1,0 +1,307 @@
+{
+  "pack_id": "animals",
+  "pack_version": 1,
+  "schema_version": 1,
+  "name": {
+    "en": "Animals",
+    "ar": "الحيوانات"
+  },
+  "asset_root": "animals/",
+  "items": [
+    {
+      "item_key": "cat",
+      "name": { "en": "Cat", "ar": "قطة" },
+      "image": "animals/cat.webp",
+      "images": ["animals/photos/cat_1.jpg", "animals/photos/cat_2.jpg", "animals/photos/cat_3.jpg", "animals/photos/cat_4.jpg", "animals/photos/cat_5.jpg", "animals/photos/cat_6.jpg", "animals/photos/cat_7.jpg", "animals/photos/cat_8.jpg", "animals/photos/cat_9.jpg", "animals/photos/cat_10.jpg", "animals/photos/cat_11.jpg", "animals/photos/cat_12.jpg", "animals/photos/cat_13.jpg", "animals/photos/cat_14.jpg", "animals/photos/cat_15.jpg"],
+      "sound": "animals/cat_sound.mp3",
+      "name_audio": {
+        "en": "animals/cat_name_en.mp3",
+        "ar": "animals/cat_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "dog",
+      "name": { "en": "Dog", "ar": "كلب" },
+      "image": "animals/dog.webp",
+      "images": ["animals/photos/dog_1.jpg", "animals/photos/dog_2.jpg", "animals/photos/dog_3.jpg"],
+      "sound": "animals/dog_sound.mp3",
+      "name_audio": {
+        "en": "animals/dog_name_en.mp3",
+        "ar": "animals/dog_name_ar.mp3"
+      },
+      "confusable_with": ["wolf"]
+    },
+    {
+      "item_key": "cow",
+      "name": { "en": "Cow", "ar": "بقرة" },
+      "image": "animals/cow.webp",
+      "sound": "animals/cow_sound.mp3",
+      "name_audio": {
+        "en": "animals/cow_name_en.mp3",
+        "ar": "animals/cow_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "sheep",
+      "name": { "en": "Sheep", "ar": "خروف" },
+      "image": "animals/sheep.webp",
+      "sound": "animals/sheep_sound.mp3",
+      "name_audio": {
+        "en": "animals/sheep_name_en.mp3",
+        "ar": "animals/sheep_name_ar.mp3"
+      },
+      "confusable_with": ["goat"]
+    },
+    {
+      "item_key": "goat",
+      "name": { "en": "Goat", "ar": "عنزة" },
+      "image": "animals/goat.webp",
+      "sound": "animals/goat_sound.mp3",
+      "name_audio": {
+        "en": "animals/goat_name_en.mp3",
+        "ar": "animals/goat_name_ar.mp3"
+      },
+      "confusable_with": ["sheep"]
+    },
+    {
+      "item_key": "horse",
+      "name": { "en": "Horse", "ar": "حصان" },
+      "image": "animals/horse.webp",
+      "sound": "animals/horse_sound.mp3",
+      "name_audio": {
+        "en": "animals/horse_name_en.mp3",
+        "ar": "animals/horse_name_ar.mp3"
+      },
+      "confusable_with": ["donkey"]
+    },
+    {
+      "item_key": "donkey",
+      "name": { "en": "Donkey", "ar": "حمار" },
+      "image": "animals/donkey.webp",
+      "sound": "animals/donkey_sound.mp3",
+      "name_audio": {
+        "en": "animals/donkey_name_en.mp3",
+        "ar": "animals/donkey_name_ar.mp3"
+      },
+      "confusable_with": ["horse"]
+    },
+    {
+      "item_key": "camel",
+      "name": { "en": "Camel", "ar": "جمل" },
+      "image": "animals/camel.webp",
+      "sound": "animals/camel_sound.mp3",
+      "name_audio": {
+        "en": "animals/camel_name_en.mp3",
+        "ar": "animals/camel_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "hen",
+      "name": { "en": "Hen", "ar": "دجاجة" },
+      "image": "animals/hen.webp",
+      "sound": "animals/hen_sound.mp3",
+      "name_audio": {
+        "en": "animals/hen_name_en.mp3",
+        "ar": "animals/hen_name_ar.mp3"
+      },
+      "confusable_with": ["rooster"]
+    },
+    {
+      "item_key": "rooster",
+      "name": { "en": "Rooster", "ar": "ديك" },
+      "image": "animals/rooster.webp",
+      "sound": "animals/rooster_sound.mp3",
+      "name_audio": {
+        "en": "animals/rooster_name_en.mp3",
+        "ar": "animals/rooster_name_ar.mp3"
+      },
+      "confusable_with": ["hen"]
+    },
+    {
+      "item_key": "duck",
+      "name": { "en": "Duck", "ar": "بطة" },
+      "image": "animals/duck.webp",
+      "images": ["animals/photos/duck_1.jpg", "animals/photos/duck_2.jpg", "animals/photos/duck_3.jpg", "animals/photos/duck_4.jpg", "animals/photos/duck_5.jpg"],
+      "sound": "animals/duck_sound.mp3",
+      "name_audio": {
+        "en": "animals/duck_name_en.mp3",
+        "ar": "animals/duck_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "lion",
+      "name": { "en": "Lion", "ar": "أسد" },
+      "image": "animals/lion.webp",
+      "sound": "animals/lion_sound.mp3",
+      "name_audio": {
+        "en": "animals/lion_name_en.mp3",
+        "ar": "animals/lion_name_ar.mp3"
+      },
+      "confusable_with": ["tiger", "bear"]
+    },
+    {
+      "item_key": "tiger",
+      "name": { "en": "Tiger", "ar": "نمر" },
+      "image": "animals/tiger.webp",
+      "sound": "animals/tiger_sound.mp3",
+      "name_audio": {
+        "en": "animals/tiger_name_en.mp3",
+        "ar": "animals/tiger_name_ar.mp3"
+      },
+      "confusable_with": ["lion", "bear"]
+    },
+    {
+      "item_key": "elephant",
+      "name": { "en": "Elephant", "ar": "فيل" },
+      "image": "animals/elephant.webp",
+      "sound": "animals/elephant_sound.mp3",
+      "name_audio": {
+        "en": "animals/elephant_name_en.mp3",
+        "ar": "animals/elephant_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "monkey",
+      "name": { "en": "Monkey", "ar": "قرد" },
+      "image": "animals/monkey.webp",
+      "sound": "animals/monkey_sound.mp3",
+      "name_audio": {
+        "en": "animals/monkey_name_en.mp3",
+        "ar": "animals/monkey_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "bird",
+      "name": { "en": "Bird", "ar": "عصفور" },
+      "image": "animals/bird.webp",
+      "sound": "animals/bird_sound.mp3",
+      "name_audio": {
+        "en": "animals/bird_name_en.mp3",
+        "ar": "animals/bird_name_ar.mp3"
+      },
+      "confusable_with": ["pigeon"]
+    },
+    {
+      "item_key": "pigeon",
+      "name": { "en": "Pigeon", "ar": "حمامة" },
+      "image": "animals/pigeon.webp",
+      "sound": "animals/pigeon_sound.mp3",
+      "name_audio": {
+        "en": "animals/pigeon_name_en.mp3",
+        "ar": "animals/pigeon_name_ar.mp3"
+      },
+      "confusable_with": ["bird"]
+    },
+    {
+      "item_key": "owl",
+      "name": { "en": "Owl", "ar": "بومة" },
+      "image": "animals/owl.webp",
+      "sound": "animals/owl_sound.mp3",
+      "name_audio": {
+        "en": "animals/owl_name_en.mp3",
+        "ar": "animals/owl_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "frog",
+      "name": { "en": "Frog", "ar": "ضفدع" },
+      "image": "animals/frog.webp",
+      "sound": "animals/frog_sound.mp3",
+      "name_audio": {
+        "en": "animals/frog_name_en.mp3",
+        "ar": "animals/frog_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "bee",
+      "name": { "en": "Bee", "ar": "نحلة" },
+      "image": "animals/bee.webp",
+      "sound": "animals/bee_sound.mp3",
+      "name_audio": {
+        "en": "animals/bee_name_en.mp3",
+        "ar": "animals/bee_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "snake",
+      "name": { "en": "Snake", "ar": "أفعى" },
+      "image": "animals/snake.webp",
+      "sound": "animals/snake_sound.mp3",
+      "name_audio": {
+        "en": "animals/snake_name_en.mp3",
+        "ar": "animals/snake_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "wolf",
+      "name": { "en": "Wolf", "ar": "ذئب" },
+      "image": "animals/wolf.webp",
+      "sound": "animals/wolf_sound.mp3",
+      "name_audio": {
+        "en": "animals/wolf_name_en.mp3",
+        "ar": "animals/wolf_name_ar.mp3"
+      },
+      "confusable_with": ["dog"]
+    },
+    {
+      "item_key": "bear",
+      "name": { "en": "Bear", "ar": "دب" },
+      "image": "animals/bear.webp",
+      "sound": "animals/bear_sound.mp3",
+      "name_audio": {
+        "en": "animals/bear_name_en.mp3",
+        "ar": "animals/bear_name_ar.mp3"
+      },
+      "confusable_with": ["lion", "tiger"]
+    },
+    {
+      "item_key": "mouse",
+      "name": { "en": "Mouse", "ar": "فأر" },
+      "image": "animals/mouse.webp",
+      "sound": "animals/mouse_sound.mp3",
+      "name_audio": {
+        "en": "animals/mouse_name_en.mp3",
+        "ar": "animals/mouse_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "groups": [
+    { "id": "first", "name": { "en": "First animals", "ar": "حيوانات للبداية" }, "items": ["cat", "dog", "cow", "sheep", "hen", "duck", "horse", "bird"] },
+    { "id": "farm", "name": { "en": "Farm", "ar": "حيوانات المزرعة" }, "items": ["cat", "dog", "cow", "sheep", "goat", "horse", "donkey", "camel", "hen", "rooster", "duck"] },
+    { "id": "wild", "name": { "en": "Wild", "ar": "حيوانات برية" }, "items": ["lion", "tiger", "elephant", "monkey", "wolf", "bear", "snake", "owl", "frog"] }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}
