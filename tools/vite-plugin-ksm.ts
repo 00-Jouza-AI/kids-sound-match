@@ -6,6 +6,8 @@ import type { Plugin, ResolvedConfig } from 'vite';
 interface Options {
   allowPlaceholders: boolean;
   telemetryUrl: string;
+  /** Optional cloud backup of parents' own packs (Supabase). */
+  supabaseUrl: string;
 }
 
 /** Shape of /assets/packs/index.json. Browsers can't list folders, so this replaces the folder scan. */
@@ -50,16 +52,24 @@ export function buildAssetIndex(assetsDir: string, placeholderDir: string | null
   return { packs, files, placeholders: placeholderDir ? listFiles(placeholderDir) : [] };
 }
 
-/** Blocks every request to another server. The only exception is the telemetry origin, when configured. */
-export function contentSecurityPolicy(telemetryUrl: string): string {
-  let telemetryOrigin = '';
-  if (telemetryUrl) {
-    try {
-      telemetryOrigin = ` ${new URL(telemetryUrl).origin}`;
-    } catch {
-      throw new Error(`VITE_TELEMETRY_URL is not a valid URL: ${telemetryUrl}`);
-    }
+function originOf(url: string, name: string): string {
+  try {
+    return new URL(url).origin;
+  } catch {
+    throw new Error(`${name} is not a valid URL: ${url}`);
   }
+}
+
+/**
+ * Blocks every request to another server. The only exceptions are the telemetry endpoint and the
+ * cloud-backup project, and only in builds configured with them.
+ */
+export function contentSecurityPolicy(telemetryUrl: string, supabaseUrl = ''): string {
+  const allowed = [
+    ...(telemetryUrl ? [originOf(telemetryUrl, 'VITE_TELEMETRY_URL')] : []),
+    ...(supabaseUrl ? [originOf(supabaseUrl, 'VITE_SUPABASE_URL')] : []),
+  ];
+  const extraOrigins = allowed.map((o) => ` ${o}`).join('');
   return [
     "default-src 'self'",
     "script-src 'self'",
@@ -67,7 +77,7 @@ export function contentSecurityPolicy(telemetryUrl: string): string {
     "img-src 'self' data: blob:",
     "media-src 'self' data: blob:",
     "font-src 'self'",
-    `connect-src 'self'${telemetryOrigin}`,
+    `connect-src 'self'${extraOrigins}`,
     "worker-src 'self'",
     "manifest-src 'self'",
     "object-src 'none'",
@@ -152,7 +162,7 @@ export function ksmPlugin(opts: Options): Plugin {
 
     transformIndexHtml(html) {
       if (config.command !== 'build') return html;
-      const csp = contentSecurityPolicy(opts.telemetryUrl);
+      const csp = contentSecurityPolicy(opts.telemetryUrl, opts.supabaseUrl);
       return html.replace('<head>', `<head>\n    <meta http-equiv="Content-Security-Policy" content="${csp}" />`);
     },
 

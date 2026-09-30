@@ -13,7 +13,11 @@ export default defineConfig(({ command, mode }) => {
   const allowPlaceholders = command === 'serve' || mode === 'test';
   return {
     base: './',
-    plugins: [react(), ksmPlugin({ allowPlaceholders, telemetryUrl: env.VITE_TELEMETRY_URL ?? '' })],
+    plugins: [react(), ksmPlugin({
+        allowPlaceholders,
+        telemetryUrl: env.VITE_TELEMETRY_URL ?? '',
+        supabaseUrl: env.VITE_SUPABASE_URL ?? '',
+      })],
     define: {
       __APP_VERSION__: JSON.stringify(pkg.version),
       __ALLOW_PLACEHOLDERS__: JSON.stringify(allowPlaceholders),

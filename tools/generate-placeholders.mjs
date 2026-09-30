@@ -179,7 +179,8 @@ for (const packId of packIds) {
   manifest.items.forEach((item, index) => {
     const pictures = [...(item.images ?? []), ...(item.image ? [item.image] : [])];
     for (const p of pictures) count += write(`packs/${p}`, pictureSvg(item));
-    count += write(`packs/${item.sound}`, wav(animalTone(index)));
+    // Things without a sound (name-only items) get no sound placeholder.
+    if (item.sound) count += write(`packs/${item.sound}`, wav(animalTone(index % 24)));
     for (const lang of ['en', 'ar']) {
       if (item.name_audio?.[lang]) count += write(`packs/${item.name_audio[lang]}`, wav(nameTone(index, lang)));
     }

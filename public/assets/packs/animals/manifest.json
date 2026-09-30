@@ -18,7 +18,7 @@
         "en": "animals/cat_name_en.mp3",
         "ar": "animals/cat_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["peacock"]
     },
     {
       "item_key": "dog",
@@ -30,7 +30,7 @@
         "en": "animals/dog_name_en.mp3",
         "ar": "animals/dog_name_ar.mp3"
       },
-      "confusable_with": ["wolf"]
+      "confusable_with": ["wolf", "seal", "fox"]
     },
     {
       "item_key": "cow",
@@ -74,7 +74,7 @@
         "en": "animals/horse_name_en.mp3",
         "ar": "animals/horse_name_ar.mp3"
       },
-      "confusable_with": ["donkey"]
+      "confusable_with": ["donkey", "zebra"]
     },
     {
       "item_key": "donkey",
@@ -85,7 +85,7 @@
         "en": "animals/donkey_name_en.mp3",
         "ar": "animals/donkey_name_ar.mp3"
       },
-      "confusable_with": ["horse"]
+      "confusable_with": ["horse", "zebra", "penguin"]
     },
     {
       "item_key": "camel",
@@ -130,7 +130,7 @@
         "en": "animals/duck_name_en.mp3",
         "ar": "animals/duck_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["goose"]
     },
     {
       "item_key": "lion",
@@ -141,7 +141,7 @@
         "en": "animals/lion_name_en.mp3",
         "ar": "animals/lion_name_ar.mp3"
       },
-      "confusable_with": ["tiger", "bear"]
+      "confusable_with": ["tiger", "bear", "leopard"]
     },
     {
       "item_key": "tiger",
@@ -152,7 +152,7 @@
         "en": "animals/tiger_name_en.mp3",
         "ar": "animals/tiger_name_ar.mp3"
       },
-      "confusable_with": ["lion", "bear"]
+      "confusable_with": ["lion", "bear", "leopard"]
     },
     {
       "item_key": "elephant",
@@ -174,7 +174,7 @@
         "en": "animals/monkey_name_en.mp3",
         "ar": "animals/monkey_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["gorilla"]
     },
     {
       "item_key": "bird",
@@ -185,7 +185,7 @@
         "en": "animals/bird_name_en.mp3",
         "ar": "animals/bird_name_ar.mp3"
       },
-      "confusable_with": ["pigeon"]
+      "confusable_with": ["pigeon", "chick", "cricket"]
     },
     {
       "item_key": "pigeon",
@@ -229,7 +229,7 @@
         "en": "animals/bee_name_en.mp3",
         "ar": "animals/bee_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["mosquito"]
     },
     {
       "item_key": "snake",
@@ -240,7 +240,7 @@
         "en": "animals/snake_name_en.mp3",
         "ar": "animals/snake_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["crocodile"]
     },
     {
       "item_key": "wolf",
@@ -262,7 +262,7 @@
         "en": "animals/bear_name_en.mp3",
         "ar": "animals/bear_name_ar.mp3"
       },
-      "confusable_with": ["lion", "tiger"]
+      "confusable_with": ["lion", "tiger", "leopard"]
     },
     {
       "item_key": "mouse",
@@ -273,13 +273,336 @@
         "en": "animals/mouse_name_en.mp3",
         "ar": "animals/mouse_name_ar.mp3"
       },
+      "confusable_with": ["bat"]
+    },
+    {
+      "item_key": "chick",
+      "name": { "en": "Chick", "ar": "كتكوت" },
+      "image": "animals/chick.webp",
+      "sound": "animals/chick_sound.mp3",
+      "name_audio": {
+        "en": "animals/chick_name_en.mp3",
+        "ar": "animals/chick_name_ar.mp3"
+      },
+      "confusable_with": ["bird"]
+    },
+    {
+      "item_key": "turkey",
+      "name": { "en": "Turkey", "ar": "ديك رومي" },
+      "image": "animals/turkey.webp",
+      "sound": "animals/turkey_sound.mp3",
+      "name_audio": {
+        "en": "animals/turkey_name_en.mp3",
+        "ar": "animals/turkey_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "goose",
+      "name": { "en": "Goose", "ar": "إوزة" },
+      "image": "animals/goose.webp",
+      "sound": "animals/goose_sound.mp3",
+      "name_audio": {
+        "en": "animals/goose_name_en.mp3",
+        "ar": "animals/goose_name_ar.mp3"
+      },
+      "confusable_with": ["duck"]
+    },
+    {
+      "item_key": "parrot",
+      "name": { "en": "Parrot", "ar": "ببغاء" },
+      "image": "animals/parrot.webp",
+      "sound": "animals/parrot_sound.mp3",
+      "name_audio": {
+        "en": "animals/parrot_name_en.mp3",
+        "ar": "animals/parrot_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "peacock",
+      "name": { "en": "Peacock", "ar": "طاووس" },
+      "image": "animals/peacock.webp",
+      "sound": "animals/peacock_sound.mp3",
+      "name_audio": {
+        "en": "animals/peacock_name_en.mp3",
+        "ar": "animals/peacock_name_ar.mp3"
+      },
+      "confusable_with": ["cat"]
+    },
+    {
+      "item_key": "eagle",
+      "name": { "en": "Eagle", "ar": "نسر" },
+      "image": "animals/eagle.webp",
+      "sound": "animals/eagle_sound.mp3",
+      "name_audio": {
+        "en": "animals/eagle_name_en.mp3",
+        "ar": "animals/eagle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "seal",
+      "name": { "en": "Seal", "ar": "فقمة" },
+      "image": "animals/seal.webp",
+      "sound": "animals/seal_sound.mp3",
+      "name_audio": {
+        "en": "animals/seal_name_en.mp3",
+        "ar": "animals/seal_name_ar.mp3"
+      },
+      "confusable_with": ["dog", "fox"]
+    },
+    {
+      "item_key": "dolphin",
+      "name": { "en": "Dolphin", "ar": "دلفين" },
+      "image": "animals/dolphin.webp",
+      "sound": "animals/dolphin_sound.mp3",
+      "name_audio": {
+        "en": "animals/dolphin_name_en.mp3",
+        "ar": "animals/dolphin_name_ar.mp3"
+      },
+      "confusable_with": ["whale"]
+    },
+    {
+      "item_key": "whale",
+      "name": { "en": "Whale", "ar": "حوت" },
+      "image": "animals/whale.webp",
+      "sound": "animals/whale_sound.mp3",
+      "name_audio": {
+        "en": "animals/whale_name_en.mp3",
+        "ar": "animals/whale_name_ar.mp3"
+      },
+      "confusable_with": ["dolphin"]
+    },
+    {
+      "item_key": "fox",
+      "name": { "en": "Fox", "ar": "ثعلب" },
+      "image": "animals/fox.webp",
+      "sound": "animals/fox_sound.mp3",
+      "name_audio": {
+        "en": "animals/fox_name_en.mp3",
+        "ar": "animals/fox_name_ar.mp3"
+      },
+      "confusable_with": ["dog", "seal"]
+    },
+    {
+      "item_key": "zebra",
+      "name": { "en": "Zebra", "ar": "حمار وحشي" },
+      "image": "animals/zebra.webp",
+      "sound": "animals/zebra_sound.mp3",
+      "name_audio": {
+        "en": "animals/zebra_name_en.mp3",
+        "ar": "animals/zebra_name_ar.mp3"
+      },
+      "confusable_with": ["horse", "donkey"]
+    },
+    {
+      "item_key": "deer",
+      "name": { "en": "Deer", "ar": "غزال" },
+      "image": "animals/deer.webp",
+      "sound": "animals/deer_sound.mp3",
+      "name_audio": {
+        "en": "animals/deer_name_en.mp3",
+        "ar": "animals/deer_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "hippo",
+      "name": { "en": "Hippo", "ar": "فرس النهر" },
+      "image": "animals/hippo.webp",
+      "sound": "animals/hippo_sound.mp3",
+      "name_audio": {
+        "en": "animals/hippo_name_en.mp3",
+        "ar": "animals/hippo_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "gorilla",
+      "name": { "en": "Gorilla", "ar": "غوريلا" },
+      "image": "animals/gorilla.webp",
+      "sound": "animals/gorilla_sound.mp3",
+      "name_audio": {
+        "en": "animals/gorilla_name_en.mp3",
+        "ar": "animals/gorilla_name_ar.mp3"
+      },
+      "confusable_with": ["monkey"]
+    },
+    {
+      "item_key": "crocodile",
+      "name": { "en": "Crocodile", "ar": "تمساح" },
+      "image": "animals/crocodile.webp",
+      "sound": "animals/crocodile_sound.mp3",
+      "name_audio": {
+        "en": "animals/crocodile_name_en.mp3",
+        "ar": "animals/crocodile_name_ar.mp3"
+      },
+      "confusable_with": ["snake"]
+    },
+    {
+      "item_key": "cricket",
+      "name": { "en": "Cricket", "ar": "صرصور الليل" },
+      "image": "animals/cricket.webp",
+      "sound": "animals/cricket_sound.mp3",
+      "name_audio": {
+        "en": "animals/cricket_name_en.mp3",
+        "ar": "animals/cricket_name_ar.mp3"
+      },
+      "confusable_with": ["bird"]
+    },
+    {
+      "item_key": "mosquito",
+      "name": { "en": "Mosquito", "ar": "بعوضة" },
+      "image": "animals/mosquito.webp",
+      "sound": "animals/mosquito_sound.mp3",
+      "name_audio": {
+        "en": "animals/mosquito_name_en.mp3",
+        "ar": "animals/mosquito_name_ar.mp3"
+      },
+      "confusable_with": ["bee"]
+    },
+    {
+      "item_key": "bat",
+      "name": { "en": "Bat", "ar": "خفاش" },
+      "image": "animals/bat.webp",
+      "sound": "animals/bat_sound.mp3",
+      "name_audio": {
+        "en": "animals/bat_name_en.mp3",
+        "ar": "animals/bat_name_ar.mp3"
+      },
+      "confusable_with": ["mouse"]
+    },
+    {
+      "item_key": "penguin",
+      "name": { "en": "Penguin", "ar": "بطريق" },
+      "image": "animals/penguin.webp",
+      "sound": "animals/penguin_sound.mp3",
+      "name_audio": {
+        "en": "animals/penguin_name_en.mp3",
+        "ar": "animals/penguin_name_ar.mp3"
+      },
+      "confusable_with": ["donkey"]
+    },
+    {
+      "item_key": "leopard",
+      "name": { "en": "Leopard", "ar": "فهد" },
+      "image": "animals/leopard.webp",
+      "sound": "animals/leopard_sound.mp3",
+      "name_audio": {
+        "en": "animals/leopard_name_en.mp3",
+        "ar": "animals/leopard_name_ar.mp3"
+      },
+      "confusable_with": ["lion", "tiger", "bear"]
+    },
+    {
+      "item_key": "rabbit",
+      "name": { "en": "Rabbit", "ar": "أرنب" },
+      "image": "animals/rabbit.webp",
+      "name_audio": {
+        "en": "animals/rabbit_name_en.mp3",
+        "ar": "animals/rabbit_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "giraffe",
+      "name": { "en": "Giraffe", "ar": "زرافة" },
+      "image": "animals/giraffe.webp",
+      "name_audio": {
+        "en": "animals/giraffe_name_en.mp3",
+        "ar": "animals/giraffe_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "turtle",
+      "name": { "en": "Turtle", "ar": "سلحفاة" },
+      "image": "animals/turtle.webp",
+      "name_audio": {
+        "en": "animals/turtle_name_en.mp3",
+        "ar": "animals/turtle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "fish",
+      "name": { "en": "Fish", "ar": "سمكة" },
+      "image": "animals/fish.webp",
+      "name_audio": {
+        "en": "animals/fish_name_en.mp3",
+        "ar": "animals/fish_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "butterfly",
+      "name": { "en": "Butterfly", "ar": "فراشة" },
+      "image": "animals/butterfly.webp",
+      "name_audio": {
+        "en": "animals/butterfly_name_en.mp3",
+        "ar": "animals/butterfly_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "snail",
+      "name": { "en": "Snail", "ar": "حلزون" },
+      "image": "animals/snail.webp",
+      "name_audio": {
+        "en": "animals/snail_name_en.mp3",
+        "ar": "animals/snail_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "ladybug",
+      "name": { "en": "Ladybug", "ar": "دعسوقة" },
+      "image": "animals/ladybug.webp",
+      "name_audio": {
+        "en": "animals/ladybug_name_en.mp3",
+        "ar": "animals/ladybug_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "ant",
+      "name": { "en": "Ant", "ar": "نملة" },
+      "image": "animals/ant.webp",
+      "name_audio": {
+        "en": "animals/ant_name_en.mp3",
+        "ar": "animals/ant_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "kangaroo",
+      "name": { "en": "Kangaroo", "ar": "كنغر" },
+      "image": "animals/kangaroo.webp",
+      "name_audio": {
+        "en": "animals/kangaroo_name_en.mp3",
+        "ar": "animals/kangaroo_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "panda",
+      "name": { "en": "Panda", "ar": "باندا" },
+      "image": "animals/panda.webp",
+      "name_audio": {
+        "en": "animals/panda_name_en.mp3",
+        "ar": "animals/panda_name_ar.mp3"
+      },
       "confusable_with": []
     }
   ],
   "groups": [
     { "id": "first", "name": { "en": "First animals", "ar": "حيوانات للبداية" }, "items": ["cat", "dog", "cow", "sheep", "hen", "duck", "horse", "bird"] },
-    { "id": "farm", "name": { "en": "Farm", "ar": "حيوانات المزرعة" }, "items": ["cat", "dog", "cow", "sheep", "goat", "horse", "donkey", "camel", "hen", "rooster", "duck"] },
-    { "id": "wild", "name": { "en": "Wild", "ar": "حيوانات برية" }, "items": ["lion", "tiger", "elephant", "monkey", "wolf", "bear", "snake", "owl", "frog"] }
+    { "id": "farm", "name": { "en": "Farm", "ar": "حيوانات المزرعة" }, "items": ["cat", "dog", "cow", "sheep", "goat", "horse", "donkey", "camel", "hen", "rooster", "duck", "chick", "turkey", "goose", "rabbit"] },
+    { "id": "wild", "name": { "en": "Wild", "ar": "حيوانات برية" }, "items": ["lion", "tiger", "leopard", "elephant", "monkey", "gorilla", "wolf", "fox", "bear", "zebra", "giraffe", "hippo", "deer", "kangaroo", "panda", "snake", "crocodile", "owl", "frog"] },
+    { "id": "birds", "name": { "en": "Birds", "ar": "طيور" }, "items": ["bird", "pigeon", "owl", "hen", "rooster", "duck", "chick", "turkey", "goose", "parrot", "peacock", "eagle", "penguin"] },
+    { "id": "sea", "name": { "en": "Sea animals", "ar": "حيوانات البحر" }, "items": ["fish", "dolphin", "whale", "seal", "turtle", "penguin"] },
+    { "id": "bugs", "name": { "en": "Little creatures", "ar": "كائنات صغيرة" }, "items": ["bee", "butterfly", "ladybug", "ant", "snail", "cricket", "mosquito"] }
   ],
   "feedback_audio": {
     "correct": {

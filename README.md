@@ -60,6 +60,23 @@ photo to 720 px (1–15 MB becomes ~50–100 KB), fixes phone rotation, saves it
 Running it again replaces that animal's photos; files that aren't an animal are skipped. A question
 only shows photos when every picture in it has one, so photos and emoji never share a screen.
 
+## My packs (your own pictures and voice)
+
+Home → **My packs** (behind the PIN): create packs like "Family" or "Toys". Each item has a picture
+(take a photo, choose one and crop it square, or pick an icon), its name typed in Arabic and/or
+English, the name **recorded** in either or both languages (record, then drag two handles to cut
+it to the exact word), and optionally a sound. A pack is playable once it has 5 finished items;
+items without a sound play in "Name only" mode and Explore. Choose the pack in Settings.
+
+Recording needs the microphone, which browsers only allow on HTTPS or `localhost`; over home
+Wi-Fi you can choose a recorded audio file instead.
+
+### Optional cloud backup (Google sign-in)
+
+Packs stay on the phone unless a parent signs in with Google in My packs; then they're backed up to
+Supabase and appear on the parent's other devices. The child's results are never uploaded. Setup
+(once): [docs/CLOUD-SETUP.md](docs/CLOUD-SETUP.md) and [supabase/schema.sql](supabase/schema.sql).
+
 ## Put it on your phone as a real app (Cloudflare Pages)
 
 Over home Wi-Fi a phone can't install the app, keep the screen on or work offline; over HTTPS it can.

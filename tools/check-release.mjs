@@ -9,7 +9,8 @@ import path from 'node:path';
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const MARKER = 'KSM-PLACEHOLDER';
-const RUNTIME_ALLOWLIST = new Set(['react', 'react-dom']);
+// @supabase/supabase-js: optional cloud backup of parents' own packs (agreed 30 Sept 2026).
+const RUNTIME_ALLOWLIST = new Set(['react', 'react-dom', '@supabase/supabase-js']);
 const DEV_ALLOWLIST = new Set([
   'vite',
   '@vitejs/plugin-react',
@@ -25,6 +26,19 @@ const TRACKERS =
   /google-analytics\.com|googletagmanager\.com|doubleclick\.net|googlesyndication\.com|googleadservices\.com|firebaseio\.com|firebase\.googleapis\.com|firebaselogging|crashlytics\.com|connect\.facebook\.net|graph\.facebook\.com|sentry\.io|appsflyer\.com|adjust\.com|mixpanel\.com|segment\.(io|com)|amplitude\.com|hotjar\.com|clarity\.ms|branch\.io|onesignal\.com|admob/i;
 
 const problems = [];
+
+/** Reads KEY=value lines, as Vite does, so the gate knows the build's configured servers. */
+function readEnvFile(name) {
+  const file = path.join(ROOT, name);
+  if (!fs.existsSync(file)) return {};
+  const entries = [];
+  for (const line of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const m = /^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/.exec(line);
+    if (m) entries.push([m[1], m[2].replace(/^['"]|['"]$/g, '')]);
+  }
+  return Object.fromEntries(entries);
+}
+
 const walk = (dir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]));
 
@@ -54,15 +68,17 @@ const html = fs.readFileSync(path.join(DIST, 'index.html'), 'utf8');
 const csp = /http-equiv="Content-Security-Policy" content="([^"]+)"/.exec(html)?.[1];
 if (!csp) problems.push('index.html has no Content-Security-Policy');
 else {
-  const telemetryOrigin = (() => {
+  // The only servers a build may talk to: its telemetry endpoint and cloud-backup project, if set.
+  const env = { ...readEnvFile('.env'), ...readEnvFile('.env.local'), ...process.env };
+  const allowedOrigins = [env.VITE_TELEMETRY_URL, env.VITE_SUPABASE_URL].flatMap((u) => {
     try {
-      return process.env.VITE_TELEMETRY_URL ? new URL(process.env.VITE_TELEMETRY_URL).origin : null;
+      return u ? [new URL(u).origin] : [];
     } catch {
-      return null;
+      return [];
     }
-  })();
+  });
   const hosts = csp.match(/https?:\/\/[^\s;]+/g) ?? [];
-  for (const host of hosts) if (host !== telemetryOrigin) problems.push(`CSP allows another server: ${host}`);
+  for (const host of hosts) if (!allowedOrigins.includes(host)) problems.push(`CSP allows another server: ${host}`);
 }
 const externalRefs = html.match(/(src|href)="https?:\/\/[^"]+"/g) ?? [];
 for (const ref of externalRefs) problems.push(`index.html loads from another server: ${ref}`);

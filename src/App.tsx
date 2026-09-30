@@ -1,8 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audioEngine } from './audio/audioEngine';
 import { placeholderPictureUsable } from './content/emojiSupport';
 import { loadContent } from './content/loader';
-import type { LoadedContent } from './content/types';
+import type { LoadedContent, LoadedFeedback, LoadedPack } from './content/types';
+import { MIN_ITEMS_PER_PACK } from './content/validate';
+import { cloud } from './custom/cloud';
+import { customStore } from './custom/store';
+import { customToLoaded, type CustomPackView } from './custom/toLoaded';
 import { I18nProvider, useI18n } from './i18n/I18n';
 import { enterFullscreen } from './lock/fullscreen';
 import { ParentGate } from './lock/ParentGate';
@@ -16,7 +20,8 @@ import { KidMode } from './ui/kid/KidMode';
 import { clearKidSnapshot, loadKidSnapshot, type KidConfig, type KidKind, type KidSnapshot } from './ui/kid/kidSnapshot';
 import { FirstRun } from './ui/parent/FirstRun';
 import { Home, type HomeLink } from './ui/parent/Home';
-import { AboutScreen, ContentProblems, NothingToPlay, PrivacyScreen } from './ui/parent/InfoScreens';
+import { AboutScreen, ContentProblems, PrivacyScreen } from './ui/parent/InfoScreens';
+import { MyPacks } from './ui/parent/MyPacks';
 import { ReportScreen } from './ui/parent/ReportScreen';
 import { SettingsScreen } from './ui/parent/SettingsScreen';
 import { StartFlow, type StartStep } from './ui/parent/StartFlow';
@@ -24,13 +29,13 @@ import { StartFlow, type StartStep } from './ui/parent/StartFlow';
 type Screen =
   | 'loading'
   | 'problems'
-  | 'empty'
   | 'firstRun'
   | 'home'
   | 'settings'
   | 'report'
   | 'privacy'
   | 'about'
+  | 'myPacks'
   | 'start'
   | 'kid';
 
@@ -42,6 +47,7 @@ const NUDGE_DISMISSED_KEY = 'ksm.nudgeDismissed.v1';
 /** After "Not now", the suggestion comes back only after this many more games at that level. */
 const NUDGE_AGAIN_AFTER_GAMES = 3;
 const PARENTS_GROUP_URL = (import.meta.env.VITE_PARENTS_GROUP_URL ?? '').trim();
+const NO_FEEDBACK: LoadedFeedback = { correct: { en: [], ar: [] }, incorrectTone: null, sessionEnd: { en: null, ar: null } };
 
 export function App() {
   const [settings, setSettings] = useState<Settings>(loadSettings);
@@ -70,59 +76,100 @@ export function App() {
 
 function Shell({ settings, update }: { settings: Settings; update: (patch: Partial<Settings>) => void }) {
   const { t } = useI18n();
-  const [content, setContent] = useState<LoadedContent | null>(null);
+  const [builtin, setBuiltin] = useState<LoadedContent | null>(null);
+  const [customViews, setCustomViews] = useState<CustomPackView[]>([]);
   const [screen, setScreen] = useState<Screen>('loading');
   const [gate, setGate] = useState<{ run: () => void } | null>(null);
-  const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null } | null>(null);
+  const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack } | null>(null);
   const [startStep, setStartStep] = useState<StartStep>('soundCheck');
   const [startKind, setStartKind] = useState<KidKind>('game');
   const [nudge, setNudge] = useState<NextLevel | null>(null);
   const unlockedUntil = useRef(0);
   const soundChecked = useRef(false);
+  const feedback = useRef<LoadedFeedback>(NO_FEEDBACK);
 
-  const pack = content?.packs.find((p) => p.id === settings.packId) ?? content?.packs[0];
+  // Built-in packs plus the parent's own packs that have enough finished items to play.
+  const allPacks = useMemo(() => [...(builtin?.packs ?? []), ...customViews.map((v) => v.loaded)], [builtin, customViews]);
+  const playablePacks = useMemo(
+    () => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK),
+    [allPacks],
+  );
+  const content: LoadedContent = { packs: playablePacks, issues: builtin?.issues ?? [] };
+  const pack = playablePacks.find((p) => p.id === settings.packId) ?? playablePacks[0];
 
-  const afterLoad = useCallback((loaded: LoadedContent) => {
+  const readCustom = async () => {
+    const [packs, items] = await Promise.all([customStore.packs(), customStore.items()]);
+    return customToLoaded(packs, items, feedback.current);
+  };
+
+  const refreshCustom = useCallback(async () => {
+    try {
+      setCustomViews(await readCustom());
+    } catch (e) {
+      console.warn('[custom] could not read my packs', e);
+    }
+  }, []);
+
+  /** Settings, Report, My packs, outside links and difficulty changes sit behind the parent gate (spec 6.2). */
+  const requireParent = (run: () => void) => {
+    if (Date.now() < unlockedUntil.current) run();
+    else setGate({ run });
+  };
+
+  const afterLoad = (packs: readonly LoadedPack[]) => {
     if (!loadPinRecord()) {
       setScreen('firstRun');
       return;
     }
     // A reload during a game returns to that game (the web's version of process death).
     const snap = loadKidSnapshot();
-    if (snap && loaded.packs.some((p) => p.id === snap.config.packId)) {
-      setKid({ config: snap.config, snapshot: snap });
+    const snapPack = snap && packs.find((p) => p.id === snap.config.packId);
+    if (snap && snapPack) {
+      setKid({ config: snap.config, snapshot: snap, pack: snapPack });
       setScreen('kid');
       return;
     }
     if (snap) clearKidSnapshot();
     setScreen('home');
-  }, []);
+    // Back from Google's sign-in page: reopen My packs (after the PIN, as always).
+    if (cloud.takeReturnToMyPacks()) requireParent(() => setScreen('myPacks'));
+  };
 
   useEffect(() => {
     let cancelled = false;
-    loadContent({
-      baseUrl: import.meta.env.BASE_URL,
-      allowPlaceholders: __ALLOW_PLACEHOLDERS__,
-      placeholderPictureUsable,
-    })
-      .then((loaded) => {
-        if (cancelled) return;
-        setContent(loaded);
-        if (loaded.issues.length) console.warn('[content]', loaded.issues);
-        // Spec 3.4: fail loudly in development; in release, skip broken items and carry on.
-        if (import.meta.env.DEV && loaded.issues.some((i) => i.level === 'error')) setScreen('problems');
-        else if (!loaded.packs.length) setScreen('empty');
-        else afterLoad(loaded);
-      })
-      .catch((e: unknown) => {
-        if (cancelled) return;
-        setContent({ packs: [], issues: [{ packId: '?', message: String(e), level: 'error' }] });
-        setScreen('empty');
-      });
+    (async () => {
+      let loaded: LoadedContent;
+      try {
+        loaded = await loadContent({
+          baseUrl: import.meta.env.BASE_URL,
+          allowPlaceholders: __ALLOW_PLACEHOLDERS__,
+          placeholderPictureUsable,
+        });
+      } catch (e) {
+        loaded = { packs: [], issues: [{ packId: '?', message: String(e), level: 'error' }] };
+      }
+      if (cancelled) return;
+      feedback.current = loaded.packs[0]?.feedback ?? NO_FEEDBACK;
+      let custom: CustomPackView[] = [];
+      try {
+        custom = await readCustom();
+      } catch (e) {
+        console.warn('[custom] could not read my packs', e);
+      }
+      if (cancelled) return;
+      setBuiltin(loaded);
+      setCustomViews(custom);
+      if (loaded.issues.length) console.warn('[content]', loaded.issues);
+      // Spec 3.4: fail loudly in development; in release, skip broken items and carry on.
+      if (import.meta.env.DEV && loaded.issues.some((i) => i.level === 'error')) setScreen('problems');
+      else afterLoad([...loaded.packs, ...custom.map((v) => v.loaded).filter((p) => p.items.length >= MIN_ITEMS_PER_PACK)]);
+      // Only contacts the cloud if a parent signed in before, or is coming back from Google.
+      void cloud.init(() => void refreshCustom());
+    })();
     return () => {
       cancelled = true;
     };
-  }, [afterLoad]);
+  }, []);
 
   // The web has no background jobs: telemetry (if enabled) uploads when the app is opened or shown.
   useEffect(() => {
@@ -153,12 +200,6 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     };
   }, [screen, settings.choiceCount]);
 
-  /** Settings, Report, outside links and difficulty changes sit behind the parent gate (spec 6.2). */
-  const requireParent = (run: () => void) => {
-    if (Date.now() < unlockedUntil.current) run();
-    else setGate({ run });
-  };
-
   const open = (link: HomeLink) => {
     if (link === 'about') setScreen('about');
     else if (link === 'parentsGroup') requireParent(() => window.open(PARENTS_GROUP_URL, '_blank', 'noopener,noreferrer'));
@@ -178,6 +219,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     }
     unlockedUntil.current = 0;
     setKid({
+      pack,
       config: {
         kind,
         packId: pack.id,
@@ -189,6 +231,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         language: settings.language,
         repeatIntervalSec: settings.repeatIntervalSec,
         hints: settings.hints,
+        replaysPerDay: settings.replaysPerDay,
         weights,
       },
       snapshot: null,
@@ -219,6 +262,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
   };
 
   const home = () => setScreen('home');
+  const playableCount = pack ? enabledItemKeys(pack, settings).length : 0;
   let body;
   switch (screen) {
     case 'loading':
@@ -227,29 +271,38 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     case 'problems':
       body = (
         <ContentProblems
-          issues={content?.issues ?? []}
-          canContinue={Boolean(content?.packs.length)}
-          onContinue={() => content && afterLoad(content)}
+          issues={content.issues}
+          canContinue={playablePacks.length > 0}
+          onContinue={() => afterLoad(playablePacks)}
         />
       );
-      break;
-    case 'empty':
-      body = <NothingToPlay issues={content?.issues ?? []} />;
       break;
     case 'firstRun':
       body = <FirstRun update={update} onDone={home} />;
       break;
     case 'settings':
-      body = content && pack && <SettingsScreen content={content} pack={pack} settings={settings} update={update} onBack={home} />;
+      body = pack ? <SettingsScreen content={content} pack={pack} settings={settings} update={update} onBack={home} /> : null;
       break;
     case 'report':
-      body = <ReportScreen packs={content?.packs ?? []} onBack={home} />;
+      body = <ReportScreen packs={allPacks} onBack={home} />;
       break;
     case 'privacy':
       body = <PrivacyScreen onBack={home} />;
       break;
     case 'about':
       body = <AboutScreen onBack={home} />;
+      break;
+    case 'myPacks':
+      body = (
+        <MyPacks
+          views={customViews}
+          onBack={home}
+          onChanged={async () => {
+            await refreshCustom();
+            cloud.scheduleSync();
+          }}
+        />
+      );
       break;
     case 'start':
       body = pack && (
@@ -271,11 +324,10 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         />
       );
       break;
-    case 'kid': {
-      const kidPack = content?.packs.find((p) => p.id === kid?.config.packId);
-      body = kid && kidPack && (
+    case 'kid':
+      body = kid && (
         <KidMode
-          pack={kidPack}
+          pack={kid.pack}
           config={kid.config}
           snapshot={kid.snapshot}
           telemetryEnabled={settings.telemetryEnabled}
@@ -287,12 +339,13 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         />
       );
       break;
-    }
     default:
-      body = pack && (
+      body = (
         <Home
           pack={pack}
           settings={settings}
+          canStart={playableCount >= MIN_ITEMS_PER_PACK}
+          canExplore={playableCount > 0}
           showParentsGroup={PARENTS_GROUP_URL !== ''}
           nudge={nudge}
           onStart={() => begin('game')}

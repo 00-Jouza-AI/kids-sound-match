@@ -1,6 +1,7 @@
 import type { LoadedItem, LoadedPack, Lang } from '../content/types';
 import { MIN_ITEMS_PER_PACK } from '../content/validate';
 import type { ChoiceCount } from '../engine';
+import { REPLAY_LIMITS } from './replays';
 import { local } from './storage';
 
 /** What the child hears as the question: the animal sound, its name, or both. */
@@ -24,6 +25,8 @@ export interface Settings {
   hints: boolean;
   /** Animals the child misses come up more often, known ones less (from the local Report). */
   adaptive: boolean;
+  /** Games the child can start from the end screen each day (0 = parent only, 99 = no limit). */
+  replaysPerDay: number;
   telemetryEnabled: boolean;
   uiLanguageOverride: UiLanguageOverride;
   /** Per pack, the animals the parent turned on. No entry means the default selection. */
@@ -70,6 +73,7 @@ export function defaultSettings(device: Lang): Settings {
     toddlerMode: false,
     hints: true,
     adaptive: true,
+    replaysPerDay: 3,
     telemetryEnabled: false,
     uiLanguageOverride: 'system',
     enabledItems: {},
@@ -103,6 +107,7 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
     toddlerMode: bool(r.toddlerMode, d.toddlerMode),
     hints: bool(r.hints, d.hints),
     adaptive: bool(r.adaptive, d.adaptive),
+    replaysPerDay: pick(r.replaysPerDay, REPLAY_LIMITS as readonly number[], d.replaysPerDay),
     telemetryEnabled: bool(r.telemetryEnabled, d.telemetryEnabled),
     uiLanguageOverride: pick(r.uiLanguageOverride, UI_LANGUAGES, d.uiLanguageOverride),
     enabledItems,

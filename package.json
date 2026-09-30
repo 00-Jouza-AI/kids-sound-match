@@ -17,6 +17,7 @@
     "deploy": "npm run build:test && npx --yes wrangler@4 pages deploy dist --project-name kids-sound-match --branch main --commit-dirty=true"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },

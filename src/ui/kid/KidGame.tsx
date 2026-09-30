@@ -3,12 +3,14 @@ import { audioEngine } from '../../audio/audioEngine';
 import { ClipResolver } from '../../audio/clips';
 import { GameAudio } from '../../audio/gameAudio';
 import type { LoadedItem, LoadedPack } from '../../content/types';
+import { isCustomPackId } from '../../custom/types';
 import { GameSession, type QuestionState, type SessionResult } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import { reportStore } from '../../report/db';
+import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
 import { telemetry } from '../../telemetry/telemetry';
-import { SpeakerIcon } from './icons';
+import { PlayIcon, SpeakerIcon } from './icons';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures } from './layout';
@@ -50,9 +52,10 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   const { t } = useI18n();
   const items = useMemo(() => new Map(pack.items.map((i) => [i.key, i])), [pack]);
 
+  // The current game. Replaced by "play again", so everything reads it through the ref.
   const sessionRef = useRef<GameSession | null>(null);
   if (!sessionRef.current) sessionRef.current = createSession(config, items, snapshot);
-  const session = sessionRef.current;
+  const game = () => sessionRef.current!;
 
   const audio = useMemo(
     () =>
@@ -67,10 +70,11 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   const [stage, setStageState] = useState<Stage>(() =>
     snapshot ? (snapshot.stage === 'idle' ? 'idle' : 'paused') : 'playing',
   );
-  const [view, setView] = useState<QuestionState>(session.current);
+  const [view, setView] = useState<QuestionState>(() => game().current);
   const [questionNo, setQuestionNo] = useState(0);
   const [pictures, setPictures] = useState<Record<string, string>>({});
   const [hint, setHint] = useState<{ key: string; pulse: number } | null>(null);
+  const [canReplay, setCanReplay] = useState(() => replaysLeft(config.replaysPerDay) > 0);
 
   // Refs mirror state for async callbacks (timers, audio promises).
   const stageRef = useRef(stage);
@@ -92,8 +96,8 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     timers.current.add(id);
   };
   const item = (key: string): LoadedItem => items.get(key)!;
-  const target = () => item(session.current.question.targetKey);
-  const asking = () => ['presenting', 'awaitingTap'].includes(session.current.phase);
+  const target = () => item(game().current.question.targetKey);
+  const asking = () => ['presenting', 'awaitingTap'].includes(game().current.phase);
   const canPlay = () =>
     alive.current && stageRef.current === 'playing' && !gateRef.current && document.visibilityState === 'visible';
 
@@ -103,7 +107,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       config,
       startedAt: startedAt.current,
       stage: stageToSave,
-      session: stageToSave === 'playing' ? session.snapshot() : null,
+      session: stageToSave === 'playing' ? game().snapshot() : null,
     });
 
   const clearHint = () => {
@@ -127,26 +131,26 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       scheduleHint(); // behind the parent gate or in the background: try again later
       return;
     }
-    if (!session.hint()) return;
-    setView(session.current);
-    setHint((h) => ({ key: session.current.question.targetKey, pulse: (h?.pulse ?? 0) + 1 }));
+    if (!game().hint()) return;
+    setView(game().current);
+    setHint((h) => ({ key: game().current.question.targetKey, pulse: (h?.pulse ?? 0) + 1 }));
     scheduleHint();
   };
 
   /** Shows the current question, starts its sound, and accepts taps after the input guard. */
   const presentQuestion = () => {
-    const q = session.current;
+    const q = game().current;
     clearHint();
     setHint(null);
     setView(q);
     setPictures(choosePictures(q.question.options.map(item)));
     setQuestionNo((n) => n + 1);
-    const upcoming = session.upcoming ? session.upcoming.options.map(item) : [];
+    const upcoming = game().upcoming ? game().upcoming!.options.map(item) : [];
     audio.preload([...q.question.options.map(item), ...upcoming]);
     if (canPlay()) void audio.prompt(target());
     later(() => {
-      session.ready();
-      setView(session.current);
+      game().ready();
+      setView(game().current);
       scheduleHint();
     }, INPUT_GUARD_MS);
   };
@@ -181,19 +185,25 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
 
   const finishSession = () => {
     clearHint();
-    const result = session.result();
+    const result = game().result();
     void saveToReport(result, true);
-    telemetry.record(result, { packId: pack.id, lang: config.language, mode: config.mode }, telemetryEnabled);
+    // The parent's own packs are personal: they never go into (even anonymous) statistics.
+    if (!isCustomPackId(pack.id)) {
+      telemetry.record(result, { packId: pack.id, lang: config.language, mode: config.mode }, telemetryEnabled);
+    }
     persist('idle');
     setStage('ending');
     const began = performance.now();
     void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
-      later(() => setStage('idle'), Math.max(0, SESSION_END_MS - (performance.now() - began)));
+      later(() => {
+        setCanReplay(replaysLeft(config.replaysPerDay) > 0);
+        setStage('idle');
+      }, Math.max(0, SESSION_END_MS - (performance.now() - began)));
     });
   };
 
   const advance = () => {
-    const r = session.finishCelebration();
+    const r = game().finishCelebration();
     if (r === 'next') {
       persist('playing');
       presentQuestion();
@@ -213,14 +223,14 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
 
   const onTap = (key: string) => {
     if (stageRef.current !== 'playing' || gateRef.current) return;
-    const targetKey = session.current.question.targetKey;
-    const outcome = session.tap(key);
+    const targetKey = game().current.question.targetKey;
+    const outcome = game().tap(key);
     if (outcome === 'ignored') return;
-    setView(session.current);
+    setView(game().current);
     if (outcome === 'wrong') {
       void audio.wrong(item(targetKey));
       // Two wrong taps: help straight away. Otherwise the 8-second clock starts again.
-      if (session.current.faded.length >= 2) showHint();
+      if (game().current.faded.length >= 2) showHint();
       else scheduleHint();
       return;
     }
@@ -238,9 +248,22 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     presentQuestion();
   };
 
+  /** "Play again" from the end screen: a new game with the same settings, counted against today's limit. */
+  const playAgain = () => {
+    if (stageRef.current !== 'idle' || gateRef.current || replaysLeft(config.replaysPerDay) <= 0) return;
+    countReplay();
+    audioEngine.unlock();
+    sessionRef.current = createSession(config, items, null);
+    startedAt.current = Date.now();
+    setStage('playing');
+    persist('playing');
+    audio.preload([], true);
+    presentQuestion();
+  };
+
   const exit = () => {
-    if ((stageRef.current === 'playing' || stageRef.current === 'paused') && session.results.length) {
-      void saveToReport(session.result(), false);
+    if ((stageRef.current === 'playing' || stageRef.current === 'paused') && game().results.length) {
+      void saveToReport(game().result(), false);
     }
     clearHint();
     audio.stop();
@@ -318,6 +341,13 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       {stage === 'paused' && <PausedScreen label={t('resumeGame')} onResume={resume} />}
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'idle' && <IdleScene />}
+      {stage === 'idle' && canReplay && (
+        <div className="kid-center play-again-layer">
+          <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
+            <PlayIcon />
+          </button>
+        </div>
+      )}
     </KidFrame>
   );
 }

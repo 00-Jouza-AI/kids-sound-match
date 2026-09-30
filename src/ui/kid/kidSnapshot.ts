@@ -16,6 +16,8 @@ export interface KidConfig {
   language: GameLanguage;
   repeatIntervalSec: number;
   hints: boolean;
+  /** Games the child can start again from the end screen today (see settings/replays). */
+  replaysPerDay: number;
   /** Adaptive practice: how often each animal is dealt, fixed when the game starts. */
   weights: Record<string, number>;
 }
@@ -40,7 +42,7 @@ export function loadKidSnapshot(): KidSnapshot | null {
   const s = tabStorage.getJson<KidSnapshot>(KEY);
   if (!s || s.v !== 1 || !s.config || !Array.isArray(s.config.itemKeys)) return null;
   // Snapshots saved before Explore, hints and adaptive practice existed.
-  s.config = { ...s.config, kind: s.config.kind ?? 'game', hints: s.config.hints ?? true, weights: s.config.weights ?? {} };
+  s.config = { ...s.config, kind: s.config.kind ?? 'game', hints: s.config.hints ?? true, weights: s.config.weights ?? {}, replaysPerDay: s.config.replaysPerDay ?? 0 };
   return s;
 }
 

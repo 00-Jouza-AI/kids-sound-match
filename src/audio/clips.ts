@@ -43,7 +43,9 @@ export class ClipResolver {
 
   /** The name in each spoken language, in order ("قطة… Cat" for Both). */
   names(item: LoadedItem): Clip[] {
-    return this.languages.map((lang) => this.voiced(item.nameAudio[lang], item.name[lang], lang, 'name', `name:${item.key}:${lang}`));
+    const clips = this.languages.map((lang) => this.voiced(item.nameAudio[lang], item.name[lang], lang, 'name', `name:${item.key}:${lang}`));
+    // A parent's item recorded in one language uses that recording for both: say it once.
+    return clips.filter((c, i) => c.kind !== 'file' || clips.findIndex((o) => o.kind === 'file' && o.url === c.url) === i);
   }
 
   /** One praise line, in a random spoken language. */

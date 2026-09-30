@@ -1568,6 +1568,379 @@ html.kid-locked body {
   background: #2b8aa6;
 }
 
+/* ---------- Play again (end screen) ---------- */
+
+.play-again-layer {
+  position: relative;
+  z-index: 1;
+}
+
+.play-again {
+  animation: breathe 2.2s ease-in-out infinite;
+}
+
+.start-btn:disabled,
+.explore-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* ---------- My packs, item editor, cloud backup ---------- */
+
+.pack-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  border: 0;
+  text-align: start;
+  cursor: pointer;
+}
+
+.pack-thumbs {
+  display: flex;
+  flex: none;
+  width: 92px;
+  height: 56px;
+}
+
+.pack-thumbs img {
+  width: 48px;
+  height: 48px;
+  margin-inline-end: -18px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  background: #fff;
+  object-fit: cover;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.pack-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.item-grid .animal img {
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.badges {
+  min-height: 1em;
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+}
+
+.no-pic,
+.plus {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  font-size: 1.8rem;
+}
+
+.animal.add-item {
+  border-style: dashed;
+  background: #fff;
+  opacity: 1;
+}
+
+.plus {
+  color: var(--primary);
+  font-weight: 300;
+  font-size: 2.4rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 10px 0;
+}
+
+.field span {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.field input {
+  min-height: 46px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  font: inherit;
+  font-size: 1.05rem;
+}
+
+.field input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.picture-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.picture-row .stack {
+  flex: 1 1 160px;
+  margin: 0;
+}
+
+.picture-preview {
+  display: grid;
+  place-items: center;
+  width: 140px;
+  height: 140px;
+  overflow: hidden;
+  border: 2px dashed var(--line);
+  border-radius: 20px;
+  background: #faf6ef;
+  font-size: 2.6rem;
+}
+
+.picture-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.rec-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.card > h2 + .rec-row {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rec-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rec-actions .btn {
+  min-height: 40px;
+  padding: 6px 12px;
+}
+
+.hint.done {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.cropper {
+  position: relative;
+  max-width: 100%;
+  margin: 10px auto;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #222;
+  cursor: grab;
+  touch-action: none;
+}
+
+.cropper img {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.zoom {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 6px;
+  max-height: 50vh;
+  overflow: auto;
+}
+
+.icon-choice {
+  height: 52px;
+  border: 0;
+  border-radius: 12px;
+  background: #f4ede2;
+  font-family: var(--emoji);
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.sound-ready,
+.sound-recording {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.record-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 10px 26px;
+  border: 0;
+  border-radius: 999px;
+  background: #c62f2f;
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.record-btn.stop {
+  background: var(--ink);
+}
+
+.rec-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.stop-square {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.meter {
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1e9dd;
+}
+
+.meter i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #f2b134);
+  transition: width 80ms linear;
+}
+
+.wave {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 90px;
+  margin: 10px 0 4px;
+  padding: 0 2px;
+  border-radius: 12px;
+  background: #f4ede2;
+  touch-action: none;
+}
+
+.wave i {
+  flex: 1;
+  min-width: 1px;
+  border-radius: 2px;
+  background: var(--primary);
+}
+
+.wave .shade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+}
+
+.wave .handle {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 28px;
+  margin-left: -14px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.wave .handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--accent-strong);
+}
+
+.wave .handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 6px;
+  width: 16px;
+  height: 24px;
+  margin-top: -12px;
+  border-radius: 6px;
+  background: var(--accent-strong);
+}
+
+.trim-times {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.cloud-card p {
+  margin: 0 0 10px;
+}
+
+.cloud-card .btn + .btn,
+.cloud-card .nudge-actions + .btn {
+  margin-top: 10px;
+}
+
+.btn.google {
+  gap: 10px;
+  border-color: #dadce0;
+  background: #fff;
+  color: #3c4043;
+}
+
+.g-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: conic-gradient(#ea4335 0 25%, #fbbc05 0 50%, #34a853 0 75%, #4285f4 0);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

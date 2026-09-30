@@ -28,7 +28,8 @@ export function ReportScreen({ packs, onBack }: { packs: readonly LoadedPack[]; 
     for (const p of packs) for (const i of p.items) map.set(i.key, i.name[lang]);
     return map;
   }, [packs, lang]);
-  const name = (key: string) => names.get(key) ?? key;
+  // Items from a pack the parent has since deleted have no name any more.
+  const name = (key: string) => names.get(key) ?? (/^[0-9a-f-]{36}$/.test(key) ? t('deletedItem') : key);
 
   const summary = data ? itemSummary(data.sessions, data.questions) : [];
   const games = data ? [...data.sessions].sort((a, b) => b.startedAt - a.startedAt) : [];

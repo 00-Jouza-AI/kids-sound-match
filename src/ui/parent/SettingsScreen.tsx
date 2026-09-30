@@ -13,6 +13,8 @@ import {
   usableInMode,
   type Settings,
 } from '../../settings/settings';
+import { isCustomPackId } from '../../custom/types';
+import { NO_REPLAY_LIMIT, REPLAY_LIMITS } from '../../settings/replays';
 import { telemetry } from '../../telemetry/telemetry';
 import { Overlay, Row, Screen, Segmented, Toggle } from './components';
 
@@ -35,7 +37,8 @@ export function SettingsScreen({
   const [nudge, setNudge] = useState(false);
 
   const enabled = enabledItemKeys(pack, settings);
-  const allKeys = pack.items.map((i) => i.key);
+  // Only animals that work in the current mode (quiet ones need "Name only").
+  const allKeys = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
 
   const setEnabled = (keys: string[]) => {
     if (keys.length < MIN_ITEMS_PER_PACK) {
@@ -52,7 +55,7 @@ export function SettingsScreen({
   const presets = [
     { id: 'all', label: t('presetAll'), keys: allKeys },
     { id: 'sound', label: t('presetWithSound'), keys: pack.items.filter((i) => i.sound?.real).map((i) => i.key) },
-    ...pack.groups.map((g) => ({ id: g.id, label: g.name[lang], keys: g.items })),
+    ...pack.groups.map((g) => ({ id: g.id, label: g.name[lang], keys: g.items.filter((k) => allKeys.includes(k)) })),
   ];
 
   const showToast = (text: string) => {
@@ -84,7 +87,7 @@ export function SettingsScreen({
 
       <section className={nudge ? 'card nudge' : 'card'}>
         <div className="card-head">
-          <h2>{t('settingsAnimals')}</h2>
+          <h2>{isCustomPackId(pack.id) ? t('settingsItems') : t('settingsAnimals')}</h2>
           <span className="muted">{t('animalsSelected', { n: enabled.length })}</span>
         </div>
         <div className="chips">
@@ -179,6 +182,17 @@ export function SettingsScreen({
         </Row>
         <Row label={t('settingsAdaptive')} hint={t('settingsAdaptiveHint')}>
           <Toggle label={t('settingsAdaptive')} checked={settings.adaptive} onChange={(adaptive) => update({ adaptive })} />
+        </Row>
+        <Row label={t('settingsReplays')} hint={t('settingsReplaysHint')}>
+          <Segmented
+            label={t('settingsReplays')}
+            value={settings.replaysPerDay}
+            options={REPLAY_LIMITS.map((n) => ({
+              value: n as number,
+              label: n === 0 ? t('off') : n >= NO_REPLAY_LIMIT ? t('replayNoLimit') : String(n),
+            }))}
+            onChange={(replaysPerDay) => update({ replaysPerDay })}
+          />
         </Row>
       </section>
 

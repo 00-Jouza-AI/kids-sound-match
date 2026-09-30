@@ -68,6 +68,7 @@ export function FirstRun({
             <li>{t('privacyNoAds')}</li>
             <li>{t('privacyNoAccount')}</li>
             <li>{t('privacyLocal')}</li>
+            <li>{t('privacyOwn')}</li>
           </ul>
         </section>
       )}

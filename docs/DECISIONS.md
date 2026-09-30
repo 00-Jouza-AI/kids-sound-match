@@ -36,6 +36,32 @@ Agreed on 29 September 2026, before the build. The Android build should carry th
 | Photo helper | `npm run photos`: shrinks photos with Windows' built-in imaging and adds them as `images`. Photos and emoji never share a question or an Explore page |
 | Real app on the phone | Cloudflare Pages (private code, free HTTPS). `npm run deploy` uploads the test build (emoji and device voice included) so the phone can install it, keep the screen on and work offline |
 
+## Added on 30 September 2026 (second round)
+
+These override parts of the V1 spec at the owner's request: rule 6 ("no accounts, no login"), rule 4
+("nothing leaves the device" — now true for the child's results, not for parents' own packs if they
+sign in), rule 5 (microphone permission) and the V1 out-of-scope list (parent photos, voice
+recording, cloud sync). The privacy promise and policy were rewritten to match.
+
+| Feature | Decision |
+|---|---|
+| 30 more animals | 20 with sounds (chick, turkey, goose, parrot, peacock, eagle, seal, dolphin, whale, fox, zebra, deer, hippo, gorilla, crocodile, cricket, mosquito, bat, penguin, leopard) and 10 quiet ones for Name-only/Explore (rabbit, giraffe, turtle, fish, butterfly, snail, ladybug, ant, kangaroo, panda). No pig or boar. New sound-alike pairs: dog/seal/fox, horse/donkey/zebra, donkey/penguin, duck/goose, lion/tiger/bear/leopard, monkey/gorilla, bird/chick/cricket, bee/mosquito, snake/crocodile, mouse/bat, cat/peacock, dolphin/whale. New groups: Birds, Sea animals, Little creatures |
+| Play again | A big ▶ on the end screen starts a new game with the same settings, up to a daily limit set in Settings (Off / 1 / 3 / 5 / no limit; default 3). After that the end screen waits for a parent |
+| My packs | Parents create their own packs (5+ finished items to play). Item = square picture (photo from camera/gallery with crop, or an icon) + names + the name recorded in Arabic and/or English (record, then trim with two handles) + optional sound. Stored on the device (IndexedDB) |
+| Cloud backup | Supabase, optional: "Sign in with Google" in My packs backs packs up and restores them on other devices (last change wins; deletions sync). Rows and files are private per account (Row Level Security). The app only contacts Supabase after a parent signs in. "Delete my cloud data" removes everything. Custom packs never go into telemetry |
+| GitHub | Private repository, published from GitHub Desktop |
+
+### More clips for the voice session
+
+60 more name recordings, same naming as before (`<key>_name_ar.mp3`, `<key>_name_en.mp3`) for:
+chick (كتكوت), turkey (ديك رومي), goose (إوزة), parrot (ببغاء), peacock (طاووس), eagle (نسر),
+seal (فقمة), dolphin (دلفين), whale (حوت), fox (ثعلب), zebra (حمار وحشي), deer (غزال),
+hippo (فرس النهر), gorilla (غوريلا), crocodile (تمساح), cricket (صرصور الليل), mosquito (بعوضة),
+bat (خفاش), penguin (بطريق), leopard (فهد), rabbit (أرنب), giraffe (زرافة), turtle (سلحفاة),
+fish (سمكة), butterfly (فراشة), snail (حلزون), ladybug (دعسوقة), ant (نملة), kangaroo (كنغر),
+panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the first 20. Worth checking:
+"deer" is named غزال (gazelle), the word most families use.
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.

@@ -28,7 +28,7 @@ describe('animals manifest (spec 3.4)', () => {
   it('is valid in development (real files + placeholders)', () => {
     const { issues, validKeys } = validatePack(manifest, existsInDev);
     expect(issues.filter((i) => i.level === 'error')).toEqual([]);
-    expect(validKeys.size).toBe(24);
+    expect(validKeys.size).toBe(54);
   });
 
   it('has symmetric confusable pairs that name real animals', () => {
@@ -43,8 +43,14 @@ describe('animals manifest (spec 3.4)', () => {
 
   it('keeps bear apart from lion and tiger, and uses the singular for goat', () => {
     const bear = manifest.items.find((i) => i.item_key === 'bear')!;
-    expect(bear.confusable_with).toEqual(['lion', 'tiger']);
+    expect(bear.confusable_with).toEqual(['lion', 'tiger', 'leopard']);
     expect(manifest.items.find((i) => i.item_key === 'goat')!.name.ar).toBe('عنزة');
+  });
+
+  it('adds 30 animals: 20 with a sound, 10 quiet ones for name-only play', () => {
+    const quiet = manifest.items.filter((i) => !i.sound).map((i) => i.item_key);
+    expect(quiet).toEqual(['rabbit', 'giraffe', 'turtle', 'fish', 'butterfly', 'snail', 'ladybug', 'ant', 'kangaroo', 'panda']);
+    expect(manifest.items.find((i) => i.item_key === 'leopard')!.confusable_with).toEqual(['lion', 'tiger', 'bear']);
   });
 
   it('has the 8 real animal sounds', () => {
@@ -115,7 +121,7 @@ describe('loader', () => {
   it('prefers real files and falls back to placeholders in development', async () => {
     const content = await loadContent({ baseUrl: '/', allowPlaceholders: true, fetchJson });
     const animals = content.packs[0];
-    expect(animals.items).toHaveLength(24);
+    expect(animals.items).toHaveLength(54);
     const cat = animals.items.find((i) => i.key === 'cat')!;
     expect(cat.sound).toEqual({ path: 'packs/animals/cat_sound.mp3', url: '/assets/packs/animals/cat_sound.mp3', real: true });
     // Real photos replace the emoji, which is kept only as the stand-in for mixed questions.
@@ -128,7 +134,7 @@ describe('loader', () => {
     expect(cow.images.map((a) => a.url)).toEqual(['/placeholders/packs/animals/cow.svg']);
     expect(cow.sound?.url).toBe('/placeholders/packs/animals/cow_sound.wav');
     expect(animals.feedback.incorrectTone?.url).toBe('/placeholders/feedback/incorrect_tone.wav');
-    expect(animals.groups.map((g) => g.id)).toEqual(['first', 'farm', 'wild']);
+    expect(animals.groups.map((g) => g.id)).toEqual(['first', 'farm', 'wild', 'birds', 'sea', 'bugs']);
   });
 
   it('drops an animal whose placeholder picture the device cannot draw', async () => {
@@ -140,7 +146,8 @@ describe('loader', () => {
     });
     const keys = content.packs[0].items.map((i) => i.key);
     expect(keys).not.toContain('donkey');
-    expect(content.packs[0].items.find((i) => i.key === 'horse')!.confusableWith).toEqual([]);
+    // The dropped donkey also disappears from the horse's sound-alikes; the zebra stays.
+    expect(content.packs[0].items.find((i) => i.key === 'horse')!.confusableWith).toEqual(['zebra']);
   });
 
   it('never uses placeholders when they are not allowed', async () => {

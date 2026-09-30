@@ -1,4 +1,5 @@
 import type { ContentIssue } from '../../content/types';
+import { cloudConfigured } from '../../custom/cloud';
 import { useI18n } from '../../i18n/I18n';
 import { privacyPolicy } from '../../i18n/privacy';
 import { telemetry } from '../../telemetry/telemetry';
@@ -8,7 +9,7 @@ export function PrivacyScreen({ onBack }: { onBack: () => void }) {
   const { t, lang } = useI18n();
   return (
     <Screen title={t('privacyPolicy')} onBack={onBack}>
-      {privacyPolicy(lang, telemetry.available).map((s) => (
+      {privacyPolicy(lang, telemetry.available, cloudConfigured).map((s) => (
         <section className="card prose" key={s.heading}>
           <h2>{s.heading}</h2>
           <p>{s.body}</p>
