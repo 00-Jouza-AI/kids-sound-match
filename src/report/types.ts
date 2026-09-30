@@ -25,7 +25,16 @@ export interface QuestionResultEntity {
   choiceCount: number;
   /** The right picture wiggled before it was found. Missing in games saved before hints existed. */
   hinted?: boolean;
+  /** Mixed game: the pack the picture came from. Otherwise the session's pack. */
+  packId?: string;
+  /** "Who eats what?": the animal the question was about (the item is its food). */
+  promptKey?: string;
 }
 
 export type NewSession = Omit<SessionEntity, 'id'>;
 export type NewQuestionResult = Omit<QuestionResultEntity, 'id' | 'sessionId'>;
+
+/** The pack a result counts for: its own pack in a Mixed game, else the game's pack. */
+export function resultPack(q: Pick<QuestionResultEntity, 'packId'>, session: Pick<SessionEntity, 'packId'>): string {
+  return q.packId ?? session.packId;
+}

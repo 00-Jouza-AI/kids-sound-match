@@ -38,28 +38,35 @@ export class GameAudio {
   /**
    * Spec 7.1, per mode: the sound, then the name(s); only the sound; or only the name(s)
    * ("Where's the cat?"). A pause, then again until stopped.
+   * Association games (`about` = the animal): its sound, then "Cow! What does it eat?" in every mode.
    */
-  async prompt(target: LoadedItem): Promise<void> {
+  async prompt(target: LoadedItem, about?: LoadedItem): Promise<void> {
     const token = this.begin();
     const { mode } = this.options;
     while (!token.cancelled) {
-      if (mode !== 'NAME_ONLY') await this.play(this.clips.sound(target), token);
-      if (mode !== 'SOUND_ONLY') await this.playAll(this.clips.names(target), token);
+      if (about) {
+        await this.play(this.clips.sound(about), token);
+        await this.playAll(this.clips.askAbout(about), token);
+      } else {
+        if (mode !== 'NAME_ONLY') await this.play(this.clips.sound(target), token);
+        if (mode !== 'SOUND_ONLY') await this.playAll(this.clips.names(target), token);
+      }
       await this.wait(this.options.repeatIntervalSec * 1000, token);
     }
   }
 
-  /** Wrong tap: the soft tone, then the target again straight away. */
-  async wrong(target: LoadedItem): Promise<void> {
+  /** Wrong tap: the soft tone, then the question again straight away. */
+  async wrong(target: LoadedItem, about?: LoadedItem): Promise<void> {
     const token = this.begin();
     await this.play(this.clips.incorrectTone(), token);
-    if (!token.cancelled) void this.prompt(target);
+    if (!token.cancelled) void this.prompt(target, about);
   }
 
-  /** Right tap: the animal's name, then praise. Resolves when done or stopped. */
-  async correct(item: LoadedItem): Promise<void> {
+  /** Right tap: the name, then praise. Association games add a "yum" in between. Resolves when done or stopped. */
+  async correct(item: LoadedItem, eaten = false): Promise<void> {
     const token = this.begin();
     await this.playAll(this.clips.names(item), token);
+    if (eaten) await this.play(this.clips.reward(), token);
     await this.play(this.clips.correct(this.options.random), token);
   }
 

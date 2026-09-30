@@ -1941,6 +1941,199 @@ html.kid-locked body {
   font-weight: 900;
 }
 
+/* ---------- Pack picker (Settings), Report sections, Your voice ---------- */
+
+.link-icon.big {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--primary-soft);
+  font-size: 1.5rem;
+}
+
+.pack-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.pack-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #faf6ef;
+  cursor: pointer;
+}
+
+.pack-tile.on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.pack-tile-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.pack-thumb {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  gap: 2px;
+}
+
+.pack-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.pack-thumb.n2 {
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+}
+
+.pack-thumb.n3,
+.pack-thumb.n4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.tag.eaters {
+  max-width: 100%;
+  overflow: hidden;
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-pack + .report-pack {
+  margin-top: 14px;
+}
+
+.report-pack h3 {
+  margin: 4px 0 2px;
+  color: var(--primary-strong);
+  font-size: 0.95rem;
+}
+
+.rec-row .say {
+  font-weight: 700;
+}
+
+/* ---------- Kid Mode: "Who eats what?" ---------- */
+
+.assoc {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  min-height: 0;
+  min-width: 0;
+}
+
+.assoc.landscape {
+  flex-direction: row;
+}
+
+.assoc > .kid-grid {
+  align-self: stretch;
+  /* Lets the pictures shrink to fit beside the animal when the phone is sideways. */
+  min-width: 0;
+}
+
+/* The animal the question is about: round, so it never looks like one of the answers. */
+.prompt-card {
+  position: relative;
+  display: grid;
+  flex: none;
+  place-items: center;
+  margin-top: 4px;
+  padding: 0;
+  border: 6px solid #ffd98a;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(150, 95, 30, 0.16);
+  cursor: pointer;
+  touch-action: none;
+  animation: appear 0.35s ease-out backwards;
+}
+
+.assoc.landscape .prompt-card {
+  margin: 0;
+  margin-inline-start: 20px;
+}
+
+.prompt-card > img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.prompt-card.eating > img:first-child {
+  animation: munch 0.9s ease-in-out 0.45s;
+}
+
+/* The right food moves into the animal and disappears: eaten. */
+.prompt-card > img.bite {
+  position: absolute;
+  bottom: 6%;
+  width: 40%;
+  height: 40%;
+  animation: bite 0.95s ease-in forwards;
+}
+
+@keyframes munch {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.08, 0.93);
+  }
+  40% {
+    transform: scale(0.96, 1.05);
+  }
+  60% {
+    transform: scale(1.07, 0.94);
+  }
+  80% {
+    transform: scale(0.99, 1.02);
+  }
+}
+
+@keyframes bite {
+  0% {
+    transform: translateY(80%) scale(1.25);
+    opacity: 0;
+  }
+  25% {
+    transform: translateY(35%) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(-5%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-12%) scale(0.15);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

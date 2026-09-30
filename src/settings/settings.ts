@@ -31,6 +31,8 @@ export interface Settings {
   uiLanguageOverride: UiLanguageOverride;
   /** Per pack, the animals the parent turned on. No entry means the default selection. */
   enabledItems: Record<string, string[]>;
+  /** Packs left out of the Mixed game. New packs join the mix automatically. */
+  mixedExcluded: string[];
 }
 
 export const CHOICE_COUNTS = [2, 3, 4] as const;
@@ -77,6 +79,7 @@ export function defaultSettings(device: Lang): Settings {
     telemetryEnabled: false,
     uiLanguageOverride: 'system',
     enabledItems: {},
+    mixedExcluded: [],
   };
 }
 
@@ -111,6 +114,7 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
     telemetryEnabled: bool(r.telemetryEnabled, d.telemetryEnabled),
     uiLanguageOverride: pick(r.uiLanguageOverride, UI_LANGUAGES, d.uiLanguageOverride),
     enabledItems,
+    mixedExcluded: Array.isArray(r.mixedExcluded) ? r.mixedExcluded.filter((k): k is string => typeof k === 'string') : [],
   };
 }
 
@@ -126,9 +130,12 @@ export function uiLanguage(settings: Settings): Lang {
   return settings.uiLanguageOverride === 'system' ? deviceLanguage(browserLanguages()) : settings.uiLanguageOverride;
 }
 
-/** Sound modes need an animal sound; "name only" works for anything (clothes, food, family...). */
+/**
+ * Sound modes need an animal sound; "name only" works for anything (clothes, food, family...).
+ * Answers in "Who eats what?" always work: the question is the animal, not the food.
+ */
 export function usableInMode(item: LoadedItem, mode: GameMode): boolean {
-  return mode === 'NAME_ONLY' || item.sound !== null;
+  return mode === 'NAME_ONLY' || item.sound !== null || (item.prompts?.length ?? 0) > 0;
 }
 
 /** Default selection: the animals that have a real sound, so testing uses real sounds only. */
@@ -138,8 +145,16 @@ export function defaultSelection(pack: LoadedPack, mode: GameMode = 'SOUND_AND_N
   return withRealSound.length >= MIN_ITEMS_PER_PACK ? withRealSound : usable.map((i) => i.key);
 }
 
-/** The animals the game will use: the parent's choice if it still has enough usable animals, else the default. */
+/**
+ * The animals the game will use: the parent's choice if it still has enough usable animals, else the default.
+ * The Mixed game uses each pack's own choice, for every pack left in the mix.
+ */
 export function enabledItemKeys(pack: LoadedPack, settings: Settings): string[] {
+  if (pack.parts) {
+    const keys = pack.parts.filter((p) => !settings.mixedExcluded.includes(p.id)).flatMap((p) => enabledItemKeys(p, settings));
+    const inMix = new Set(pack.items.map((i) => i.key));
+    return [...new Set(keys)].filter((k) => inMix.has(k));
+  }
   const usable = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
   const chosen = settings.enabledItems[pack.id];
   if (chosen) {

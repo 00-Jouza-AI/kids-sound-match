@@ -1,5 +1,4 @@
 import type { LoadedPack } from '../../content/types';
-import { isCustomPackId } from '../../custom/types';
 import type { ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import type { NextLevel } from '../../report/practice';
@@ -41,15 +40,17 @@ export function Home({
     settings.mode
   ];
   const languageLabel = { ar: 'العربية', en: 'English', both: 'العربية + English' }[settings.language];
+  // "Who eats what?" always asks about the animal, and has no Toddler mode.
+  const association = pack?.kind === 'association';
   const summary = pack
     ? [
         pack.name[lang],
-        modeLabel,
+        ...(association ? [] : [modeLabel]),
         languageLabel,
         t('summaryPictures', { n: settings.choiceCount }),
         t('summaryQuestions', { n: settings.questionsPerSession }),
-        t(isCustomPackId(pack.id) ? 'summaryItems' : 'summaryAnimals', { n: enabledItemKeys(pack, settings).length }),
-        ...(settings.toddlerMode ? [t('toddlerMode')] : []),
+        t(pack.id === 'animals' ? 'summaryAnimals' : 'summaryItems', { n: enabledItemKeys(pack, settings).length }),
+        ...(settings.toddlerMode && !association ? [t('toddlerMode')] : []),
       ]
     : [];
   const links: { id: HomeLink; label: string; icon: string }[] = [

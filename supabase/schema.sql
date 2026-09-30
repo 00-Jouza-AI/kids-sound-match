@@ -1,4 +1,5 @@
--- Kids Sound Match: cloud backup of parents' own packs.
+-- Kids Sound Match: cloud backup of parents' own packs, and of their own voice and photos for the
+-- built-in packs ("Your voice and photos").
 -- Run once in Supabase: SQL Editor -> New query -> paste this file -> Run.
 --
 -- Every row and every file belongs to one signed-in parent. Row Level Security means each
@@ -29,11 +30,22 @@ create table if not exists public.custom_items (
   deleted boolean not null default false
 );
 
+-- "Your voice and photos": a parent's own recording or photo for a file in a built-in pack.
+create table if not exists public.custom_overrides (
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  path text not null,                  -- the built-in file it replaces, e.g. packs/animals/cat_name_ar.mp3
+  media_version integer not null default 0,
+  updated_at bigint not null,
+  deleted boolean not null default false,
+  primary key (user_id, path)
+);
+
 create index if not exists custom_items_user on public.custom_items (user_id);
 create index if not exists custom_packs_user on public.custom_packs (user_id);
 
 alter table public.custom_packs enable row level security;
 alter table public.custom_items enable row level security;
+alter table public.custom_overrides enable row level security;
 
 drop policy if exists "Parents manage their own packs" on public.custom_packs;
 create policy "Parents manage their own packs" on public.custom_packs
@@ -43,6 +55,12 @@ create policy "Parents manage their own packs" on public.custom_packs
 
 drop policy if exists "Parents manage their own items" on public.custom_items;
 create policy "Parents manage their own items" on public.custom_items
+  for all to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+drop policy if exists "Parents manage their own voice and photos" on public.custom_overrides;
+create policy "Parents manage their own voice and photos" on public.custom_overrides
   for all to authenticated
   using (user_id = auth.uid())
   with check (user_id = auth.uid());

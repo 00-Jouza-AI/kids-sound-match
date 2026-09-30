@@ -22,6 +22,8 @@ export interface QuestionResult {
   readonly choiceCount: number;
   /** The right picture wiggled before the child found it. */
   readonly hinted: boolean;
+  /** Association games: what the question was about (the animal, when the answer was its food). */
+  readonly promptKey?: string;
 }
 
 export interface SessionResult {
@@ -35,6 +37,8 @@ export interface SessionSnapshot {
   readonly current: Question;
   readonly upcoming: Question | null;
   readonly lastTarget: string | null;
+  /** Association games. Missing in snapshots saved before they existed. */
+  readonly lastPrompt?: string | null;
   readonly bagRemaining: readonly string[];
   readonly rngState: number;
 }
@@ -50,6 +54,7 @@ export class GameSession {
   /** Generated one question ahead so its clips can be preloaded. */
   private _upcoming: Question | null;
   private lastTarget: string | null;
+  private lastPrompt: string | null;
 
   constructor(
     readonly config: SessionConfig,
@@ -69,11 +74,13 @@ export class GameSession {
     if (snapshot) {
       this._results = snapshot.results.slice();
       this.lastTarget = snapshot.lastTarget;
+      this.lastPrompt = snapshot.lastPrompt ?? null;
       this._current = startQuestion(snapshot.current, config.toddlerMode);
       this._upcoming = snapshot.upcoming;
     } else {
       this._results = [];
       this.lastTarget = null;
+      this.lastPrompt = null;
       this._current = startQuestion(this.makeQuestion(), config.toddlerMode);
       this._upcoming = this.questionsAfterCurrent() > 0 ? this.makeQuestion() : null;
     }
@@ -133,6 +140,7 @@ export class GameSession {
       attempts: done.attempts,
       choiceCount: done.question.options.length,
       hinted: done.hinted,
+      ...(done.question.promptKey !== undefined ? { promptKey: done.question.promptKey } : {}),
     });
     this._current = done;
     if (this.isOver) return 'end';
@@ -151,6 +159,7 @@ export class GameSession {
       current: this._current.question,
       upcoming: this._upcoming,
       lastTarget: this.lastTarget,
+      lastPrompt: this.lastPrompt,
       bagRemaining: this.bag.snapshot(),
       rngState: this.rng.state(),
     };
@@ -169,8 +178,10 @@ export class GameSession {
       rng: this.rng,
       targetKey,
       graph: this.graph,
+      previousPromptKey: this.lastPrompt,
     });
     this.lastTarget = targetKey;
+    this.lastPrompt = question.promptKey ?? null;
     return question;
   }
 }

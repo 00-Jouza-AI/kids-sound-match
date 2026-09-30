@@ -1,0 +1,197 @@
+{
+  "pack_id": "home",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 2,
+  "name": { "en": "Things at home", "ar": "أشياء في البيت" },
+  "items": [
+    {
+      "item_key": "doorbell",
+      "name": { "en": "Doorbell", "ar": "جرس الباب" },
+      "image": "home/doorbell.webp",
+      "sound": "home/doorbell_sound.mp3",
+      "name_audio": {
+        "en": "home/doorbell_name_en.mp3",
+        "ar": "home/doorbell_name_ar.mp3"
+      },
+      "confusable_with": ["phone", "alarm_clock"]
+    },
+    {
+      "item_key": "phone",
+      "name": { "en": "Phone", "ar": "هاتف" },
+      "image": "home/phone.webp",
+      "sound": "home/phone_sound.mp3",
+      "name_audio": {
+        "en": "home/phone_name_en.mp3",
+        "ar": "home/phone_name_ar.mp3"
+      },
+      "confusable_with": ["doorbell", "alarm_clock"]
+    },
+    {
+      "item_key": "alarm_clock",
+      "name": { "en": "Alarm clock", "ar": "منبّه" },
+      "image": "home/alarm_clock.webp",
+      "sound": "home/alarm_clock_sound.mp3",
+      "name_audio": {
+        "en": "home/alarm_clock_name_en.mp3",
+        "ar": "home/alarm_clock_name_ar.mp3"
+      },
+      "confusable_with": ["doorbell", "phone"]
+    },
+    {
+      "item_key": "clock",
+      "name": { "en": "Clock", "ar": "ساعة" },
+      "image": "home/clock.webp",
+      "sound": "home/clock_sound.mp3",
+      "name_audio": {
+        "en": "home/clock_name_en.mp3",
+        "ar": "home/clock_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "tap",
+      "name": { "en": "Tap", "ar": "حنفية" },
+      "image": "home/tap.webp",
+      "sound": "home/tap_sound.mp3",
+      "name_audio": {
+        "en": "home/tap_name_en.mp3",
+        "ar": "home/tap_name_ar.mp3"
+      },
+      "confusable_with": ["shower", "frying_pan"]
+    },
+    {
+      "item_key": "shower",
+      "name": { "en": "Shower", "ar": "دُش" },
+      "image": "home/shower.webp",
+      "sound": "home/shower_sound.mp3",
+      "name_audio": {
+        "en": "home/shower_name_en.mp3",
+        "ar": "home/shower_name_ar.mp3"
+      },
+      "confusable_with": ["tap", "frying_pan"]
+    },
+    {
+      "item_key": "kettle",
+      "name": { "en": "Kettle", "ar": "إبريق" },
+      "image": "home/kettle.webp",
+      "sound": "home/kettle_sound.mp3",
+      "name_audio": {
+        "en": "home/kettle_name_en.mp3",
+        "ar": "home/kettle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "frying_pan",
+      "name": { "en": "Frying pan", "ar": "مقلاة" },
+      "image": "home/frying_pan.webp",
+      "sound": "home/frying_pan_sound.mp3",
+      "name_audio": {
+        "en": "home/frying_pan_name_en.mp3",
+        "ar": "home/frying_pan_name_ar.mp3"
+      },
+      "confusable_with": ["tap", "shower"]
+    },
+    {
+      "item_key": "door",
+      "name": { "en": "Door", "ar": "باب" },
+      "image": "home/door.webp",
+      "sound": "home/door_sound.mp3",
+      "name_audio": {
+        "en": "home/door_name_en.mp3",
+        "ar": "home/door_name_ar.mp3"
+      },
+      "confusable_with": ["hammer"]
+    },
+    {
+      "item_key": "keys",
+      "name": { "en": "Keys", "ar": "مفاتيح" },
+      "image": "home/keys.webp",
+      "sound": "home/keys_sound.mp3",
+      "name_audio": {
+        "en": "home/keys_name_en.mp3",
+        "ar": "home/keys_name_ar.mp3"
+      },
+      "confusable_with": ["scissors"]
+    },
+    {
+      "item_key": "vacuum",
+      "name": { "en": "Vacuum cleaner", "ar": "مكنسة كهربائية" },
+      "image": "home/vacuum.webp",
+      "sound": "home/vacuum_sound.mp3",
+      "name_audio": {
+        "en": "home/vacuum_name_en.mp3",
+        "ar": "home/vacuum_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "toothbrush",
+      "name": { "en": "Toothbrush", "ar": "فرشاة أسنان" },
+      "image": "home/toothbrush.webp",
+      "sound": "home/toothbrush_sound.mp3",
+      "name_audio": {
+        "en": "home/toothbrush_name_en.mp3",
+        "ar": "home/toothbrush_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "scissors",
+      "name": { "en": "Scissors", "ar": "مقص" },
+      "image": "home/scissors.webp",
+      "sound": "home/scissors_sound.mp3",
+      "name_audio": {
+        "en": "home/scissors_name_en.mp3",
+        "ar": "home/scissors_name_ar.mp3"
+      },
+      "confusable_with": ["keys"]
+    },
+    {
+      "item_key": "camera",
+      "name": { "en": "Camera", "ar": "كاميرا" },
+      "image": "home/camera.webp",
+      "sound": "home/camera_sound.mp3",
+      "name_audio": {
+        "en": "home/camera_name_en.mp3",
+        "ar": "home/camera_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "hammer",
+      "name": { "en": "Hammer", "ar": "مطرقة" },
+      "image": "home/hammer.webp",
+      "sound": "home/hammer_sound.mp3",
+      "name_audio": {
+        "en": "home/hammer_name_en.mp3",
+        "ar": "home/hammer_name_ar.mp3"
+      },
+      "confusable_with": ["door"]
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

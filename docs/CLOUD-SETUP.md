@@ -12,7 +12,8 @@ You'll need about 20 minutes, a Google account, and a free Supabase account.
    database password somewhere safe.
 2. Open **SQL Editor → New query**, paste the whole of [`supabase/schema.sql`](../supabase/schema.sql),
    and press **Run**. This creates the tables, the private file storage, and the rules that let
-   each account see only its own packs.
+   each account see only its own packs, voice and photos. Running it again is safe: if you ran an
+   older copy, run the new one once more to add the table for "Your voice and photos".
 
 ## 2. Create the Google sign-in client
 

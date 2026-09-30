@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import type { LoadedContent, LoadedPack } from '../../content/types';
+import type { LoadedContent, LoadedItem, LoadedPack } from '../../content/types';
 import { MIN_ITEMS_PER_PACK } from '../../content/validate';
+import { isCustomPackId } from '../../custom/types';
 import type { ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import { ParentGate } from '../../lock/ParentGate';
@@ -13,9 +14,9 @@ import {
   usableInMode,
   type Settings,
 } from '../../settings/settings';
-import { isCustomPackId } from '../../custom/types';
 import { NO_REPLAY_LIMIT, REPLAY_LIMITS } from '../../settings/replays';
 import { telemetry } from '../../telemetry/telemetry';
+import { choosePictures } from '../kid/layout';
 import { Overlay, Row, Screen, Segmented, Toggle } from './components';
 
 export function SettingsScreen({
@@ -35,28 +36,13 @@ export function SettingsScreen({
   const [pinStep, setPinStep] = useState<'verify' | 'new' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [nudge, setNudge] = useState(false);
+  const association = pack.kind === 'association';
 
-  const enabled = enabledItemKeys(pack, settings);
-  // Only animals that work in the current mode (quiet ones need "Name only").
-  const allKeys = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
-
-  const setEnabled = (keys: string[]) => {
-    if (keys.length < MIN_ITEMS_PER_PACK) {
-      setNudge(true);
-      window.setTimeout(() => setNudge(false), 600);
-      return;
-    }
-    update({ enabledItems: { ...settings.enabledItems, [pack.id]: keys } });
+  /** Too few pictures left: shake the card instead of saving. */
+  const refuse = () => {
+    setNudge(true);
+    window.setTimeout(() => setNudge(false), 600);
   };
-  const toggleItem = (key: string) =>
-    setEnabled(enabled.includes(key) ? enabled.filter((k) => k !== key) : allKeys.filter((k) => k === key || enabled.includes(k)));
-
-  const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((k) => b.includes(k));
-  const presets = [
-    { id: 'all', label: t('presetAll'), keys: allKeys },
-    { id: 'sound', label: t('presetWithSound'), keys: pack.items.filter((i) => i.sound?.real).map((i) => i.key) },
-    ...pack.groups.map((g) => ({ id: g.id, label: g.name[lang], keys: g.items.filter((k) => allKeys.includes(k)) })),
-  ];
 
   const showToast = (text: string) => {
     setToast(text);
@@ -65,6 +51,28 @@ export function SettingsScreen({
 
   return (
     <Screen title={t('settings')} onBack={onBack}>
+      {content.packs.length > 1 && (
+        <section className="card">
+          <h2>{t('settingsPack')}</h2>
+          <div className="pack-picker" role="radiogroup" aria-label={t('settingsPack')}>
+            {content.packs.map((p) => (
+              <button
+                type="button"
+                key={p.id}
+                role="radio"
+                aria-checked={p.id === pack.id}
+                className={p.id === pack.id ? 'pack-tile on' : 'pack-tile'}
+                onClick={() => update({ packId: p.id })}
+              >
+                <PackThumb pack={p} />
+                <span className="pack-tile-name">{p.name[lang]}</span>
+                {isCustomPackId(p.id) && <span className="tag">{t('myPackTag')}</span>}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="card featured">
         <h2>{t('settingsPictures')}</h2>
         <div className="choice-cards" role="radiogroup" aria-label={t('settingsPictures')}>
@@ -85,64 +93,27 @@ export function SettingsScreen({
         <p className="hint">{t('settingsPicturesHint')}</p>
       </section>
 
-      <section className={nudge ? 'card nudge' : 'card'}>
-        <div className="card-head">
-          <h2>{isCustomPackId(pack.id) ? t('settingsItems') : t('settingsAnimals')}</h2>
-          <span className="muted">{t('animalsSelected', { n: enabled.length })}</span>
-        </div>
-        <div className="chips">
-          {presets.map((p) => (
-            <button
-              type="button"
-              key={p.id}
-              className={sameSet(p.keys, enabled) ? 'chip on' : 'chip'}
-              disabled={p.keys.length < MIN_ITEMS_PER_PACK}
-              onClick={() => setEnabled(allKeys.filter((k) => p.keys.includes(k)))}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <div className="animal-grid">
-          {pack.items.map((item) => {
-            const on = enabled.includes(item.key);
-            const usable = usableInMode(item, settings.mode);
-            return (
-              <button
-                type="button"
-                key={item.key}
-                className={on ? 'animal on' : 'animal'}
-                aria-pressed={on}
-                disabled={!usable}
-                onClick={() => toggleItem(item.key)}
-              >
-                <img src={item.images[0].url} alt="" draggable={false} />
-                <span className="animal-name">{item.name[lang]}</span>
-                {!item.sound ? (
-                  <span className="tag">{t('nameOnlyTag')}</span>
-                ) : (
-                  !item.sound.real && <span className="tag">{t('noSoundYet')}</span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-        <p className="hint">{t('settingsAnimalsHint', { min: MIN_ITEMS_PER_PACK })}</p>
-      </section>
+      {pack.parts ? (
+        <MixCard pack={pack} settings={settings} update={update} nudge={nudge} onRefuse={refuse} />
+      ) : (
+        <ItemsCard pack={pack} settings={settings} update={update} nudge={nudge} onRefuse={refuse} />
+      )}
 
       <section className="card">
-        <Row label={t('settingsHears')}>
-          <Segmented
-            label={t('settingsHears')}
-            value={settings.mode}
-            options={[
-              { value: 'SOUND_AND_NAME', label: t('modeSoundAndName') },
-              { value: 'SOUND_ONLY', label: t('modeSoundOnly') },
-              { value: 'NAME_ONLY', label: t('modeNameOnly') },
-            ]}
-            onChange={(mode) => update({ mode })}
-          />
-        </Row>
+        {!association && (
+          <Row label={t('settingsHears')}>
+            <Segmented
+              label={t('settingsHears')}
+              value={settings.mode}
+              options={[
+                { value: 'SOUND_AND_NAME', label: t('modeSoundAndName') },
+                { value: 'SOUND_ONLY', label: t('modeSoundOnly') },
+                { value: 'NAME_ONLY', label: t('modeNameOnly') },
+              ]}
+              onChange={(mode) => update({ mode })}
+            />
+          </Row>
+        )}
         <Row label={t('settingsLanguage')}>
           <Segmented
             label={t('settingsLanguage')}
@@ -174,7 +145,10 @@ export function SettingsScreen({
       </section>
 
       <section className="card">
-        <Row label={t('settingsToddler')} hint={t('settingsToddlerHint')}>
+        <Row
+          label={t('settingsToddler')}
+          hint={association ? `${t('settingsToddlerHint')} ${t('toddlerNotInAssociation')}` : t('settingsToddlerHint')}
+        >
           <Toggle label={t('settingsToddler')} checked={settings.toddlerMode} onChange={(toddlerMode) => update({ toddlerMode })} />
         </Row>
         <Row label={t('settingsHints')} hint={t('settingsHintsHint')}>
@@ -221,16 +195,6 @@ export function SettingsScreen({
             onChange={(uiLanguageOverride) => update({ uiLanguageOverride })}
           />
         </Row>
-        {content.packs.length > 1 && (
-          <Row label={t('settingsPack')}>
-            <Segmented
-              label={t('settingsPack')}
-              value={pack.id}
-              options={content.packs.map((p) => ({ value: p.id, label: p.name[lang] }))}
-              onChange={(packId) => update({ packId })}
-            />
-          </Row>
-        )}
         <Row label={t('settingsPin')}>
           <button type="button" className="btn" onClick={() => setPinStep('verify')}>
             {t('changePin')}
@@ -268,6 +232,150 @@ export function SettingsScreen({
         </div>
       )}
     </Screen>
+  );
+}
+
+interface CardProps {
+  pack: LoadedPack;
+  settings: Settings;
+  update: (patch: Partial<Settings>) => void;
+  nudge: boolean;
+  onRefuse: () => void;
+}
+
+/** The pictures of one pack, with presets. "Who eats what?" lists each food's animals. */
+function ItemsCard({ pack, settings, update, nudge, onRefuse }: CardProps) {
+  const { t, lang } = useI18n();
+  const association = pack.kind === 'association';
+  const enabled = enabledItemKeys(pack, settings);
+  // Only pictures that work in the current mode (quiet ones need "Name only").
+  const allKeys = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
+
+  const setEnabled = (keys: string[]) => {
+    if (keys.length < MIN_ITEMS_PER_PACK) {
+      onRefuse();
+      return;
+    }
+    update({ enabledItems: { ...settings.enabledItems, [pack.id]: keys } });
+  };
+  const toggleItem = (key: string) =>
+    setEnabled(enabled.includes(key) ? enabled.filter((k) => k !== key) : allKeys.filter((k) => k === key || enabled.includes(k)));
+
+  const sameSet = (a: string[], b: string[]) => a.length === b.length && a.every((k) => b.includes(k));
+  const presets = [
+    { id: 'all', label: t('presetAll'), keys: allKeys },
+    ...(association ? [] : [{ id: 'sound', label: t('presetWithSound'), keys: pack.items.filter((i) => i.sound?.real).map((i) => i.key) }]),
+    ...pack.groups.map((g) => ({ id: g.id, label: g.name[lang], keys: g.items.filter((k) => allKeys.includes(k)) })),
+  ];
+  const tag = (item: LoadedItem) => {
+    if (item.prompts) return <span className="tag eaters">{eaters(item, lang)}</span>;
+    if (!item.sound) return <span className="tag">{t('nameOnlyTag')}</span>;
+    return item.sound.real ? null : <span className="tag">{t('noSoundYet')}</span>;
+  };
+
+  return (
+    <section className={nudge ? 'card nudge' : 'card'}>
+      <div className="card-head">
+        <h2>{pack.id === 'animals' ? t('settingsAnimals') : t('settingsItems')}</h2>
+        <span className="muted">{t('animalsSelected', { n: enabled.length })}</span>
+      </div>
+      {association && <p className="hint">{t('associationHint')}</p>}
+      <div className="chips">
+        {presets.map((p) => (
+          <button
+            type="button"
+            key={p.id}
+            className={sameSet(p.keys, enabled) ? 'chip on' : 'chip'}
+            disabled={p.keys.length < MIN_ITEMS_PER_PACK}
+            onClick={() => setEnabled(allKeys.filter((k) => p.keys.includes(k)))}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+      <div className="animal-grid">
+        {pack.items.map((item) => {
+          const on = enabled.includes(item.key);
+          return (
+            <button
+              type="button"
+              key={item.key}
+              className={on ? 'animal on' : 'animal'}
+              aria-pressed={on}
+              disabled={!usableInMode(item, settings.mode)}
+              onClick={() => toggleItem(item.key)}
+            >
+              <img src={item.images[0].url} alt="" draggable={false} />
+              <span className="animal-name">{item.name[lang]}</span>
+              {tag(item)}
+            </button>
+          );
+        })}
+      </div>
+      <p className="hint">
+        {pack.id === 'animals' ? t('settingsAnimalsHint', { min: MIN_ITEMS_PER_PACK }) : t('settingsItemsHint', { min: MIN_ITEMS_PER_PACK })}
+      </p>
+    </section>
+  );
+}
+
+/** "Carrot": rabbit, donkey, horse. Kept short so the tile stays readable. */
+function eaters(item: LoadedItem, lang: 'ar' | 'en'): string {
+  const names = (item.prompts ?? []).map((p) => p.name[lang]);
+  const shown = names.slice(0, 3).join(lang === 'ar' ? '، ' : ', ');
+  return names.length > 3 ? `${shown}…` : shown;
+}
+
+/** The Mixed game: which packs join the mix. Each pack keeps its own picture choice. */
+function MixCard({ pack, settings, update, nudge, onRefuse }: CardProps) {
+  const { t, lang } = useI18n();
+  const parts = pack.parts ?? [];
+  const toggle = (id: string) => {
+    const mixedExcluded = settings.mixedExcluded.includes(id)
+      ? settings.mixedExcluded.filter((x) => x !== id)
+      : [...settings.mixedExcluded, id];
+    if (enabledItemKeys(pack, { ...settings, mixedExcluded }).length < MIN_ITEMS_PER_PACK) {
+      onRefuse();
+      return;
+    }
+    update({ mixedExcluded });
+  };
+  return (
+    <section className={nudge ? 'card nudge' : 'card'}>
+      <div className="card-head">
+        <h2>{t('mixTitle')}</h2>
+        <span className="muted">{t('animalsSelected', { n: enabledItemKeys(pack, settings).length })}</span>
+      </div>
+      {parts.map((p) => {
+        const n = enabledItemKeys(p, settings).length;
+        const label = isCustomPackId(p.id) ? `${p.name[lang]} (${t('myPackTag')})` : p.name[lang];
+        return (
+          <Row key={p.id} label={label} hint={n ? t('mixPackCount', { n }) : t('mixPackNone')}>
+            <Toggle label={p.name[lang]} checked={!settings.mixedExcluded.includes(p.id)} onChange={() => toggle(p.id)} />
+          </Row>
+        );
+      })}
+      <p className="hint">{t('mixHint')}</p>
+    </section>
+  );
+}
+
+/** A small picture for a pack: its first picture, animal + food for "Who eats what?", four for the Mix. */
+function PackThumb({ pack }: { pack: LoadedPack }) {
+  const firstOf = (p: LoadedPack) => p.items[0];
+  const items: LoadedItem[] = pack.parts
+    ? pack.parts.slice(0, 4).map(firstOf)
+    : pack.kind === 'association' && pack.items[0]?.prompts?.[0]
+      ? [pack.items[0].prompts[0], pack.items[0]]
+      : [firstOf(pack)];
+  // Always the first photo, so the picture doesn't change every time a setting does.
+  const pictures = items.filter(Boolean).map((i) => choosePictures([i], () => 0)[i.key]);
+  return (
+    <span className={`pack-thumb n${pictures.length}`} aria-hidden="true">
+      {pictures.map((src, i) => (
+        <img key={i} src={src} alt="" draggable={false} />
+      ))}
+    </span>
   );
 }
 

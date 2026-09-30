@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import type { LoadedFeedback } from '../content/types';
+import type { LoadedFeedback, LoadedItem, LoadedPack, ResolvedAsset } from '../content/types';
 import { encodeWav, resample, suggestTrim, trimSamples, waveformPeaks } from './audioTools';
 import { centredSquare, clampCrop } from './imageTools';
 import { customOps } from './ops';
+import { applyOverrides, overrideMap, overrideOps } from './overrides';
 import { MemoryCustomStore } from './store';
-import { forgetCloud, planSync, runSync, type Remote, type RemoteItem, type RemotePack } from './sync';
+import { forgetCloud, planSync, runSync, type Remote, type RemoteItem, type RemoteOverride, type RemotePack } from './sync';
 import { customToLoaded } from './toLoaded';
 import type { MediaName } from './types';
 
@@ -105,12 +106,31 @@ describe('custom packs in the game', () => {
 class FakeRemote implements Remote {
   packs = new Map<string, RemotePack>();
   items = new Map<string, RemoteItem>();
+  overrides = new Map<string, RemoteOverride>();
   media = new Map<string, Blob>();
+  overrideFiles = new Map<string, Blob>();
   async listPacks() {
     return [...this.packs.values()];
   }
   async listItems() {
     return [...this.items.values()];
+  }
+  async listOverrides() {
+    return [...this.overrides.values()];
+  }
+  async upsertOverride(o: RemoteOverride) {
+    this.overrides.set(o.path, o);
+  }
+  async uploadOverride(path: string, b: Blob) {
+    this.overrideFiles.set(path, b);
+  }
+  async downloadOverride(path: string) {
+    const b = this.overrideFiles.get(path);
+    if (!b) throw new Error(`missing ${path}`);
+    return b;
+  }
+  async removeOverride(path: string) {
+    this.overrideFiles.delete(path);
   }
   async upsertPack(p: RemotePack) {
     this.packs.set(p.id, p);
@@ -132,7 +152,9 @@ class FakeRemote implements Remote {
   async deleteEverything() {
     this.packs.clear();
     this.items.clear();
+    this.overrides.clear();
     this.media.clear();
+    this.overrideFiles.clear();
   }
 }
 
@@ -203,5 +225,94 @@ describe('cloud sync', () => {
     const [pack] = await phone.packs();
     expect(pack.ownerId).toBeUndefined();
     expect(pack.syncedAt).toBeUndefined();
+  });
+
+  it("backs up the parent's voice and photos, and removals reach the other phone", async () => {
+    let clock = 1000;
+    const tick = () => ++clock;
+    const cloud = new FakeRemote();
+    const phoneA = new MemoryCustomStore();
+    const phoneB = new MemoryCustomStore();
+    const voiceA = overrideOps(phoneA, tick);
+    await voiceA.save('packs/family/mama_name_ar.mp3', blob('mama'));
+    await voiceA.save('packs/family/mama.webp', blob('photo'));
+
+    expect(await runSync(phoneA, cloud, 'u')).toEqual({ pushed: 2, pulled: 0 });
+    expect(await runSync(phoneB, cloud, 'u')).toEqual({ pushed: 0, pulled: 2 });
+    const onB = overrideMap(await phoneB.overrides());
+    expect(await onB.get('packs/family/mama_name_ar.mp3')!.text()).toBe('mama');
+
+    await voiceA.remove('packs/family/mama.webp');
+    await runSync(phoneA, cloud, 'u');
+    expect(cloud.overrideFiles.has('packs/family/mama.webp')).toBe(false);
+    await runSync(phoneB, cloud, 'u');
+    expect([...overrideMap(await phoneB.overrides()).keys()]).toEqual(['packs/family/mama_name_ar.mp3']);
+  });
+});
+
+describe('your voice and photos', () => {
+  const asset = (path: string): ResolvedAsset => ({ path, url: `placeholder:${path}`, real: false });
+  const loaded = (key: string, folder: string, extra: Partial<LoadedItem> = {}): LoadedItem => ({
+    key,
+    name: { en: key, ar: key },
+    images: [asset(`packs/${folder}/${key}.webp`)],
+    placeholderImage: asset(`packs/${folder}/${key}.webp`),
+    sound: null,
+    nameAudio: { ar: asset(`packs/${folder}/${key}_name_ar.mp3`), en: asset(`packs/${folder}/${key}_name_en.mp3`) },
+    confusableWith: [],
+    picturePath: `packs/${folder}/${key}.webp`,
+    ...extra,
+  });
+  const packOf = (id: string, items: LoadedItem[], extra: Partial<LoadedPack> = {}): LoadedPack => ({
+    id,
+    version: 1,
+    name: { en: id, ar: id },
+    kind: 'match',
+    order: 1,
+    items,
+    groups: [],
+    feedback: { correct: { ar: [asset('feedback/correct_ar_1.mp3')], en: [] }, incorrectTone: null, sessionEnd: { ar: null, en: null } },
+    ...extra,
+  });
+
+  it('swaps in the recordings and photos, everywhere a file is used', () => {
+    const rabbit = loaded('rabbit', 'animals');
+    const food = packOf('food', [loaded('carrot', 'food')]);
+    const whoEats = packOf('who-eats-what', [loaded('carrot', 'food', { prompts: [rabbit] })], {
+      kind: 'association',
+      association: {
+        promptPackId: 'animals',
+        question: { ar: asset('feedback/eat_question_ar.mp3'), en: null },
+        questionFeminine: { ar: null, en: null },
+        reward: null,
+      },
+    });
+    const mine = new Map([
+      ['packs/food/carrot_name_ar.mp3', blob('jazara')],
+      ['packs/food/carrot.webp', blob('our carrot')],
+      ['packs/animals/rabbit_name_ar.mp3', blob('arnab')],
+      ['feedback/correct_ar_1.mp3', blob('jameel')],
+      ['feedback/eat_question_ar.mp3', blob('question')],
+    ]);
+    const [f, w] = applyOverrides([food, whoEats], mine, (b) => `blob:${b.size}`);
+    for (const carrot of [f.items[0], w.items[0]]) {
+      expect(carrot.nameAudio.ar).toEqual({ path: 'packs/food/carrot_name_ar.mp3', url: 'blob:6', real: true });
+      expect(carrot.nameAudio.en.real).toBe(false); // not recorded: the original stays
+      expect(carrot.images).toEqual([{ path: 'packs/food/carrot.webp', url: 'blob:10', real: true }]);
+    }
+    expect(w.items[0].prompts![0].nameAudio.ar.real).toBe(true);
+    expect(f.feedback.correct.ar[0].real).toBe(true);
+    expect(w.association!.question.ar!.real).toBe(true);
+  });
+
+  it('keeps a removed recording as a marker, and forgets it in the map', async () => {
+    const store = new MemoryCustomStore();
+    const voice = overrideOps(store, () => 5);
+    await voice.save('packs/animals/cat_name_ar.mp3', blob('a'));
+    await voice.save('packs/animals/cat_name_ar.mp3', blob('b'));
+    await voice.remove('packs/animals/cat_name_ar.mp3');
+    const [record] = await store.overrides();
+    expect(record).toMatchObject({ deleted: true, blob: null, mediaVersion: 3 });
+    expect(overrideMap(await store.overrides()).size).toBe(0);
   });
 });

@@ -38,6 +38,24 @@ export interface CustomItem {
   syncedMediaVersion?: number;
 }
 
+/**
+ * "Your voice and photos": a parent's own recording or photo for something in a built-in pack
+ * (ماما in their voice, a photo of their own cat). Keyed by the file it replaces.
+ */
+export interface AssetOverride {
+  /** The built-in file it replaces, e.g. "packs/animals/cat_name_ar.mp3" or "packs/family/mama.webp". */
+  path: string;
+  /** Null once removed (kept as a marker so other signed-in devices learn about it). */
+  blob: Blob | null;
+  updatedAt: number;
+  deleted: boolean;
+  /** Bumped whenever the recording or photo changes, so sync only re-sends the file then. */
+  mediaVersion: number;
+  ownerId?: string;
+  syncedAt?: number;
+  syncedMediaVersion?: number;
+}
+
 /** Custom pack ids in the game are prefixed so they can't clash with built-in packs. */
 export const CUSTOM_PACK_PREFIX = 'custom:';
 

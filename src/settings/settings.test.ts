@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { LoadedItem, LoadedPack } from '../content/types';
-import { defaultSelection, defaultSettings, deviceLanguage, enabledItemKeys, sanitizeSettings, spokenLanguages } from './settings';
+import {
+  defaultSelection,
+  defaultSettings,
+  deviceLanguage,
+  enabledItemKeys,
+  sanitizeSettings,
+  spokenLanguages,
+  usableInMode,
+} from './settings';
 
 describe('settings', () => {
   it('follows the device language and falls back to Arabic', () => {
@@ -63,6 +71,8 @@ describe('animal selection', () => {
     id: 'animals',
     version: 1,
     name: { en: 'Animals', ar: 'Animals' },
+    kind: 'match',
+    order: 1,
     items,
     groups: [],
     feedback: { correct: { en: [], ar: [] }, incorrectTone: null, sessionEnd: { en: null, ar: null } },
@@ -98,5 +108,16 @@ describe('animal selection', () => {
     expect(enabledItemKeys(eightReal, settings)).toEqual(['cat', 'dog', 'bear', 'cow', 'goat']);
     settings.enabledItems = { animals: ['cat', 'dog'] };
     expect(enabledItemKeys(eightReal, settings)).toHaveLength(8);
+  });
+
+  it('always lets "Who eats what?" foods play, whatever the mode: the question is the animal', () => {
+    const carrot: LoadedItem = { ...item('carrot', false), sound: null, prompts: [item('rabbit', true)] };
+    for (const mode of ['SOUND_AND_NAME', 'SOUND_ONLY', 'NAME_ONLY'] as const) expect(usableInMode(carrot, mode)).toBe(true);
+    expect(usableInMode({ ...carrot, prompts: undefined }, 'SOUND_ONLY')).toBe(false);
+  });
+
+  it('repairs a damaged Mixed-game list', () => {
+    expect(sanitizeSettings({ mixedExcluded: ['food', 3, null] }, 'ar').mixedExcluded).toEqual(['food']);
+    expect(sanitizeSettings({ mixedExcluded: 'food' }, 'ar').mixedExcluded).toEqual([]);
   });
 });

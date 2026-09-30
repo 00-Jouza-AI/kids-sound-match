@@ -1,6 +1,6 @@
 import type { Lang } from '../content/types';
 import type { CustomStore } from './store';
-import type { CustomItem, CustomPack, MediaName } from './types';
+import type { AssetOverride, CustomItem, CustomPack, MediaName } from './types';
 
 /** Cloud rows (see supabase/schema.sql). Timestamps are milliseconds. */
 export interface RemotePack {
@@ -25,15 +25,28 @@ export interface RemoteItem {
   deleted: boolean;
 }
 
+/** The parent's own voice or photo for a built-in file ("Your voice and photos"). */
+export interface RemoteOverride {
+  path: string;
+  media_version: number;
+  updated_at: number;
+  deleted: boolean;
+}
+
 /** What sync needs from the cloud. Supabase implements it; tests use an in-memory fake. */
 export interface Remote {
   listPacks(): Promise<RemotePack[]>;
   listItems(): Promise<RemoteItem[]>;
+  listOverrides(): Promise<RemoteOverride[]>;
   upsertPack(pack: RemotePack): Promise<void>;
   upsertItem(item: RemoteItem): Promise<void>;
+  upsertOverride(override: RemoteOverride): Promise<void>;
   uploadMedia(itemId: string, name: MediaName, blob: Blob): Promise<void>;
   downloadMedia(itemId: string, name: MediaName): Promise<Blob>;
   removeMedia(itemId: string, names: MediaName[]): Promise<void>;
+  uploadOverride(path: string, blob: Blob): Promise<void>;
+  downloadOverride(path: string): Promise<Blob>;
+  removeOverride(path: string): Promise<void>;
   deleteEverything(): Promise<void>;
 }
 
@@ -42,6 +55,8 @@ export interface SyncPlan {
   pullPacks: RemotePack[];
   pushItems: CustomItem[];
   pullItems: RemoteItem[];
+  pushOverrides: AssetOverride[];
+  pullOverrides: RemoteOverride[];
 }
 
 /**
@@ -52,14 +67,16 @@ const uploadable = (ownerId: string | undefined, uid: string) => ownerId === und
 
 /** Last write wins, record by record. Deletions travel as markers (`deleted: true`). */
 export function planSync(
-  local: { packs: readonly CustomPack[]; items: readonly CustomItem[] },
-  remote: { packs: readonly RemotePack[]; items: readonly RemoteItem[] },
+  local: { packs: readonly CustomPack[]; items: readonly CustomItem[]; overrides?: readonly AssetOverride[] },
+  remote: { packs: readonly RemotePack[]; items: readonly RemoteItem[]; overrides?: readonly RemoteOverride[] },
   uid: string,
 ): SyncPlan {
   const remotePacks = new Map(remote.packs.map((p) => [p.id, p]));
   const remoteItems = new Map(remote.items.map((i) => [i.id, i]));
+  const remoteOverrides = new Map((remote.overrides ?? []).map((o) => [o.path, o]));
   const localPacks = new Map(local.packs.map((p) => [p.id, p]));
   const localItems = new Map(local.items.map((i) => [i.id, i]));
+  const localOverrides = new Map((local.overrides ?? []).map((o) => [o.path, o]));
   const changedHere = (r: { ownerId?: string; syncedAt?: number; updatedAt: number }, remoteUpdated?: number) =>
     uploadable(r.ownerId, uid) && r.syncedAt !== r.updatedAt && (remoteUpdated === undefined || r.updatedAt > remoteUpdated);
   const newerThere = (remoteUpdated: number, localRecord?: { updatedAt: number }) =>
@@ -70,6 +87,8 @@ export function planSync(
     pullPacks: remote.packs.filter((r) => newerThere(r.updated_at, localPacks.get(r.id))),
     pushItems: local.items.filter((i) => changedHere(i, remoteItems.get(i.id)?.updated_at)),
     pullItems: remote.items.filter((r) => newerThere(r.updated_at, localItems.get(r.id))),
+    pushOverrides: (local.overrides ?? []).filter((o) => changedHere(o, remoteOverrides.get(o.path)?.updated_at)),
+    pullOverrides: (remote.overrides ?? []).filter((r) => newerThere(r.updated_at, localOverrides.get(r.path))),
   };
 }
 
@@ -93,6 +112,10 @@ export function toRemoteItem(i: CustomItem): RemoteItem {
   };
 }
 
+export function toRemoteOverride(o: AssetOverride): RemoteOverride {
+  return { path: o.path, media_version: o.mediaVersion, updated_at: o.updatedAt, deleted: o.deleted };
+}
+
 const NAME_MEDIA: Record<Lang, MediaName> = { ar: 'name_ar', en: 'name_en' };
 const ALL_MEDIA: MediaName[] = ['picture', 'name_ar', 'name_en', 'sound'];
 
@@ -103,24 +126,33 @@ export interface SyncResult {
 
 /** One full two-way sync for the signed-in parent. */
 export async function runSync(store: CustomStore, remote: Remote, uid: string): Promise<SyncResult> {
-  const [packs, items, remotePacks, remoteItems] = await Promise.all([
+  const [packs, items, overrides, remotePacks, remoteItems, remoteOverrides] = await Promise.all([
     store.packs(),
     store.items(),
+    store.overrides(),
     remote.listPacks(),
     remote.listItems(),
+    remote.listOverrides(),
   ]);
-  const plan = planSync({ packs, items }, { packs: remotePacks, items: remoteItems }, uid);
+  const plan = planSync(
+    { packs, items, overrides },
+    { packs: remotePacks, items: remoteItems, overrides: remoteOverrides },
+    uid,
+  );
   const localItem = new Map(items.map((i) => [i.id, i]));
   const localPack = new Map(packs.map((p) => [p.id, p]));
+  const localOverride = new Map(overrides.map((o) => [o.path, o]));
   // A parent may edit while a sync runs; never overwrite a record that changed since we read it.
-  const unchanged = async <T extends { id: string; updatedAt: number }>(read: () => Promise<T[]>, before?: T) => {
+  const unchanged = async <T extends { updatedAt: number }>(read: () => Promise<T[]>, key: (r: T) => string, before?: T) => {
     if (!before) return true; // nothing here yet: a cloud-only record can't have been edited on this phone
-    const latest = (await read()).find((r) => r.id === before.id);
+    const latest = (await read()).find((r) => key(r) === key(before));
     return !latest || latest.updatedAt === before.updatedAt;
   };
+  const byId = (r: { id: string }) => r.id;
+  const byPath = (r: { path: string }) => r.path;
 
   for (const r of plan.pullPacks) {
-    if (!(await unchanged(() => store.packs(), localPack.get(r.id)))) continue;
+    if (!(await unchanged(() => store.packs(), byId, localPack.get(r.id)))) continue;
     await store.putPack({
       id: r.id,
       name: { en: r.name_en, ar: r.name_ar },
@@ -147,7 +179,7 @@ export async function runSync(store: CustomStore, remote: Remote, uid: string): 
         sound: r.has_sound ? await remote.downloadMedia(r.id, 'sound') : null,
       };
     }
-    if (!(await unchanged(() => store.items(), before))) continue;
+    if (!(await unchanged(() => store.items(), byId, before))) continue;
     await store.putItem({
       id: r.id,
       packId: r.pack_id,
@@ -163,9 +195,28 @@ export async function runSync(store: CustomStore, remote: Remote, uid: string): 
     });
   }
 
+  for (const r of plan.pullOverrides) {
+    const before = localOverride.get(r.path);
+    let blob: Blob | null = null;
+    if (!r.deleted) {
+      blob = before && before.mediaVersion === r.media_version && before.blob ? before.blob : await remote.downloadOverride(r.path);
+    }
+    if (!(await unchanged(() => store.overrides(), byPath, before))) continue;
+    await store.putOverride({
+      path: r.path,
+      blob,
+      updatedAt: r.updated_at,
+      deleted: r.deleted,
+      mediaVersion: r.media_version,
+      ownerId: uid,
+      syncedAt: r.updated_at,
+      syncedMediaVersion: r.media_version,
+    });
+  }
+
   for (const p of plan.pushPacks) {
     await remote.upsertPack(toRemotePack(p));
-    if (await unchanged(() => store.packs(), p)) await store.putPack({ ...p, ownerId: uid, syncedAt: p.updatedAt });
+    if (await unchanged(() => store.packs(), byId, p)) await store.putPack({ ...p, ownerId: uid, syncedAt: p.updatedAt });
   }
 
   for (const i of plan.pushItems) {
@@ -184,14 +235,23 @@ export async function runSync(store: CustomStore, remote: Remote, uid: string): 
       if (gone.length) await remote.removeMedia(i.id, gone);
     }
     await remote.upsertItem(toRemoteItem(i));
-    if (await unchanged(() => store.items(), i)) {
+    if (await unchanged(() => store.items(), byId, i)) {
       await store.putItem({ ...i, ownerId: uid, syncedAt: i.updatedAt, syncedMediaVersion: i.mediaVersion });
     }
   }
 
+  for (const o of plan.pushOverrides) {
+    if (o.deleted) await remote.removeOverride(o.path);
+    else if (o.syncedMediaVersion !== o.mediaVersion && o.blob) await remote.uploadOverride(o.path, o.blob);
+    await remote.upsertOverride(toRemoteOverride(o));
+    if (await unchanged(() => store.overrides(), byPath, o)) {
+      await store.putOverride({ ...o, ownerId: uid, syncedAt: o.updatedAt, syncedMediaVersion: o.mediaVersion });
+    }
+  }
+
   return {
-    pushed: plan.pushPacks.length + plan.pushItems.length,
-    pulled: plan.pullPacks.length + plan.pullItems.length,
+    pushed: plan.pushPacks.length + plan.pushItems.length + plan.pushOverrides.length,
+    pulled: plan.pullPacks.length + plan.pullItems.length + plan.pullOverrides.length,
   };
 }
 
@@ -200,5 +260,8 @@ export async function forgetCloud(store: CustomStore): Promise<void> {
   for (const p of await store.packs()) await store.putPack({ ...p, ownerId: undefined, syncedAt: undefined });
   for (const i of await store.items()) {
     await store.putItem({ ...i, ownerId: undefined, syncedAt: undefined, syncedMediaVersion: undefined });
+  }
+  for (const o of await store.overrides()) {
+    await store.putOverride({ ...o, ownerId: undefined, syncedAt: undefined, syncedMediaVersion: undefined });
   }
 }

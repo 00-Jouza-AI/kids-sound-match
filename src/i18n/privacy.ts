@@ -35,12 +35,12 @@ const EN = [
   {
     id: 'own',
     heading: 'Your own pictures and recordings',
-    body: 'Packs you make in My packs (photos, icons, your recordings and the names you type) are saved on this device. Recording uses the microphone only while you press Record.',
+    body: 'Packs you make in My packs (photos, icons, your recordings and the names you type), and your own voice and photos for our packs, are saved on this device. Recording uses the microphone only while you press Record.',
   },
   {
     id: 'cloud',
     heading: 'Optional cloud backup (only if you sign in)',
-    body: 'If you sign in with Google in My packs, the packs you make are copied to a private storage space with Supabase, our storage provider, so you can use them on your other devices. Only your signed-in account can read them. We receive your Google email address to identify your account and use it for nothing else. "Delete my cloud data" in My packs removes everything from the cloud.',
+    body: 'If you sign in with Google in My packs, the packs you make and your voice and photos for our packs are copied to a private storage space with Supabase, our storage provider, so you can use them on your other devices. Only your signed-in account can read them. We receive your Google email address to identify your account and use it for nothing else. "Delete my cloud data" in My packs removes everything from the cloud.',
   },
   {
     id: 'pin',
@@ -83,12 +83,12 @@ const AR: typeof EN = [
   {
     id: 'own',
     heading: 'صورك وتسجيلاتك الخاصة',
-    body: 'المجموعات التي تصنعها في «مجموعاتي» (الصور والرموز وتسجيلاتك والأسماء التي تكتبها) تُحفظ على هذا الجهاز. لا يُستخدم الميكروفون إلا أثناء ضغطك على «تسجيل».',
+    body: 'المجموعات التي تصنعها في «مجموعاتي» (الصور والرموز وتسجيلاتك والأسماء التي تكتبها)، وصوتك وصورك لمجموعاتنا، تُحفظ على هذا الجهاز. لا يُستخدم الميكروفون إلا أثناء ضغطك على «تسجيل».',
   },
   {
     id: 'cloud',
     heading: 'نسخ احتياطي سحابي اختياري (فقط إذا سجلت الدخول)',
-    body: 'إذا سجلت الدخول باستخدام Google من «مجموعاتي»، تُنسخ المجموعات التي تصنعها إلى مساحة تخزين خاصة لدى Supabase، مزوّد التخزين لدينا، لتستخدمها على أجهزتك الأخرى. لا يقرؤها إلا حسابك بعد تسجيل الدخول. نتلقى عنوان بريدك في Google لتعريف حسابك فقط ولا نستخدمه لأي شيء آخر. يحذف زر «حذف بياناتي من السحابة» في «مجموعاتي» كل شيء من السحابة.',
+    body: 'إذا سجلت الدخول باستخدام Google من «مجموعاتي»، تُنسخ المجموعات التي تصنعها وصوتك وصورك لمجموعاتنا إلى مساحة تخزين خاصة لدى Supabase، مزوّد التخزين لدينا، لتستخدمها على أجهزتك الأخرى. لا يقرؤها إلا حسابك بعد تسجيل الدخول. نتلقى عنوان بريدك في Google لتعريف حسابك فقط ولا نستخدمه لأي شيء آخر. يحذف زر «حذف بياناتي من السحابة» في «مجموعاتي» كل شيء من السحابة.',
   },
   {
     id: 'pin',

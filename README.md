@@ -1,9 +1,13 @@
 # Kids Sound Match (web)
 
-The web version of Kids Sound Match V1. A child hears an animal sound, sees 2–4 pictures and taps the
-matching animal, in Arabic or English. No ads, no tracking, no accounts; results stay on the device.
-It follows `App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
-for every change agreed before the build.
+The web version of Kids Sound Match V1. A child hears a sound or a word, sees 2–4 pictures and taps the
+matching one, in Arabic or English. No ads, no tracking; results stay on the device. It follows
+`App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
+for every change agreed since.
+
+Packs: Animals (54), Things at home, Vehicles, Musical instruments, Food, Body parts, Family,
+**Who eats what?** (see an animal, tap its food), a **Mixed** game of everything, and the parent's own
+packs. Parents can also put their own voice and photos into the built-in packs.
 
 ## Run it
 
@@ -43,7 +47,11 @@ placeholder, no code changes needed.
   the manifest; one is picked at random each time
 - Sounds: `public/assets/packs/animals/cat_sound.mp3`, names `cat_name_ar.mp3` / `cat_name_en.mp3`
 - Praise and end-of-game clips: `public/assets/feedback/correct_ar_1.mp3` etc.
-- A new pack: `public/assets/packs/<id>/manifest.json` plus its files. It's discovered automatically.
+- A new pack: `public/assets/packs/<id>/manifest.json` plus its files. It's discovered automatically;
+  `"order"` sets its place in the list. Items without a `"sound"` play in "Name only" and Explore.
+- A "Who eats what?"-style pack: `"kind": "association"` with an `"association"` block (the pack the
+  questions are about, the question and "yum" clips), and `"prompts"` on each answer listing the items
+  it goes with (see `packs/who-eats-what/manifest.json`). Answers can reuse another pack's files.
 
 Until real files exist, development builds use emoji pictures, tones, and the device's own voice
 (on-device voices only). Release builds refuse to show anything that isn't real.
@@ -70,6 +78,10 @@ items without a sound play in "Name only" mode and Explore. Choose the pack in S
 
 Recording needs the microphone, which browsers only allow on HTTPS or `localhost`; over home
 Wi-Fi you can choose a recorded audio file instead.
+
+**Your voice and photos** (in My packs): record any name in the built-in packs in your own voice, plus
+the praise lines, or swap a picture for your own photo, like Grandma's photo for "Grandma" in Family.
+Anything you don't change keeps the original.
 
 ### Optional cloud backup (Google sign-in)
 

@@ -6,6 +6,8 @@ export interface Question {
   readonly targetKey: string;
   /** Item keys in display order, including the target. */
   readonly options: readonly string[];
+  /** Association games: what the question is about ("rabbit" when the answer is the carrot). */
+  readonly promptKey?: string;
 }
 
 export interface GenerateOptions {
@@ -16,6 +18,8 @@ export interface GenerateOptions {
   /** Normally supplied by the session's TargetBag; if absent a random target (not the previous one) is picked. */
   targetKey?: string;
   graph?: ConfusionGraph;
+  /** Association games: the previous question's prompt, avoided when the answer has others. */
+  previousPromptKey?: string | null;
 }
 
 /** Spec 4.1 step 1: a random target, excluding the previous question's target. */
@@ -31,14 +35,30 @@ export function generateQuestion(opts: GenerateOptions): Question {
   const graph = opts.graph ?? new ConfusionGraph(items);
   const targetKey = opts.targetKey ?? pickTarget(items, previousTargetKey, rng);
 
+  const target = items.find((i) => i.key === targetKey);
+  const promptKey = pickPrompt(target?.prompts ?? [], opts.previousPromptKey ?? null, rng);
+
   // Spec 4.1 step 2: everything except the target and anything confusable with it.
   const pool = items
-    .map((i) => i.key)
-    .filter((k) => k !== targetKey && !graph.areConfusable(targetKey, k));
+    .filter((i) => i.key !== targetKey && !graph.areConfusable(targetKey, i.key))
+    // Association: never offer another answer that also goes with this prompt (horses eat apples and carrots).
+    .filter((i) => promptKey === undefined || !(i.prompts ?? []).includes(promptKey))
+    // Mixed game: wrong answers come from the same group as the right one.
+    .filter((i) => target?.group === undefined || i.group === target.group)
+    .map((i) => i.key);
 
   // Steps 3-4: distractors that are not confusable with each other, then shuffle positions.
   const distractors = pickNonConfusable(shuffled(pool, rng), choiceCount - 1, graph);
-  return { targetKey, options: shuffled([targetKey, ...distractors], rng) };
+  const options = shuffled([targetKey, ...distractors], rng);
+  return promptKey === undefined ? { targetKey, options } : { targetKey, options, promptKey };
+}
+
+/** One of the answer's prompt items, preferably not the one the previous question was about. */
+function pickPrompt(prompts: readonly string[], previous: string | null, rng: Rng): string | undefined {
+  if (!prompts.length) return undefined;
+  const fresh = prompts.filter((p) => p !== previous);
+  const pool = fresh.length ? fresh : prompts;
+  return pool[randomInt(rng, pool.length)];
 }
 
 /**

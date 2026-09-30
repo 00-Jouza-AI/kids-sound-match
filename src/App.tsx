@@ -2,11 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audioEngine } from './audio/audioEngine';
 import { placeholderPictureUsable } from './content/emojiSupport';
 import { loadContent } from './content/loader';
+import { buildMixedPack } from './content/mixed';
 import type { LoadedContent, LoadedFeedback, LoadedPack } from './content/types';
 import { MIN_ITEMS_PER_PACK } from './content/validate';
 import { cloud } from './custom/cloud';
+import { applyOverrides, overrideMap } from './custom/overrides';
 import { customStore } from './custom/store';
-import { customToLoaded, type CustomPackView } from './custom/toLoaded';
+import { customToLoaded } from './custom/toLoaded';
+import type { AssetOverride, CustomItem, CustomPack } from './custom/types';
 import { I18nProvider, useI18n } from './i18n/I18n';
 import { enterFullscreen } from './lock/fullscreen';
 import { ParentGate } from './lock/ParentGate';
@@ -22,6 +25,7 @@ import { FirstRun } from './ui/parent/FirstRun';
 import { Home, type HomeLink } from './ui/parent/Home';
 import { AboutScreen, ContentProblems, PrivacyScreen } from './ui/parent/InfoScreens';
 import { MyPacks } from './ui/parent/MyPacks';
+import { Personalize } from './ui/parent/Personalize';
 import { ReportScreen } from './ui/parent/ReportScreen';
 import { SettingsScreen } from './ui/parent/SettingsScreen';
 import { StartFlow, type StartStep } from './ui/parent/StartFlow';
@@ -36,6 +40,7 @@ type Screen =
   | 'privacy'
   | 'about'
   | 'myPacks'
+  | 'personalize'
   | 'start'
   | 'kid';
 
@@ -48,6 +53,33 @@ const NUDGE_DISMISSED_KEY = 'ksm.nudgeDismissed.v1';
 const NUDGE_AGAIN_AFTER_GAMES = 3;
 const PARENTS_GROUP_URL = (import.meta.env.VITE_PARENTS_GROUP_URL ?? '').trim();
 const NO_FEEDBACK: LoadedFeedback = { correct: { en: [], ar: [] }, incorrectTone: null, sessionEnd: { en: null, ar: null } };
+
+/** Everything the parent made on this phone: their packs, and their voice and photos in ours. */
+interface CustomData {
+  packs: CustomPack[];
+  items: CustomItem[];
+  overrides: AssetOverride[];
+}
+
+const NO_CUSTOM: CustomData = { packs: [], items: [], overrides: [] };
+
+async function readCustom(): Promise<CustomData> {
+  const [packs, items, overrides] = await Promise.all([customStore.packs(), customStore.items(), customStore.overrides()]);
+  return { packs, items, overrides };
+}
+
+/**
+ * The packs the app shows, in order: the built-in packs (with the parent's voice and photos swapped
+ * in), the Mixed game, then the parent's own packs. Custom packs borrow the built-in praise.
+ */
+function composePacks(builtin: readonly LoadedPack[], custom: CustomData) {
+  const voiced = applyOverrides(builtin, overrideMap(custom.overrides));
+  const feedback = voiced[0]?.feedback ?? NO_FEEDBACK;
+  const customViews = customToLoaded(custom.packs, custom.items, feedback);
+  const own = customViews.map((v) => v.loaded);
+  const mixed = buildMixedPack([...voiced, ...own], feedback);
+  return { customViews, allPacks: [...voiced, ...(mixed ? [mixed] : []), ...own] };
+}
 
 export function App() {
   const [settings, setSettings] = useState<Settings>(loadSettings);
@@ -77,7 +109,7 @@ export function App() {
 function Shell({ settings, update }: { settings: Settings; update: (patch: Partial<Settings>) => void }) {
   const { t } = useI18n();
   const [builtin, setBuiltin] = useState<LoadedContent | null>(null);
-  const [customViews, setCustomViews] = useState<CustomPackView[]>([]);
+  const [custom, setCustom] = useState<CustomData>(NO_CUSTOM);
   const [screen, setScreen] = useState<Screen>('loading');
   const [gate, setGate] = useState<{ run: () => void } | null>(null);
   const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack } | null>(null);
@@ -86,25 +118,16 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
   const [nudge, setNudge] = useState<NextLevel | null>(null);
   const unlockedUntil = useRef(0);
   const soundChecked = useRef(false);
-  const feedback = useRef<LoadedFeedback>(NO_FEEDBACK);
 
-  // Built-in packs plus the parent's own packs that have enough finished items to play.
-  const allPacks = useMemo(() => [...(builtin?.packs ?? []), ...customViews.map((v) => v.loaded)], [builtin, customViews]);
-  const playablePacks = useMemo(
-    () => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK),
-    [allPacks],
-  );
+  const { customViews, allPacks } = useMemo(() => composePacks(builtin?.packs ?? [], custom), [builtin, custom]);
+  // Packs with enough finished items to play.
+  const playablePacks = useMemo(() => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK), [allPacks]);
   const content: LoadedContent = { packs: playablePacks, issues: builtin?.issues ?? [] };
   const pack = playablePacks.find((p) => p.id === settings.packId) ?? playablePacks[0];
 
-  const readCustom = async () => {
-    const [packs, items] = await Promise.all([customStore.packs(), customStore.items()]);
-    return customToLoaded(packs, items, feedback.current);
-  };
-
   const refreshCustom = useCallback(async () => {
     try {
-      setCustomViews(await readCustom());
+      setCustom(await readCustom());
     } catch (e) {
       console.warn('[custom] could not read my packs', e);
     }
@@ -149,20 +172,19 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         loaded = { packs: [], issues: [{ packId: '?', message: String(e), level: 'error' }] };
       }
       if (cancelled) return;
-      feedback.current = loaded.packs[0]?.feedback ?? NO_FEEDBACK;
-      let custom: CustomPackView[] = [];
+      let own = NO_CUSTOM;
       try {
-        custom = await readCustom();
+        own = await readCustom();
       } catch (e) {
         console.warn('[custom] could not read my packs', e);
       }
       if (cancelled) return;
       setBuiltin(loaded);
-      setCustomViews(custom);
+      setCustom(own);
       if (loaded.issues.length) console.warn('[content]', loaded.issues);
       // Spec 3.4: fail loudly in development; in release, skip broken items and carry on.
       if (import.meta.env.DEV && loaded.issues.some((i) => i.level === 'error')) setScreen('problems');
-      else afterLoad([...loaded.packs, ...custom.map((v) => v.loaded).filter((p) => p.items.length >= MIN_ITEMS_PER_PACK)]);
+      else afterLoad(composePacks(loaded.packs, own).allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK));
       // Only contacts the cloud if a parent signed in before, or is coming back from Google.
       void cloud.init(() => void refreshCustom());
     })();
@@ -208,11 +230,14 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
 
   const startKid = async (kind: KidKind) => {
     if (!pack) return;
+    // "Who eats what?" has a right answer even for the youngest, so Toddler mode doesn't apply.
+    const toddlerMode = settings.toddlerMode && pack.kind !== 'association';
     // Adaptive practice: weights come from the Report on this device when the game starts.
     let weights: Record<string, number> = {};
-    if (kind === 'game' && settings.adaptive && !settings.toddlerMode) {
+    if (kind === 'game' && settings.adaptive && !toddlerMode) {
+      const packIds = pack.parts ? pack.parts.map((p) => p.id) : [pack.id];
       try {
-        weights = practiceWeights(await reportStore.sessions(), await reportStore.questions(), pack.id);
+        weights = practiceWeights(await reportStore.sessions(), await reportStore.questions(), packIds);
       } catch {
         // No history available: every animal equally often.
       }
@@ -226,7 +251,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         itemKeys: enabledItemKeys(pack, settings),
         choiceCount: settings.choiceCount,
         questionsPerSession: settings.questionsPerSession,
-        toddlerMode: settings.toddlerMode,
+        toddlerMode,
         mode: settings.mode,
         language: settings.language,
         repeatIntervalSec: settings.repeatIntervalSec,
@@ -259,6 +284,11 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
       setStartStep('soundCheck');
       setScreen('start');
     }
+  };
+
+  const onCustomChanged = async () => {
+    await refreshCustom();
+    cloud.scheduleSync();
   };
 
   const home = () => setScreen('home');
@@ -297,10 +327,18 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
         <MyPacks
           views={customViews}
           onBack={home}
-          onChanged={async () => {
-            await refreshCustom();
-            cloud.scheduleSync();
-          }}
+          onPersonalize={() => setScreen('personalize')}
+          onChanged={onCustomChanged}
+        />
+      );
+      break;
+    case 'personalize':
+      body = (
+        <Personalize
+          packs={builtin?.packs ?? []}
+          overrides={custom.overrides}
+          onChanged={onCustomChanged}
+          onBack={() => setScreen('myPacks')}
         />
       );
       break;
@@ -345,7 +383,8 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
           pack={pack}
           settings={settings}
           canStart={playableCount >= MIN_ITEMS_PER_PACK}
-          canExplore={playableCount > 0}
+          // Explore is for hearing things; "Who eats what?" is only a question game.
+          canExplore={playableCount > 0 && pack?.kind !== 'association'}
           showParentsGroup={PARENTS_GROUP_URL !== ''}
           nudge={nudge}
           onStart={() => begin('game')}

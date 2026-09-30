@@ -3,10 +3,12 @@ import {
   LANGS,
   type ContentIssue,
   type Lang,
+  type LoadedAssociation,
   type LoadedContent,
   type LoadedFeedback,
   type LoadedItem,
   type LoadedPack,
+  type ManifestItem,
   type PackManifest,
   type ResolvedAsset,
 } from './types';
@@ -52,6 +54,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
 
   const packs: LoadedPack[] = [];
   const issues: ContentIssue[] = [];
+  const manifests = new Map<string, PackManifest>();
 
   for (const packId of index.packs) {
     let manifest: PackManifest;
@@ -75,6 +78,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       return resolved;
     };
 
+    manifests.set(manifest.pack_id, manifest);
     const validation = validatePack(manifest, (p) => usable(p) !== null);
     issues.push(...validation.issues);
     if (validation.validKeys.size < MIN_ITEMS_PER_PACK) continue;
@@ -100,6 +104,8 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
             ar: usable(itemAssetPath(item.name_audio.ar))!,
           },
           confusableWith: (item.confusable_with ?? []).filter((k) => validation.validKeys.has(k)),
+          picturePath: itemAssetPath(item.image ?? item.images![0]),
+          arFeminine: arabicFeminine(item),
         };
       });
 
@@ -113,17 +119,89 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       sessionEnd: perLang((lang) => feedbackAsset(fb?.session_end?.[lang])),
     };
 
+    const assoc = manifest.association;
+    const association: LoadedAssociation | undefined =
+      manifest.kind === 'association' && assoc
+        ? {
+            promptPackId: assoc.prompt_pack,
+            question: perLang((lang) => feedbackAsset(assoc.question_audio?.[lang])),
+            questionFeminine: perLang((lang) => feedbackAsset(assoc.question_audio_feminine?.[lang])),
+            reward: feedbackAsset(assoc.reward_audio),
+          }
+        : undefined;
+    if (manifest.kind === 'association' && !assoc) {
+      issues.push({ packId: manifest.pack_id, message: 'An association pack needs an "association" block', level: 'error' });
+      continue;
+    }
+
     packs.push({
       id: manifest.pack_id,
       version: manifest.pack_version,
       name: manifest.name,
+      kind: association ? 'association' : 'match',
+      order: typeof manifest.order === 'number' ? manifest.order : DEFAULT_ORDER,
+      ...(association ? { association } : {}),
       items,
       groups: (manifest.groups ?? []).map((g) => ({ ...g, items: g.items.filter((k) => validation.validKeys.has(k)) })),
       feedback,
     });
   }
 
-  return { packs, issues };
+  const resolved = packs.flatMap((pack) => {
+    if (pack.kind !== 'association') return [pack];
+    const linked = linkPrompts(pack, manifests, packs);
+    issues.push(...linked.issues);
+    return linked.pack ? [linked.pack] : [];
+  });
+  resolved.sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
+  return { packs: resolved, issues };
+}
+
+const DEFAULT_ORDER = 1000;
+
+/** Arabic nouns ending in ة are feminine; a manifest can say so for the others (أفعى). */
+function arabicFeminine(item: ManifestItem): boolean {
+  return typeof item.ar_feminine === 'boolean' ? item.ar_feminine : /ةs*$/.test(item.name?.ar ?? '');
+}
+
+/**
+ * An association pack's answers point at items of another pack (carrot: rabbit, donkey, horse).
+ * Answers whose prompt items are all unavailable (say, an emoji this phone can't draw) are left out.
+ */
+function linkPrompts(
+  pack: LoadedPack,
+  manifests: ReadonlyMap<string, PackManifest>,
+  packs: readonly LoadedPack[],
+): { pack: LoadedPack | null; issues: ContentIssue[] } {
+  const issues: ContentIssue[] = [];
+  const promptPackId = pack.association!.promptPackId;
+  const promptManifest = manifests.get(promptPackId);
+  const promptPack = packs.find((p) => p.id === promptPackId && p.kind === 'match');
+  if (!promptManifest || !promptPack) {
+    issues.push({ packId: pack.id, message: `Prompt pack "${promptPackId}" is missing`, level: 'error' });
+    return { pack: null, issues };
+  }
+  const known = new Set(promptManifest.items.map((i) => i.item_key));
+  const available = new Map(promptPack.items.map((i) => [i.key, i]));
+  const raw = new Map((manifests.get(pack.id)?.items ?? []).map((i) => [i.item_key, i.prompts]));
+
+  const items = pack.items.flatMap((item) => {
+    const keys = raw.get(item.key) ?? []; // validatePack already failed answers without prompts
+    for (const k of keys) {
+      if (!known.has(k)) issues.push({ packId: pack.id, itemKey: item.key, message: `prompts names unknown item "${k}"`, level: 'error' });
+    }
+    const prompts = keys.map((k) => available.get(k)).filter((p): p is LoadedItem => p !== undefined);
+    return prompts.length ? [{ ...item, prompts }] : [];
+  });
+  if (items.length < MIN_ITEMS_PER_PACK) {
+    issues.push({ packId: pack.id, message: `Only ${items.length} answers have a prompt item available`, level: 'warning' });
+    return { pack: null, issues };
+  }
+  const keys = new Set(items.map((i) => i.key));
+  return {
+    pack: { ...pack, items: items.map((i) => ({ ...i, confusableWith: i.confusableWith.filter((k) => keys.has(k)) })) },
+    issues,
+  };
 }
 
 function isAsset(a: ResolvedAsset | null | undefined): a is ResolvedAsset {

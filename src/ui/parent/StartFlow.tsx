@@ -35,7 +35,9 @@ export function StartFlow({
   const { t } = useI18n();
   const testItem = useMemo(() => {
     const enabled = pack.items.filter((i) => itemKeys.includes(i.key));
-    return enabled.find((i) => i.sound?.real) ?? enabled.find((i) => i.sound) ?? enabled[0] ?? pack.items[0];
+    // "Who eats what?" asks about animals, so the check uses one of them.
+    const candidates = pack.kind === 'association' ? enabled.flatMap((i) => i.prompts ?? []) : enabled;
+    return candidates.find((i) => i.sound?.real) ?? candidates.find((i) => i.sound) ?? candidates[0] ?? pack.items[0];
   }, [pack, itemKeys]);
   // A real animal sound when there is one; for packs without sounds, the first name.
   const testClip = useMemo<Clip>(

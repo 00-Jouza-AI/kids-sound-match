@@ -18,6 +18,13 @@ export interface ManifestItem {
   sound?: string;
   name_audio: Record<Lang, string>;
   confusable_with?: string[];
+  /**
+   * Association packs ("Who eats what?"): the items of the prompt pack this answer belongs to
+   * (carrot: rabbit, donkey, horse). The question is about one of them.
+   */
+  prompts?: string[];
+  /** Arabic grammatical gender, when the name doesn't show it (أفعى). Otherwise a final ة means feminine. */
+  ar_feminine?: boolean;
 }
 
 /** A preset for the parent's animal picker. */
@@ -33,10 +40,31 @@ export interface ManifestFeedback {
   session_end: Record<Lang, string>;
 }
 
+/**
+ * "match": hear a sound or name, tap its picture. "association": see and hear something from the
+ * prompt pack (an animal), tap the picture that goes with it (its food).
+ */
+export type PackKind = 'match' | 'association';
+
+export interface ManifestAssociation {
+  /** The pack the questions are about, e.g. "animals". */
+  prompt_pack: string;
+  /** Said after the prompt item's name: "What does it eat?". */
+  question_audio: Partial<Record<Lang, string>>;
+  /** The same question for grammatically feminine prompt items, where the language needs it (ماذا تأكل؟). */
+  question_audio_feminine?: Partial<Record<Lang, string>>;
+  /** Played after a right answer, before the praise (a happy "yum"). */
+  reward_audio?: string;
+}
+
 export interface PackManifest {
   pack_id: string;
   pack_version: number;
   schema_version: number;
+  /** Position in the parent's pack list (lowest first). */
+  order?: number;
+  kind?: PackKind;
+  association?: ManifestAssociation;
   name: LocalizedText;
   /** Present in the V1 manifest but unused: item paths already include the pack folder. */
   asset_root?: string;
@@ -67,6 +95,12 @@ export interface LoadedItem {
   readonly sound: ResolvedAsset | null;
   readonly nameAudio: Readonly<Record<Lang, ResolvedAsset>>;
   readonly confusableWith: readonly string[];
+  /** The manifest path of its main picture ("packs/family/mama.webp"): the key for a parent's own photo. */
+  readonly picturePath?: string;
+  /** Association packs: the prompt items this answer belongs to (the animals that eat it). */
+  readonly prompts?: readonly LoadedItem[];
+  /** Arabic grammatical gender, for "ماذا يأكل؟" / "ماذا تأكل؟". */
+  readonly arFeminine?: boolean;
 }
 
 export interface LoadedFeedback {
@@ -75,10 +109,24 @@ export interface LoadedFeedback {
   readonly sessionEnd: Readonly<Record<Lang, ResolvedAsset | null>>;
 }
 
+export interface LoadedAssociation {
+  readonly promptPackId: string;
+  readonly question: Readonly<Record<Lang, ResolvedAsset | null>>;
+  readonly questionFeminine: Readonly<Record<Lang, ResolvedAsset | null>>;
+  readonly reward: ResolvedAsset | null;
+}
+
 export interface LoadedPack {
   readonly id: string;
   readonly version: number;
   readonly name: LocalizedText;
+  readonly kind: PackKind;
+  /** Lowest first. */
+  readonly order: number;
+  /** Association packs only. */
+  readonly association?: LoadedAssociation;
+  /** The Mixed game: the packs its items come from. */
+  readonly parts?: readonly LoadedPack[];
   /** Only items whose every asset resolved. */
   readonly items: readonly LoadedItem[];
   readonly groups: readonly ManifestGroup[];

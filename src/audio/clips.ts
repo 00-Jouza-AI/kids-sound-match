@@ -24,6 +24,10 @@ export const FEEDBACK_SPEECH: Record<string, string> = {
   'feedback/correct_en_5.mp3': 'Amazing!',
   'feedback/session_end_ar.mp3': 'انتهينا! برافو!',
   'feedback/session_end_en.mp3': 'Well done! You finished the game',
+  // "Who eats what?": said after the animal's name. Arabic follows the animal's gender.
+  'feedback/eat_question_ar.mp3': 'ماذا يأكل؟',
+  'feedback/eat_question_ar_f.mp3': 'ماذا تأكل؟',
+  'feedback/eat_question_en.mp3': 'What does it eat?',
 };
 
 /**
@@ -46,6 +50,31 @@ export class ClipResolver {
     const clips = this.languages.map((lang) => this.voiced(item.nameAudio[lang], item.name[lang], lang, 'name', `name:${item.key}:${lang}`));
     // A parent's item recorded in one language uses that recording for both: say it once.
     return clips.filter((c, i) => c.kind !== 'file' || clips.findIndex((o) => o.kind === 'file' && o.url === c.url) === i);
+  }
+
+  /**
+   * Association games: the question after the prompt item's name, in one language
+   * ("ماذا تأكل؟" for a cow, "ماذا يأكل؟" for a horse, "What does it eat?").
+   */
+  question(about: LoadedItem, lang: Lang): Clip | null {
+    const assoc = this.pack.association;
+    if (!assoc) return null;
+    const asset = (about.arFeminine && assoc.questionFeminine[lang]) || assoc.question[lang];
+    return asset ? this.voiced(asset, FEEDBACK_SPEECH[asset.path], lang, 'feedback', `question:${asset.path}`) : null;
+  }
+
+  /** Association games: the prompt item's name, then the question, in each spoken language. */
+  askAbout(about: LoadedItem): Clip[] {
+    const names = this.names(about);
+    // A name recorded once for both languages (parents' own items) is said once, before the questions.
+    if (names.length < this.languages.length) return [...names, ...this.languages.map((l) => this.question(about, l)).filter(isClip)];
+    return this.languages.flatMap((lang, i) => [names[i], this.question(about, lang)]).filter(isClip);
+  }
+
+  /** Association games: a happy "yum" after a right answer. */
+  reward(): Clip | null {
+    const asset = this.pack.association?.reward;
+    return asset ? file(asset, 'feedback', 'reward') : null;
   }
 
   /** One praise line, in a random spoken language. */
@@ -78,14 +107,27 @@ export class ClipResolver {
     const praise = this.languages.flatMap((lang) =>
       this.pack.feedback.correct[lang].map((a) => this.voiced(a, FEEDBACK_SPEECH[a.path], lang, 'feedback', a.path)),
     );
-    return [this.incorrectTone(), ...this.sessionEnd(), ...praise].filter(isClip);
+    const assoc = this.pack.association;
+    const questions = assoc
+      ? this.languages.flatMap((lang) =>
+          [assoc.question[lang], assoc.questionFeminine[lang]]
+            .filter((a): a is ResolvedAsset => a !== null)
+            .map((a) => this.voiced(a, FEEDBACK_SPEECH[a.path], lang, 'feedback', `question:${a.path}`)),
+        )
+      : [];
+    return [this.incorrectTone(), ...this.sessionEnd(), ...praise, ...questions, this.reward()].filter(isClip);
   }
 
   private voiced(asset: ResolvedAsset, text: string | undefined, lang: Lang, category: ClipCategory, label: string): Clip {
-    // Placeholders only resolve in development/test builds, so release builds never reach speech.
-    if (!asset.real && text && speechAvailable(lang)) return { kind: 'speech', text, lang, label };
-    return file(asset, category, label);
+    return voicedClip(asset, text, lang, category, label);
   }
+}
+
+/** A recording, or (development only) the device voice reading `text` while the recording is a placeholder. */
+export function voicedClip(asset: ResolvedAsset, text: string | undefined, lang: Lang, category: ClipCategory, label: string): Clip {
+  // Placeholders only resolve in development/test builds, so release builds never reach speech.
+  if (!asset.real && text && speechAvailable(lang)) return { kind: 'speech', text, lang, label };
+  return file(asset, category, label);
 }
 
 function file(asset: ResolvedAsset, category: ClipCategory, label: string): Clip {

@@ -2,6 +2,7 @@
   "pack_id": "animals",
   "pack_version": 1,
   "schema_version": 1,
+  "order": 1,
   "name": {
     "en": "Animals",
     "ar": "الحيوانات"
@@ -234,6 +235,7 @@
     {
       "item_key": "snake",
       "name": { "en": "Snake", "ar": "أفعى" },
+      "ar_feminine": true,
       "image": "animals/snake.webp",
       "sound": "animals/snake_sound.mp3",
       "name_audio": {

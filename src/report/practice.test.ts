@@ -34,6 +34,22 @@ describe('adaptive practice weights', () => {
     await store.saveSession(game(), Array.from({ length: 10 }, () => q('owl', true)));
     expect(practiceWeights(await store.sessions(), await store.questions(), 'animals')).toEqual({ owl: 0.5 });
   });
+
+  it('counts Mixed-game tries for their own pack, and the other way round', async () => {
+    const store = new MemoryReportStore();
+    await store.saveSession(game({ packId: 'mixed' }), [
+      { ...q('owl', false), packId: 'animals' },
+      { ...q('owl', false), packId: 'animals' },
+      { ...q('bus', false), packId: 'vehicles' },
+      { ...q('bus', false), packId: 'vehicles' },
+    ]);
+    await store.saveSession(game({ packId: 'who-eats-what' }), [q('carrot', false), q('carrot', false)]);
+    const [sessions, questions] = [await store.sessions(), await store.questions()];
+    expect(practiceWeights(sessions, questions, 'animals')).toEqual({ owl: 2 });
+    expect(practiceWeights(sessions, questions, ['animals', 'vehicles'])).toEqual({ owl: 2, bus: 2 });
+    // "Who eats what?" is a different skill from naming the carrot in Food.
+    expect(practiceWeights(sessions, questions, 'food')).toEqual({});
+  });
 });
 
 describe('ready for more pictures', () => {

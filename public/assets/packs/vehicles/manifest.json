@@ -1,0 +1,186 @@
+{
+  "pack_id": "vehicles",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 3,
+  "name": { "en": "Vehicles", "ar": "وسائل النقل" },
+  "items": [
+    {
+      "item_key": "car",
+      "name": { "en": "Car", "ar": "سيارة" },
+      "image": "vehicles/car.webp",
+      "sound": "vehicles/car_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/car_name_en.mp3",
+        "ar": "vehicles/car_name_ar.mp3"
+      },
+      "confusable_with": ["truck"]
+    },
+    {
+      "item_key": "bus",
+      "name": { "en": "Bus", "ar": "حافلة" },
+      "image": "vehicles/bus.webp",
+      "sound": "vehicles/bus_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/bus_name_en.mp3",
+        "ar": "vehicles/bus_name_ar.mp3"
+      },
+      "confusable_with": ["truck"]
+    },
+    {
+      "item_key": "train",
+      "name": { "en": "Train", "ar": "قطار" },
+      "image": "vehicles/train.webp",
+      "sound": "vehicles/train_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/train_name_en.mp3",
+        "ar": "vehicles/train_name_ar.mp3"
+      },
+      "confusable_with": ["ship"]
+    },
+    {
+      "item_key": "airplane",
+      "name": { "en": "Airplane", "ar": "طائرة" },
+      "image": "vehicles/airplane.webp",
+      "sound": "vehicles/airplane_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/airplane_name_en.mp3",
+        "ar": "vehicles/airplane_name_ar.mp3"
+      },
+      "confusable_with": ["helicopter", "rocket"]
+    },
+    {
+      "item_key": "helicopter",
+      "name": { "en": "Helicopter", "ar": "طائرة مروحية" },
+      "image": "vehicles/helicopter.webp",
+      "sound": "vehicles/helicopter_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/helicopter_name_en.mp3",
+        "ar": "vehicles/helicopter_name_ar.mp3"
+      },
+      "confusable_with": ["airplane"]
+    },
+    {
+      "item_key": "ambulance",
+      "name": { "en": "Ambulance", "ar": "سيارة إسعاف" },
+      "image": "vehicles/ambulance.webp",
+      "sound": "vehicles/ambulance_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/ambulance_name_en.mp3",
+        "ar": "vehicles/ambulance_name_ar.mp3"
+      },
+      "confusable_with": ["police_car", "fire_truck"]
+    },
+    {
+      "item_key": "fire_truck",
+      "name": { "en": "Fire truck", "ar": "سيارة إطفاء" },
+      "image": "vehicles/fire_truck.webp",
+      "sound": "vehicles/fire_truck_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/fire_truck_name_en.mp3",
+        "ar": "vehicles/fire_truck_name_ar.mp3"
+      },
+      "confusable_with": ["ambulance", "police_car"]
+    },
+    {
+      "item_key": "police_car",
+      "name": { "en": "Police car", "ar": "سيارة شرطة" },
+      "image": "vehicles/police_car.webp",
+      "sound": "vehicles/police_car_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/police_car_name_en.mp3",
+        "ar": "vehicles/police_car_name_ar.mp3"
+      },
+      "confusable_with": ["ambulance", "fire_truck"]
+    },
+    {
+      "item_key": "motorcycle",
+      "name": { "en": "Motorbike", "ar": "دراجة نارية" },
+      "image": "vehicles/motorcycle.webp",
+      "sound": "vehicles/motorcycle_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/motorcycle_name_en.mp3",
+        "ar": "vehicles/motorcycle_name_ar.mp3"
+      },
+      "confusable_with": ["tractor"]
+    },
+    {
+      "item_key": "bicycle",
+      "name": { "en": "Bicycle", "ar": "دراجة هوائية" },
+      "image": "vehicles/bicycle.webp",
+      "sound": "vehicles/bicycle_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/bicycle_name_en.mp3",
+        "ar": "vehicles/bicycle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "ship",
+      "name": { "en": "Ship", "ar": "سفينة" },
+      "image": "vehicles/ship.webp",
+      "sound": "vehicles/ship_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/ship_name_en.mp3",
+        "ar": "vehicles/ship_name_ar.mp3"
+      },
+      "confusable_with": ["train"]
+    },
+    {
+      "item_key": "tractor",
+      "name": { "en": "Tractor", "ar": "جرار زراعي" },
+      "image": "vehicles/tractor.webp",
+      "sound": "vehicles/tractor_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/tractor_name_en.mp3",
+        "ar": "vehicles/tractor_name_ar.mp3"
+      },
+      "confusable_with": ["motorcycle"]
+    },
+    {
+      "item_key": "truck",
+      "name": { "en": "Truck", "ar": "شاحنة" },
+      "image": "vehicles/truck.webp",
+      "sound": "vehicles/truck_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/truck_name_en.mp3",
+        "ar": "vehicles/truck_name_ar.mp3"
+      },
+      "confusable_with": ["car", "bus"]
+    },
+    {
+      "item_key": "rocket",
+      "name": { "en": "Rocket", "ar": "صاروخ" },
+      "image": "vehicles/rocket.webp",
+      "sound": "vehicles/rocket_sound.mp3",
+      "name_audio": {
+        "en": "vehicles/rocket_name_en.mp3",
+        "ar": "vehicles/rocket_name_ar.mp3"
+      },
+      "confusable_with": ["airplane"]
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

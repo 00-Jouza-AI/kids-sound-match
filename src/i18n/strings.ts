@@ -3,7 +3,7 @@
 
 export const en = {
   appName: 'Kids Sound Match',
-  appTagline: 'Animal sounds and names for ages 1 to 4',
+  appTagline: 'Sounds and first words for ages 1 to 4',
   loading: 'Loading…',
   continue: 'Continue',
   back: 'Back',
@@ -13,7 +13,7 @@ export const en = {
 
   firstRunWelcomeTitle: 'Welcome',
   firstRunWelcomeBody:
-    'Kids Sound Match helps children aged about 1 to 4 learn animal sounds and names. Your child hears a sound and taps the matching picture, in Arabic or English.',
+    'Kids Sound Match helps children aged about 1 to 4 learn sounds and first words: animals, things at home, vehicles, food and more. Your child hears a sound or a word and taps the matching picture, in Arabic or English.',
   firstRunLockTitle: 'How Child Lock works',
   firstRunLockBody:
     "While your child plays, the game fills the screen, keeps it awake and ignores the Back button. A web page can't fully lock a phone, though: a determined child can still swipe out.",
@@ -89,7 +89,7 @@ export const en = {
   deleteDigit: 'Delete',
 
   soundCheckTitle: 'Sound check',
-  soundCheckQuestion: 'Did you hear the animal?',
+  soundCheckQuestion: 'Did you hear the sound?',
   soundCheckYes: 'Yes, start',
   soundCheckReplay: 'Play again',
   soundCheckNo: "I didn't hear it",
@@ -106,9 +106,9 @@ export const en = {
     'iPhone and iPad: Settings → Accessibility → Guided Access. Then triple-click the side (or Home) button while the game is open.',
   lockNoteOk: 'Got it',
 
-  reportByAnimal: 'By animal',
+  reportByItem: 'By picture',
   reportGames: 'Games',
-  reportExplain: 'Found on the first try, across all games. Toddler-mode games are not counted. Hardest first.',
+  reportExplain: 'Found on the first try, per pack. Toddler-mode games are not counted. Hardest first.',
   nOfM: '{n} of {m}',
   notEnoughTries: 'not enough tries yet',
   reportEmpty: 'No games yet. Results appear here after your child plays.',
@@ -125,7 +125,7 @@ export const en = {
   unfinishedGame: 'stopped early',
 
   aboutBody:
-    'A free, ad-free game that helps young children match animal sounds to pictures, in Arabic or English.',
+    'A free, ad-free game that helps young children match sounds and words to pictures, in Arabic or English.',
   aboutVersion: 'Version {v}',
   aboutSounds: 'Animal sounds: Pixabay. Placeholder pictures: your device’s emoji.',
 
@@ -135,26 +135,26 @@ export const en = {
 
   contentErrorTitle: 'Content problems found',
   contentErrorBody:
-    'The animal pack has errors. Development builds stop here so they get fixed; release builds skip the broken animals.',
+    'A pack has errors. Development builds stop here so they get fixed; release builds skip the broken pictures.',
   continueAnyway: 'Continue anyway',
   noPlayableTitle: 'Nothing to play yet',
-  noPlayableBody: 'Pictures or sounds are missing, so no animals can be shown.',
+  noPlayableBody: 'Pictures or sounds are missing, so nothing can be shown.',
 
   modeNameOnly: 'Name only',
   langBoth: 'Both',
   settingsHints: 'Gentle hints',
   settingsHintsHint:
     "If your child doesn't tap for about 8 seconds, or taps two wrong pictures, the right picture wiggles. Hinted answers don't count as first try in the Report.",
-  settingsAdaptive: 'Practise tricky animals more',
+  settingsAdaptive: 'Practise tricky pictures more',
   settingsAdaptiveHint:
-    'Animals your child often misses come up more, and ones they know come up less. Uses the Report on this phone; nothing is sent anywhere.',
+    'Pictures your child often misses come up more, and ones they know come up less. Uses the Report on this phone; nothing is sent anywhere.',
   nameOnlyTag: 'name only',
   explore: 'Explore',
-  exploreSub: 'Tap any animal to hear it',
-  explorePrev: 'Previous animals',
-  exploreNext: 'More animals',
+  exploreSub: 'Tap any picture to hear it',
+  explorePrev: 'Previous pictures',
+  exploreNext: 'More pictures',
   nudgeTitle: 'Ready for more?',
-  nudgeBody: 'Your child found {p}% of the animals on the first try in the last 3 games. Try going from {from} to {to} pictures?',
+  nudgeBody: 'Your child found {p}% of the pictures on the first try in the last 3 games. Try going from {from} to {to} pictures?',
   nudgeAccept: 'Use {to} pictures',
   nudgeDismiss: 'Not now',
   withHint: 'with a hint',
@@ -233,13 +233,42 @@ export const en = {
   noPackReady: 'No pack is ready to play yet. Make one in My packs.',
   deletedItem: 'Deleted item',
   privacyOwn: 'Your own pictures and recordings also stay on this phone, unless you choose to back them up by signing in with Google.',
+  settingsItemsHint: 'Choose at least {min}.',
+  associationHint: 'Your child sees and hears an animal, then “What does it eat?”, and taps its food. Each food lists the animals it is asked with.',
+  toddlerNotInAssociation: 'Not used in “Who eats what?”: every question has one right answer.',
+  mixTitle: 'Packs in the mix',
+  mixPackCount: '{n} pictures',
+  mixPackNone: 'none in this mode',
+  mixHint: 'Each pack uses the pictures chosen for it in Settings. Pictures from your own packs are only asked with each other.',
+  deletedPack: 'Deleted pack',
+  personalizeTitle: 'Your voice and photos',
+  personalizeCardSub: 'Say the names in our packs in your own voice, or use your own photos.',
+  personalizeIntro:
+    'Record the names in our packs in your own voice, or use your own photos (great for Family: a photo of Grandma for “Grandma”). Anything you don\'t change keeps the original.',
+  personalizePhotoHint: 'Photos show when every picture in a question has one, so add photos to all the pictures you play with.',
+  gameLines: 'Praise and game lines',
+  gameLinesHint: 'Say each line the way you would say it to your child.',
+  yoursOf: '{n} of {m} in your voice',
+  yourVoice: 'yours',
+  originalVoice: 'original',
+  useOriginal: 'Use original',
+  soundLabel: 'Sound',
+  linesPraise: 'Praise',
+  linesEnd: 'End of the game',
+  linesWhoEats: 'Who eats what?',
+  lineQuestionArM: 'Arabic, for animals like حصان',
+  lineQuestionArF: 'Arabic, for animals like بقرة',
+  lineYum: '“Yum!” after a right answer',
+  langArabic: 'Arabic',
+  langEnglish: 'English',
+  myPackTag: 'yours',
 };
 
 export type StringKey = keyof typeof en;
 
 export const ar: Record<StringKey, string> = {
   appName: 'Kids Sound Match',
-  appTagline: 'أصوات الحيوانات وأسماؤها للأطفال من سنة إلى 4 سنوات',
+  appTagline: 'أصوات وكلمات أولى للأطفال من سنة إلى 4 سنوات',
   loading: 'جارٍ التحميل…',
   continue: 'متابعة',
   back: 'رجوع',
@@ -249,7 +278,7 @@ export const ar: Record<StringKey, string> = {
 
   firstRunWelcomeTitle: 'أهلاً وسهلاً',
   firstRunWelcomeBody:
-    'تساعد لعبة Kids Sound Match الأطفال من عمر سنة إلى 4 سنوات تقريباً على تعلّم أصوات الحيوانات وأسمائها. يسمع طفلك صوتاً ثم يلمس الصورة المطابقة، بالعربية أو بالإنجليزية.',
+    'تساعد لعبة Kids Sound Match الأطفال من عمر سنة إلى 4 سنوات تقريباً على تعلّم الأصوات والكلمات الأولى: الحيوانات، أشياء البيت، وسائل النقل، الطعام وغيرها. يسمع طفلك صوتاً أو كلمة ثم يلمس الصورة المطابقة، بالعربية أو بالإنجليزية.',
   firstRunLockTitle: 'كيف يعمل قفل الطفل',
   firstRunLockBody:
     'أثناء اللعب تملأ اللعبة الشاشة وتُبقيها مضاءة وتتجاهل زر الرجوع. لكن صفحة الويب لا تستطيع قفل الهاتف بالكامل، فقد يتمكن الطفل من الخروج بالسحب.',
@@ -321,7 +350,7 @@ export const ar: Record<StringKey, string> = {
   deleteDigit: 'حذف',
 
   soundCheckTitle: 'فحص الصوت',
-  soundCheckQuestion: 'هل سمعت صوت الحيوان؟',
+  soundCheckQuestion: 'هل سمعت الصوت؟',
   soundCheckYes: 'نعم، ابدأ',
   soundCheckReplay: 'أعد التشغيل',
   soundCheckNo: 'لم أسمع شيئاً',
@@ -338,9 +367,9 @@ export const ar: Record<StringKey, string> = {
     'آيفون وآيباد: الإعدادات ← تسهيلات الاستخدام ← الوصول الموجّه. ثم اضغط زر الجانب (أو زر الشاشة الرئيسية) ثلاث مرات أثناء فتح اللعبة.',
   lockNoteOk: 'فهمت',
 
-  reportByAnimal: 'حسب الحيوان',
+  reportByItem: 'حسب الصورة',
   reportGames: 'الألعاب',
-  reportExplain: 'الإجابات الصحيحة من أول محاولة في كل الألعاب، دون ألعاب وضع الصغار. الأصعب أولاً.',
+  reportExplain: 'الإجابات الصحيحة من أول محاولة، لكل مجموعة، دون ألعاب وضع الصغار. الأصعب أولاً.',
   nOfM: '{n} من {m}',
   notEnoughTries: 'المحاولات غير كافية بعد',
   reportEmpty: 'لا توجد ألعاب بعد. ستظهر النتائج هنا بعد أن يلعب طفلك.',
@@ -356,7 +385,7 @@ export const ar: Record<StringKey, string> = {
   gameDetails: 'تفاصيل اللعبة',
   unfinishedGame: 'توقفت مبكراً',
 
-  aboutBody: 'لعبة مجانية بلا إعلانات تساعد الأطفال الصغار على مطابقة أصوات الحيوانات بصورها، بالعربية أو بالإنجليزية.',
+  aboutBody: 'لعبة مجانية بلا إعلانات تساعد الأطفال الصغار على مطابقة الأصوات والكلمات بصورها، بالعربية أو بالإنجليزية.',
   aboutVersion: 'الإصدار {v}',
   aboutSounds: 'أصوات الحيوانات: Pixabay. الصور المؤقتة: الرموز التعبيرية في جهازك.',
 
@@ -366,26 +395,26 @@ export const ar: Record<StringKey, string> = {
 
   contentErrorTitle: 'توجد مشكلات في المحتوى',
   contentErrorBody:
-    'في مجموعة الحيوانات أخطاء. نسخ التطوير تتوقف هنا لإصلاحها، أما نسخ الإصدار فتتجاوز الحيوانات المعطوبة.',
+    'في إحدى المجموعات أخطاء. نسخ التطوير تتوقف هنا لإصلاحها، أما نسخ الإصدار فتتجاوز الصور المعطوبة.',
   continueAnyway: 'متابعة على أي حال',
   noPlayableTitle: 'لا يوجد ما يُلعب بعد',
-  noPlayableBody: 'بعض الصور أو الأصوات ناقصة، لذلك لا يمكن عرض أي حيوان.',
+  noPlayableBody: 'بعض الصور أو الأصوات ناقصة، لذلك لا يمكن عرض أي شيء.',
 
   modeNameOnly: 'الاسم فقط',
   langBoth: 'الاثنتان',
   settingsHints: 'تلميحات لطيفة',
   settingsHintsHint:
     'إذا لم يلمس طفلك أي صورة لنحو 8 ثوانٍ، أو لمس صورتين خاطئتين، تهتزّ الصورة الصحيحة قليلاً. لا تُحسب الإجابة بعد التلميح من أول محاولة في التقرير.',
-  settingsAdaptive: 'تكرار الحيوانات الصعبة أكثر',
+  settingsAdaptive: 'تكرار الصور الصعبة أكثر',
   settingsAdaptiveHint:
-    'تظهر الحيوانات التي يخطئ فيها طفلك كثيراً مرات أكثر، والتي يعرفها مرات أقل. يعتمد ذلك على التقرير المحفوظ على هذا الهاتف، ولا يُرسل شيء إلى أي مكان.',
+    'تظهر الصور التي يخطئ فيها طفلك كثيراً مرات أكثر، والتي يعرفها مرات أقل. يعتمد ذلك على التقرير المحفوظ على هذا الهاتف، ولا يُرسل شيء إلى أي مكان.',
   nameOnlyTag: 'الاسم فقط',
   explore: 'استكشف',
-  exploreSub: 'المس أي حيوان لتسمعه',
-  explorePrev: 'الحيوانات السابقة',
-  exploreNext: 'حيوانات أخرى',
+  exploreSub: 'المس أي صورة لتسمعها',
+  explorePrev: 'الصور السابقة',
+  exploreNext: 'صور أخرى',
   nudgeTitle: 'هل طفلك جاهز للمزيد؟',
-  nudgeBody: 'في آخر 3 ألعاب، وجد طفلك {p}% من الحيوانات من أول محاولة. هل تريد زيادة عدد الصور من {from} إلى {to}؟',
+  nudgeBody: 'في آخر 3 ألعاب، وجد طفلك {p}% من الصور من أول محاولة. هل تريد زيادة عدد الصور من {from} إلى {to}؟',
   nudgeAccept: 'استخدم {to} صور',
   nudgeDismiss: 'ليس الآن',
   withHint: 'مع تلميح',
@@ -464,4 +493,33 @@ export const ar: Record<StringKey, string> = {
   noPackReady: 'لا توجد مجموعة جاهزة للعب بعد. أنشئ واحدة من «مجموعاتي».',
   deletedItem: 'عنصر محذوف',
   privacyOwn: 'صورك وتسجيلاتك الخاصة تبقى أيضاً على هذا الهاتف، إلا إذا اخترت نسخها احتياطياً بتسجيل الدخول باستخدام Google.',
+  settingsItemsHint: 'اختر {min} على الأقل.',
+  associationHint: 'يرى طفلك حيواناً ويسمعه، ثم يسمع «ماذا يأكل؟» فيلمس طعامه. تحت كل طعام أسماء الحيوانات التي يُسأل عنها معه.',
+  toddlerNotInAssociation: 'لا يُستخدم في «من يأكل ماذا؟»: لكل سؤال إجابة صحيحة واحدة.',
+  mixTitle: 'المجموعات في الخليط',
+  mixPackCount: 'الصور: {n}',
+  mixPackNone: 'لا شيء في هذا الوضع',
+  mixHint: 'تستخدم كل مجموعة الصور المختارة لها في الإعدادات. صور مجموعاتك الخاصة تُعرض مع بعضها فقط.',
+  deletedPack: 'مجموعة محذوفة',
+  personalizeTitle: 'صوتك وصورك',
+  personalizeCardSub: 'انطق أسماء مجموعاتنا بصوتك، أو استخدم صورك الخاصة.',
+  personalizeIntro:
+    'سجّل أسماء مجموعاتنا بصوتك، أو استخدم صورك الخاصة (مفيد لمجموعة العائلة: صورة التيتا لكلمة «تيتا»). كل ما لا تغيّره يبقى كما هو.',
+  personalizePhotoHint: 'تظهر الصور الحقيقية عندما يكون لكل صور السؤال صورة، لذلك أضف صوراً لكل الصور التي تلعبون بها.',
+  gameLines: 'عبارات المديح واللعبة',
+  gameLinesHint: 'قل كل عبارة كما تقولها لطفلك.',
+  yoursOf: '{n} من {m} بصوتك',
+  yourVoice: 'بصوتك',
+  originalVoice: 'الأصلي',
+  useOriginal: 'استخدم الأصلي',
+  soundLabel: 'الصوت',
+  linesPraise: 'المديح',
+  linesEnd: 'نهاية اللعبة',
+  linesWhoEats: 'من يأكل ماذا؟',
+  lineQuestionArM: 'بالعربية، لحيوانات مثل حصان',
+  lineQuestionArF: 'بالعربية، لحيوانات مثل بقرة',
+  lineYum: '«يمّ!» بعد الإجابة الصحيحة',
+  langArabic: 'العربية',
+  langEnglish: 'الإنجليزية',
+  myPackTag: 'من صنعك',
 };

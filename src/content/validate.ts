@@ -30,6 +30,10 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
   const items: ManifestItem[] = manifest.items;
   const allKeys = new Set<string>();
   const invalid = new Set<string>();
+  const association = manifest.kind === 'association';
+  if (association && typeof manifest.association?.prompt_pack !== 'string') {
+    error('An association pack needs "association": { "prompt_pack": ... }');
+  }
 
   for (const item of items) {
     const key = typeof item?.item_key === 'string' ? item.item_key : '';
@@ -64,6 +68,10 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
       const p = item.name_audio?.[lang];
       if (typeof p !== 'string' || !p) fail(`Missing ${lang} name audio path`);
       else if (!exists(itemAssetPath(p))) fail(`${lang} name audio not found: ${itemAssetPath(p)}`);
+    }
+    // "Who eats what?": every answer says which prompt items (animals) it goes with.
+    if (association && (!Array.isArray(item.prompts) || !item.prompts.length || item.prompts.some((k) => typeof k !== 'string'))) {
+      fail('An answer in an association pack needs "prompts": the items it goes with');
     }
   }
 
@@ -112,6 +120,18 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
     }
   } else {
     warn('No feedback_audio; celebrations will be silent');
+  }
+
+  const assoc = manifest.association;
+  if (association && assoc) {
+    const paths = [
+      ...Object.values(assoc.question_audio ?? {}),
+      ...Object.values(assoc.question_audio_feminine ?? {}),
+      assoc.reward_audio,
+    ];
+    for (const p of paths) {
+      if (typeof p === 'string' && p && !exists(feedbackAssetPath(p))) warn(`Question audio not found: ${feedbackAssetPath(p)}`);
+    }
   }
 
   return { issues, validKeys };

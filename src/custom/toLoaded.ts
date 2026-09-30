@@ -12,6 +12,8 @@ export function blobUrl(blob: Blob): string {
   return url;
 }
 
+const CUSTOM_PACK_ORDER = 2000;
+
 export interface CustomPackView {
   /** The pack as the game sees it (only complete items). */
   loaded: LoadedPack;
@@ -55,6 +57,9 @@ export function customToLoaded(
           id: CUSTOM_PACK_PREFIX + pack.id,
           version: 1,
           name: { ar: pack.name.ar || pack.name.en, en: pack.name.en || pack.name.ar },
+          kind: 'match',
+          // After the built-in packs and the Mixed game.
+          order: CUSTOM_PACK_ORDER,
           items: playable,
           groups: [],
           feedback,

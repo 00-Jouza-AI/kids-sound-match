@@ -150,7 +150,20 @@ function incorrectTone() {
 
 const C5 = 523.25, E5 = 659.25, G5 = 783.99, C6 = 1046.5;
 
+/** "Who eats what?" question placeholder: two notes going up, like a question. */
+function questionTone() {
+  return normalize(join(note(440, 0.14, bright), silence(0.04), note(587.33, 0.26, bright)), 0.4);
+}
+
+/** "Yum!" placeholder: three quick low chomps. */
+function yumTone() {
+  const chomp = (f) => note(f, 0.09, { partials: [[1, 1, 0.05], [2, 0.4, 0.03]], attack: 0.004 });
+  return normalize(join(chomp(220), silence(0.06), chomp(208), silence(0.06), chomp(196)), 0.45);
+}
+
 function feedbackTone(assetPath) {
+  if (/yum/.test(assetPath)) return yumTone();
+  if (/question/.test(assetPath)) return questionTone();
   if (/incorrect/.test(assetPath)) return incorrectTone();
   if (/session_end/.test(assetPath)) return arpeggio([C5, E5, G5, C6], 0.15, 0.7);
   const variant = Number(/_(\d+)\.\w+$/.exec(assetPath)?.[1] ?? 1);
@@ -189,6 +202,16 @@ for (const packId of packIds) {
   if (fb) {
     const feedbackPaths = [...fb.correct.en, ...fb.correct.ar, fb.incorrect_tone, fb.session_end.en, fb.session_end.ar];
     for (const p of feedbackPaths) count += write(p, wav(feedbackTone(p)));
+  }
+  // "Who eats what?": the question after the animal's name, and the "yum".
+  const assoc = manifest.association;
+  if (assoc) {
+    const paths = [
+      ...Object.values(assoc.question_audio ?? {}),
+      ...Object.values(assoc.question_audio_feminine ?? {}),
+      assoc.reward_audio,
+    ].filter(Boolean);
+    for (const p of paths) count += write(p, wav(feedbackTone(p)));
   }
 }
 

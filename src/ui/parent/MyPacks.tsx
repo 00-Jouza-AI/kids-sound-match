@@ -15,10 +15,13 @@ const ops = customOps(customStore);
 export function MyPacks({
   views,
   onChanged,
+  onPersonalize,
   onBack,
 }: {
   views: readonly CustomPackView[];
   onChanged: () => Promise<void>;
+  /** Opens "Your voice and photos" for the built-in packs. */
+  onPersonalize: () => void;
   onBack: () => void;
 }) {
   const { t, lang } = useI18n();
@@ -60,6 +63,16 @@ export function MyPacks({
   return (
     <Screen title={t('myPacks')} onBack={onBack}>
       <p className="hint">{t('myPacksIntro')}</p>
+      <button type="button" className="card pack-card" onClick={onPersonalize}>
+        <span className="link-icon big" aria-hidden="true">
+          🎙️
+        </span>
+        <span className="pack-text">
+          <strong>{t('personalizeTitle')}</strong>
+          <span className="hint">{t('personalizeCardSub')}</span>
+        </span>
+        <ChevronIcon />
+      </button>
       <CloudBackup />
       {views.map((v) => (
         <button type="button" key={v.pack.id} className="card pack-card" onClick={() => setOpenId(v.pack.id)}>

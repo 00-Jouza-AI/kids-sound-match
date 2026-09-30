@@ -319,3 +319,69 @@ describe('session (spec 4.3)', () => {
     }
   });
 });
+
+describe('association questions ("Who eats what?")', () => {
+  // Foods, each with the animals it is asked with. The horse eats apples, carrots and grass.
+  const foods: EngineItem[] = [
+    { key: 'carrot', confusableWith: [], prompts: ['rabbit', 'donkey', 'horse'] },
+    { key: 'apple', confusableWith: [], prompts: ['horse'] },
+    { key: 'grass', confusableWith: ['leaves'], prompts: ['cow', 'sheep', 'horse'] },
+    { key: 'leaves', confusableWith: ['grass'], prompts: ['giraffe'] },
+    { key: 'bone', confusableWith: [], prompts: ['dog'] },
+    { key: 'banana', confusableWith: [], prompts: ['monkey'] },
+    { key: 'cheese', confusableWith: [], prompts: ['mouse'] },
+  ];
+  const promptsOf = new Map(foods.map((f) => [f.key, f.prompts!]));
+
+  it('asks about one of the animals that eats the answer, and never offers its other foods', () => {
+    const rng = seededRng(11);
+    for (let i = 0; i < 5000; i++) {
+      const targetKey = foods[i % foods.length].key;
+      const q = generateQuestion({ items: foods, choiceCount: 4, previousTargetKey: null, rng, targetKey });
+      expect(promptsOf.get(targetKey)).toContain(q.promptKey);
+      for (const other of q.options.filter((k) => k !== targetKey)) {
+        expect(promptsOf.get(other)).not.toContain(q.promptKey); // e.g. no carrot when asking what the horse eats
+      }
+      expect(q.options.includes('grass') && q.options.includes('leaves')).toBe(false);
+    }
+  });
+
+  it('varies the animal, and records it with the result and in the snapshot', () => {
+    const config = { items: foods, choiceCount: 3 as ChoiceCount, questionsPerSession: 10, toddlerMode: false };
+    const session = new GameSession(config, 5);
+    const asked: string[] = [];
+    while (!session.isOver) {
+      session.ready();
+      asked.push(session.current.question.promptKey!);
+      session.tap(session.current.question.targetKey);
+      session.finishCelebration();
+    }
+    expect(session.results.map((r) => r.promptKey)).toEqual(asked);
+    // The same animal twice in a row only when the answer has no other animal (apple: horse only).
+    session.results.forEach((r, i) => {
+      if (i > 0 && asked[i] === asked[i - 1]) expect(promptsOf.get(r.itemKey)).toHaveLength(1);
+    });
+
+    const midway = new GameSession(config, 9);
+    midway.ready();
+    midway.tap(midway.current.question.targetKey);
+    midway.finishCelebration();
+    const restored = new GameSession(config, 0, JSON.parse(JSON.stringify(midway.snapshot())));
+    expect(restored.current.question.promptKey).toBe(midway.current.question.promptKey);
+  });
+
+  it('takes wrong answers from the same group only (Mixed game: your own packs stay together)', () => {
+    const items: EngineItem[] = [
+      ...['cat', 'dog', 'cow', 'bus', 'drum'].map((key) => ({ key, confusableWith: [], group: 'builtin' })),
+      ...['mama', 'baba', 'teddy'].map((key) => ({ key, confusableWith: [], group: 'custom' })),
+    ];
+    const group = new Map(items.map((i) => [i.key, i.group]));
+    const rng = seededRng(3);
+    for (let i = 0; i < 2000; i++) {
+      const targetKey = items[i % items.length].key;
+      const q = generateQuestion({ items, choiceCount: 4, previousTargetKey: null, rng, targetKey });
+      expect(q.options.every((k) => group.get(k) === group.get(targetKey))).toBe(true);
+      expect(q.options.length).toBe(group.get(targetKey) === 'custom' ? 3 : 4);
+    }
+  });
+});

@@ -1,5 +1,5 @@
 import { firstTryPercent } from './summary';
-import type { QuestionResultEntity, SessionEntity } from './types';
+import { resultPack, type QuestionResultEntity, type SessionEntity } from './types';
 
 /** Adaptive practice looks at each animal's most recent tries, so improvement shows up quickly. */
 export const RECENT_TRIES = 10;
@@ -11,16 +11,20 @@ const KNOWN_FROM = 0.9;
 /**
  * Weights for the game's shuffle bag (see engine/TargetBag), from the Report stored on this
  * device. Toddler games are ignored. Animals without enough history keep the normal weight.
+ * `packIds`: the game's pack, or for the Mixed game every pack in the mix (a cat found in a
+ * Mixed game counts for the Animals pack, and the other way round).
  */
 export function practiceWeights(
   sessions: readonly SessionEntity[],
   questions: readonly QuestionResultEntity[],
-  packId: string,
+  packIds: string | readonly string[],
 ): Record<string, number> {
-  const counted = new Set(sessions.filter((s) => !s.toddlerMode && s.packId === packId).map((s) => s.id));
+  const wanted = new Set(typeof packIds === 'string' ? [packIds] : packIds);
+  const counted = new Map(sessions.filter((s) => !s.toddlerMode).map((s) => [s.id, s]));
   const history = new Map<string, boolean[]>();
   for (const q of [...questions].sort((a, b) => a.id - b.id)) {
-    if (!counted.has(q.sessionId)) continue;
+    const session = counted.get(q.sessionId);
+    if (!session || !wanted.has(resultPack(q, session))) continue;
     history.set(q.itemKey, [...(history.get(q.itemKey) ?? []), q.firstTryCorrect]);
   }
   const weights: Record<string, number> = {};

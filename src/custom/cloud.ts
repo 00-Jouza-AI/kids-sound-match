@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { local, session } from '../settings/storage';
 import { customStore } from './store';
-import { forgetCloud, runSync, type Remote, type RemoteItem, type RemotePack } from './sync';
+import { forgetCloud, runSync, type Remote, type RemoteItem, type RemoteOverride, type RemotePack } from './sync';
 import type { MediaName } from './types';
 
 /**
@@ -31,6 +31,8 @@ function supabase(): Promise<SupabaseClient> {
 
 function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
   const path = (itemId: string, name: MediaName) => `${uid}/${itemId}/${name}`;
+  // "Your voice and photos": stored under the path of the built-in file each one replaces.
+  const overridePath = (assetPath: string) => `${uid}/overrides/${assetPath}`;
   const check = <T>(r: { data: T; error: unknown }): T => {
     if (r.error) throw r.error;
     return r.data;
@@ -46,8 +48,27 @@ function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
           .select('id,pack_id,name_en,name_ar,picture_kind,has_name_ar,has_name_en,has_sound,media_version,updated_at,deleted'),
       ) as RemoteItem[];
     },
+    async listOverrides() {
+      return check(await sb.from('custom_overrides').select('path,media_version,updated_at,deleted')) as RemoteOverride[];
+    },
     async upsertPack(pack) {
       check(await sb.from('custom_packs').upsert({ ...pack, user_id: uid }));
+    },
+    async upsertOverride(override) {
+      check(await sb.from('custom_overrides').upsert({ ...override, user_id: uid }, { onConflict: 'user_id,path' }));
+    },
+    async uploadOverride(assetPath, blob) {
+      check(
+        await sb.storage.from(BUCKET).upload(overridePath(assetPath), blob, { upsert: true, contentType: blob.type || undefined }),
+      );
+    },
+    async downloadOverride(assetPath) {
+      const data = check(await sb.storage.from(BUCKET).download(overridePath(assetPath)));
+      if (!data) throw new Error(`Missing your recording or photo for ${assetPath}`);
+      return data;
+    },
+    async removeOverride(assetPath) {
+      check(await sb.storage.from(BUCKET).remove([overridePath(assetPath)]));
     },
     async upsertItem(item) {
       check(await sb.from('custom_items').upsert({ ...item, user_id: uid }));
@@ -65,8 +86,10 @@ function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
     },
     async deleteEverything() {
       const items = check(await sb.from('custom_items').select('id')) as { id: string }[];
-      const paths = items.flatMap((i) => ALL_MEDIA.map((n) => path(i.id, n)));
+      const overrides = check(await sb.from('custom_overrides').select('path')) as { path: string }[];
+      const paths = [...items.flatMap((i) => ALL_MEDIA.map((n) => path(i.id, n))), ...overrides.map((o) => overridePath(o.path))];
       for (let i = 0; i < paths.length; i += 100) check(await sb.storage.from(BUCKET).remove(paths.slice(i, i + 100)));
+      check(await sb.from('custom_overrides').delete().eq('user_id', uid));
       check(await sb.from('custom_items').delete().eq('user_id', uid));
       check(await sb.from('custom_packs').delete().eq('user_id', uid));
     },

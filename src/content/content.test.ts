@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import manifestJson from '../../public/assets/packs/animals/manifest.json';
+import { defaultSettings, enabledItemKeys } from '../settings/settings';
 import { loadContent, type AssetIndex } from './loader';
+import { buildMixedPack, sourcePacks } from './mixed';
 import { placeholderPathFor } from './paths';
 import type { PackManifest } from './types';
 import { validatePack } from './validate';
@@ -154,5 +156,78 @@ describe('loader', () => {
     const content = await loadContent({ baseUrl: './', allowPlaceholders: false, fetchJson });
     expect(content.packs).toHaveLength(0); // not enough real content yet: the pack is skipped, no crash
     expect(content.issues.length).toBeGreaterThan(0);
+  });
+});
+
+describe('all packs', () => {
+  const packIds = fs.readdirSync(path.join(ASSETS, 'packs')).filter((d) => fs.existsSync(path.join(ASSETS, 'packs', d, 'manifest.json')));
+  const read = (id: string) => JSON.parse(fs.readFileSync(path.join(ASSETS, 'packs', id, 'manifest.json'), 'utf8')) as PackManifest;
+  const index: AssetIndex = { packs: packIds, files: [...realFiles], placeholders: [...placeholderFiles] };
+  const fetchAll = async (url: string) => {
+    if (url.endsWith('packs/index.json')) return index;
+    return JSON.parse(fs.readFileSync(path.join(ASSETS, url.replace(/^\.?\/assets\//, '')), 'utf8'));
+  };
+  const load = (usable?: (key: string) => boolean) =>
+    loadContent({ baseUrl: '/', allowPlaceholders: true, fetchJson: fetchAll, placeholderPictureUsable: usable });
+
+  it('are all valid in development', () => {
+    for (const id of packIds) {
+      const { issues } = validatePack(read(id), existsInDev);
+      expect(issues.filter((i) => i.level === 'error'), id).toEqual([]);
+    }
+  });
+
+  it('never reuse an item key between packs (so the Report and the Mixed game can tell them apart)', () => {
+    const owner = new Map<string, string>();
+    for (const id of packIds) {
+      const m = read(id);
+      if (m.kind === 'association') continue; // its answers reuse Food's and Animals' files on purpose
+      for (const item of m.items) {
+        expect(owner.get(item.item_key), `${item.item_key} in ${id}`).toBeUndefined();
+        owner.set(item.item_key, id);
+      }
+    }
+  });
+
+  it('load in order, and link every food to the animals that eat it', async () => {
+    const content = await load();
+    expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
+    expect(content.packs.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'who-eats-what']);
+    const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
+    expect(whoEats.kind).toBe('association');
+    expect(whoEats.items).toHaveLength(15);
+    const carrot = whoEats.items.find((i) => i.key === 'carrot')!;
+    expect(carrot.prompts!.map((p) => p.key)).toEqual(['rabbit', 'donkey', 'horse']);
+    expect(carrot.nameAudio.ar.path).toBe('packs/food/carrot_name_ar.mp3'); // the same recording as in Food
+    expect(whoEats.association!.question.ar?.url).toBe('/placeholders/feedback/eat_question_ar.wav');
+    expect(whoEats.association!.reward?.url).toBe('/placeholders/feedback/yum.wav');
+    const animals = content.packs[0];
+    const gender = (key: string) => animals.items.find((i) => i.key === key)!.arFeminine;
+    expect([gender('cow'), gender('horse'), gender('turtle'), gender('snake')]).toEqual([true, false, true, true]);
+  });
+
+  it('leave out a food when none of its animals can be shown', async () => {
+    const content = await load((key) => !['rabbit', 'donkey', 'horse'].includes(key));
+    const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
+    expect(whoEats.items.find((i) => i.key === 'carrot')).toBeUndefined();
+    expect(whoEats.items.find((i) => i.key === 'apple')).toBeUndefined();
+    expect(whoEats.items.find((i) => i.key === 'lettuce')!.prompts!.map((p) => p.key)).toEqual(['turtle', 'snail']);
+  });
+
+  it('make a Mixed game from every ready "match" pack, with each pack\'s own choice', async () => {
+    const content = await load();
+    const mixed = buildMixedPack(content.packs, content.packs[0].feedback)!;
+    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family']);
+    expect(new Set(mixed.items.map((i) => i.key)).size).toBe(mixed.items.length);
+    expect(mixed.items.find((i) => i.key === 'bell')!.confusableWith).toContain('doorbell');
+
+    const settings = defaultSettings('ar');
+    // Sound modes: the 8 animals with real sounds, plus every home, vehicle and instrument sound.
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11);
+    settings.mode = 'NAME_ONLY';
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 25 + 13 + 9);
+    settings.mixedExcluded = ['animals', 'home', 'vehicles', 'instruments', 'body', 'family'];
+    expect(enabledItemKeys(mixed, settings)).toEqual(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));
+    expect(sourcePacks(mixed).get('drum')).toBe('instruments');
   });
 });

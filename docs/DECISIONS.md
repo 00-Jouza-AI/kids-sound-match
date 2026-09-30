@@ -62,6 +62,30 @@ fish (سمكة), butterfly (فراشة), snail (حلزون), ladybug (دعسوق
 panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the first 20. Worth checking:
 "deer" is named غزال (gazelle), the word most families use.
 
+## Added on 30 September 2026 (third round)
+
+| Feature | Decision |
+|---|---|
+| New packs | Things at home (15, with sounds), Vehicles (14, with sounds), Musical instruments (11, with sounds), Food (25), Body parts (13) and Family (9). The last three are name-only. Sound-alikes are never asked together: doorbell/phone/alarm clock, tap/shower/frying pan, door/hammer, keys/scissors, ambulance/police car/fire truck, car/bus/truck, plane/helicopter/rocket, train/ship, motorbike/tractor, drum/darbuka, oud/guitar, trumpet/saxophone, piano/accordion, hand/finger/arm, foot/leg, mouth/tongue/teeth, hummus/labneh, tomato/apple, Mama/Aunt, Baba/Uncle |
+| Pack order | Manifests have an `order`: Animals, Things at home, Vehicles, Instruments, Food, Body parts, Family, Who eats what?, then Mixed, then your own packs |
+| Who eats what? | A new kind of pack (`"kind": "association"`). The child sees and hears an animal (its sound, name, then "What does it eat?") and taps its food; a right answer plays the food's name, a "yum" and praise, and the food is "eaten". 15 foods for 39 animals. An animal that eats several of the foods (the horse: apple, carrot, grass) never sees its other foods as wrong answers. The Arabic question follows the animal's gender (ماذا يأكل؟ / ماذا تأكل؟), taken from a final ة or the manifest's `ar_feminine` (أفعى). Always sound + name + question, whatever "What your child hears" says; no Toddler mode and no Explore for this pack |
+| Mixed game | A "Mixed" pack in Settings: every ready pack together, each with the pictures chosen for it; packs can be left out. Wrong answers come from the same side as the right one (built-in packs, or your own packs), so your photos are only asked with each other. A few sound-alikes across packs are kept apart (bell/doorbell/phone/alarm clock, drum/darbuka/door/hammer, trumpet/elephant, snake/frying pan/shower). Not sent in telemetry |
+| Your voice and photos | My packs → Your voice and photos: record any name in the built-in packs in your own voice (Arabic and/or English), a sound, the praise lines, the end-of-game line and the Who-eats-what lines, or replace a picture with your own photo (Grandma's photo for "Grandma"). Anything not changed keeps the original; "Use original" undoes it. A file shared by two packs (the carrot in Food and Who eats what?) changes in both. Stored on the device and, when signed in, backed up with the packs (new table `custom_overrides`) |
+| Settings | The pack choice is now a grid of pictures at the top; your own packs are marked "yours" |
+| Report | "By picture", one section per pack. Mixed-game answers count for the pack each picture came from; Who eats what? counts separately from Food (naming a carrot and knowing who eats it are different skills). Game details show "Rabbit → Carrot" |
+| Left out on purpose | "Teacher" (not family) and, in Who eats what?, peanuts and corn (the right answer wasn't clear-cut) |
+
+### More clips for the voice session (third round)
+
+- **190 name recordings** (Arabic + English) for 95 new pictures: the six new packs plus Who eats what?'s own
+  foods (grass عشب, bone عظمة, seeds حبوب, bamboo خيزران, leaves أوراق الشجر, flower زهرة, meat لحم, lettuce خس).
+- **40 sound effects** for Things at home, Vehicles and Musical instruments (`<key>_sound.mp3`).
+- **4 lines**: `eat_question_ar.mp3` ماذا يأكل؟, `eat_question_ar_f.mp3` ماذا تأكل؟,
+  `eat_question_en.mp3` "What does it eat?", and `yum.mp3` (a happy "mmm, yum!" or munching sound).
+- Worth checking: Family uses the words toddlers say at home (ماما، بابا، تيتا، جدّو، عمّو، خالتو، بيبي), not MSA;
+  Uncle and Aunt are one of each (عمّو, خالتو), and families can record their own word in "Your voice and photos".
+- Pictures still to draw: dates (the placeholder is a palm tree), labneh and hummus have no emoji of their own.
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.
@@ -95,6 +119,9 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
 - The 8 downloaded sounds look like Pixabay files; confirm the licence covers commercial use before release.
 
 ## Notes for later
+
+- Photos only show when every picture on the screen has one (the rule above), including a parent's own
+  photos. For Family, add photos to everyone you use, or turn the others off in Settings.
 
 - With 3 or 4 pictures on a phone held upright, each picture is ~150 px (about 7% of the screen) because two share the width. Stacking 3 vertically would give ~225 px; the spec's 2 + 1 layout is kept for now.
 - Emoji pictures depend on the phone's emoji font. The donkey (a 2022 emoji) is dropped automatically on phones that can't draw it.

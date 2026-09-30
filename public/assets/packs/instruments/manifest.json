@@ -1,0 +1,153 @@
+{
+  "pack_id": "instruments",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 4,
+  "name": { "en": "Musical instruments", "ar": "الآلات الموسيقية" },
+  "items": [
+    {
+      "item_key": "drum",
+      "name": { "en": "Drum", "ar": "طبل" },
+      "image": "instruments/drum.webp",
+      "sound": "instruments/drum_sound.mp3",
+      "name_audio": {
+        "en": "instruments/drum_name_en.mp3",
+        "ar": "instruments/drum_name_ar.mp3"
+      },
+      "confusable_with": ["darbuka"]
+    },
+    {
+      "item_key": "darbuka",
+      "name": { "en": "Darbuka", "ar": "دربكة" },
+      "image": "instruments/darbuka.webp",
+      "sound": "instruments/darbuka_sound.mp3",
+      "name_audio": {
+        "en": "instruments/darbuka_name_en.mp3",
+        "ar": "instruments/darbuka_name_ar.mp3"
+      },
+      "confusable_with": ["drum"]
+    },
+    {
+      "item_key": "oud",
+      "name": { "en": "Oud", "ar": "عود" },
+      "image": "instruments/oud.webp",
+      "sound": "instruments/oud_sound.mp3",
+      "name_audio": {
+        "en": "instruments/oud_name_en.mp3",
+        "ar": "instruments/oud_name_ar.mp3"
+      },
+      "confusable_with": ["guitar"]
+    },
+    {
+      "item_key": "piano",
+      "name": { "en": "Piano", "ar": "بيانو" },
+      "image": "instruments/piano.webp",
+      "sound": "instruments/piano_sound.mp3",
+      "name_audio": {
+        "en": "instruments/piano_name_en.mp3",
+        "ar": "instruments/piano_name_ar.mp3"
+      },
+      "confusable_with": ["accordion"]
+    },
+    {
+      "item_key": "guitar",
+      "name": { "en": "Guitar", "ar": "غيتار" },
+      "image": "instruments/guitar.webp",
+      "sound": "instruments/guitar_sound.mp3",
+      "name_audio": {
+        "en": "instruments/guitar_name_en.mp3",
+        "ar": "instruments/guitar_name_ar.mp3"
+      },
+      "confusable_with": ["oud"]
+    },
+    {
+      "item_key": "trumpet",
+      "name": { "en": "Trumpet", "ar": "بوق" },
+      "image": "instruments/trumpet.webp",
+      "sound": "instruments/trumpet_sound.mp3",
+      "name_audio": {
+        "en": "instruments/trumpet_name_en.mp3",
+        "ar": "instruments/trumpet_name_ar.mp3"
+      },
+      "confusable_with": ["saxophone"]
+    },
+    {
+      "item_key": "violin",
+      "name": { "en": "Violin", "ar": "كمان" },
+      "image": "instruments/violin.webp",
+      "sound": "instruments/violin_sound.mp3",
+      "name_audio": {
+        "en": "instruments/violin_name_en.mp3",
+        "ar": "instruments/violin_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "nay",
+      "name": { "en": "Nay flute", "ar": "ناي" },
+      "image": "instruments/nay.webp",
+      "sound": "instruments/nay_sound.mp3",
+      "name_audio": {
+        "en": "instruments/nay_name_en.mp3",
+        "ar": "instruments/nay_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "bell",
+      "name": { "en": "Bell", "ar": "جرس" },
+      "image": "instruments/bell.webp",
+      "sound": "instruments/bell_sound.mp3",
+      "name_audio": {
+        "en": "instruments/bell_name_en.mp3",
+        "ar": "instruments/bell_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "saxophone",
+      "name": { "en": "Saxophone", "ar": "ساكسفون" },
+      "image": "instruments/saxophone.webp",
+      "sound": "instruments/saxophone_sound.mp3",
+      "name_audio": {
+        "en": "instruments/saxophone_name_en.mp3",
+        "ar": "instruments/saxophone_name_ar.mp3"
+      },
+      "confusable_with": ["trumpet"]
+    },
+    {
+      "item_key": "accordion",
+      "name": { "en": "Accordion", "ar": "أكورديون" },
+      "image": "instruments/accordion.webp",
+      "sound": "instruments/accordion_sound.mp3",
+      "name_audio": {
+        "en": "instruments/accordion_name_en.mp3",
+        "ar": "instruments/accordion_name_ar.mp3"
+      },
+      "confusable_with": ["piano"]
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

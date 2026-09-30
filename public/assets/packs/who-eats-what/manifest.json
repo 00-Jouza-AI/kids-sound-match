@@ -1,0 +1,204 @@
+{
+  "pack_id": "who-eats-what",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 8,
+  "kind": "association",
+  "association": {
+    "prompt_pack": "animals",
+    "question_audio": { "en": "feedback/eat_question_en.mp3", "ar": "feedback/eat_question_ar.mp3" },
+    "question_audio_feminine": { "ar": "feedback/eat_question_ar_f.mp3" },
+    "reward_audio": "feedback/yum.mp3"
+  },
+  "name": { "en": "Who eats what?", "ar": "من يأكل ماذا؟" },
+  "items": [
+    {
+      "item_key": "carrot",
+      "name": { "en": "Carrot", "ar": "جزرة" },
+      "image": "food/carrot.webp",
+      "name_audio": {
+        "en": "food/carrot_name_en.mp3",
+        "ar": "food/carrot_name_ar.mp3"
+      },
+      "prompts": ["rabbit", "donkey", "horse"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "banana",
+      "name": { "en": "Banana", "ar": "موزة" },
+      "image": "food/banana.webp",
+      "name_audio": {
+        "en": "food/banana_name_en.mp3",
+        "ar": "food/banana_name_ar.mp3"
+      },
+      "prompts": ["monkey", "gorilla"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "cheese",
+      "name": { "en": "Cheese", "ar": "جبنة" },
+      "image": "food/cheese.webp",
+      "name_audio": {
+        "en": "food/cheese_name_en.mp3",
+        "ar": "food/cheese_name_ar.mp3"
+      },
+      "prompts": ["mouse"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "milk",
+      "name": { "en": "Milk", "ar": "حليب" },
+      "image": "food/milk.webp",
+      "name_audio": {
+        "en": "food/milk_name_en.mp3",
+        "ar": "food/milk_name_ar.mp3"
+      },
+      "prompts": ["cat"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "honey",
+      "name": { "en": "Honey", "ar": "عسل" },
+      "image": "food/honey.webp",
+      "name_audio": {
+        "en": "food/honey_name_en.mp3",
+        "ar": "food/honey_name_ar.mp3"
+      },
+      "prompts": ["bear"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "apple",
+      "name": { "en": "Apple", "ar": "تفاحة" },
+      "image": "food/apple.webp",
+      "name_audio": {
+        "en": "food/apple_name_en.mp3",
+        "ar": "food/apple_name_ar.mp3"
+      },
+      "prompts": ["horse"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "fish",
+      "name": { "en": "Fish", "ar": "سمكة" },
+      "image": "animals/fish.webp",
+      "name_audio": {
+        "en": "animals/fish_name_en.mp3",
+        "ar": "animals/fish_name_ar.mp3"
+      },
+      "prompts": ["penguin", "seal", "dolphin", "whale", "cat", "bear", "crocodile"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "grass",
+      "name": { "en": "Grass", "ar": "عشب" },
+      "image": "who-eats-what/grass.webp",
+      "name_audio": {
+        "en": "who-eats-what/grass_name_en.mp3",
+        "ar": "who-eats-what/grass_name_ar.mp3"
+      },
+      "prompts": ["cow", "sheep", "goat", "zebra", "deer", "camel", "hippo", "kangaroo", "horse", "donkey", "rabbit"],
+      "confusable_with": ["leaves", "lettuce"]
+    },
+    {
+      "item_key": "bone",
+      "name": { "en": "Bone", "ar": "عظمة" },
+      "image": "who-eats-what/bone.webp",
+      "name_audio": {
+        "en": "who-eats-what/bone_name_en.mp3",
+        "ar": "who-eats-what/bone_name_ar.mp3"
+      },
+      "prompts": ["dog"],
+      "confusable_with": ["meat"]
+    },
+    {
+      "item_key": "seeds",
+      "name": { "en": "Seeds", "ar": "حبوب" },
+      "image": "who-eats-what/seeds.webp",
+      "name_audio": {
+        "en": "who-eats-what/seeds_name_en.mp3",
+        "ar": "who-eats-what/seeds_name_ar.mp3"
+      },
+      "prompts": ["hen", "chick", "bird", "pigeon", "rooster", "turkey"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "bamboo",
+      "name": { "en": "Bamboo", "ar": "خيزران" },
+      "image": "who-eats-what/bamboo.webp",
+      "name_audio": {
+        "en": "who-eats-what/bamboo_name_en.mp3",
+        "ar": "who-eats-what/bamboo_name_ar.mp3"
+      },
+      "prompts": ["panda"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "leaves",
+      "name": { "en": "Leaves", "ar": "أوراق الشجر" },
+      "image": "who-eats-what/leaves.webp",
+      "name_audio": {
+        "en": "who-eats-what/leaves_name_en.mp3",
+        "ar": "who-eats-what/leaves_name_ar.mp3"
+      },
+      "prompts": ["giraffe"],
+      "confusable_with": ["grass", "lettuce"]
+    },
+    {
+      "item_key": "flower",
+      "name": { "en": "Flower", "ar": "زهرة" },
+      "image": "who-eats-what/flower.webp",
+      "name_audio": {
+        "en": "who-eats-what/flower_name_en.mp3",
+        "ar": "who-eats-what/flower_name_ar.mp3"
+      },
+      "prompts": ["bee", "butterfly"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "meat",
+      "name": { "en": "Meat", "ar": "لحم" },
+      "image": "who-eats-what/meat.webp",
+      "name_audio": {
+        "en": "who-eats-what/meat_name_en.mp3",
+        "ar": "who-eats-what/meat_name_ar.mp3"
+      },
+      "prompts": ["lion", "tiger", "leopard", "wolf", "fox", "crocodile"],
+      "confusable_with": ["bone"]
+    },
+    {
+      "item_key": "lettuce",
+      "name": { "en": "Lettuce", "ar": "خس" },
+      "image": "who-eats-what/lettuce.webp",
+      "name_audio": {
+        "en": "who-eats-what/lettuce_name_en.mp3",
+        "ar": "who-eats-what/lettuce_name_ar.mp3"
+      },
+      "prompts": ["turtle", "snail", "rabbit"],
+      "confusable_with": ["grass", "leaves"]
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}
