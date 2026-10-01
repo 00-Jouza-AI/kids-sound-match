@@ -110,6 +110,20 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
 - Pictures still to draw: the 6 feelings and the 9 homes (colours, shapes and counting are final).
 - The studio (`Home → Recording studio` on this PC) is the quickest way to record all of these.
 
+## Added on 2 October 2026
+
+| Feature | Decision |
+|---|---|
+| Real pictures | Every built-in picture is a Microsoft Fluent Emoji "Color" drawing (MIT licence, credited in About, licence in `public/assets/licenses/`), downloaded with your approval: crisp at any size and the same on every phone. No emoji fitted dates, a beehive, a vacuum cleaner or an oud, so those four were drawn for the app in the same style |
+| Your old photos | The 23 cat, dog and duck photos left the built-in pack (copies kept on this PC in `dev-assets/removed-photos`, not in git) and the photo helper (`npm run photos`) was retired: one consistent look. Your own photos still go in through "Your voice and photos" |
+| Photos vs drawings | A question shows photos only when every picture in it is a photo (a parent's photo of Grandma falls back to the pack's drawing otherwise), then drawings, then development stand-ins |
+| Memory | Pairs face down; turning a card says its sound and name; a found pair stays open with confetti; two different cards turn back after 1.3 s. No score or timer. Starts at 3 pairs; after 3 finished games with every pair found in at most two turns per pair, Home suggests 4, then 6 (behind the PIN; also in Settings). Uses the chosen pack's pictures |
+| Odd one out | "أين المختلف؟ / Which one is different?" with 3 or 4 pictures (always at least 3). Easy: different packs (three animals and a car). After 3 finished easy games at 80%+ first try it moves to harder: groups inside a pack (three farm animals and a fish; three fruits and a vegetable); two hard games under 50% move it back. Groups overlap (a duck is a farm animal and a bird), so the odd one is checked against every group the others share: every question has one clear answer |
+| Animal babies | A third question pack: see and hear a mother, "أين صغيره؟ / أين صغيرها؟ / Where is its baby?", tap the baby, who appears beside her. 10 babies: عِجل calf, حَمَل lamb, جَدي kid, مُهر foal, جَرو puppy, هُرَيرة kitten, كتكوت chick, شِبل lion cub, حُوار baby camel, فرخ البط duckling. Lamb/kid and calf/baby camel are never asked together. Real baby photos come from the studio's "Find real sounds and photos" once you approve them; until then the pack uses emoji in development and is hidden in release builds |
+| Sticker album | After each finished game the child gets a sticker of a picture they found and don't have yet; it pops up on the end screen and flies into a book. The book (next to play again) opens the album: a page per pack, found stickers in colour, the rest as faint shapes; tapping one plays it. Per child, on this phone. (The V1 spec avoided rewards; you chose to add this one.) |
+| Print flashcards | Home → Print flashcards: any pack, 4, 6 or 9 cards per A4 page with dashed cut lines, the picture with its Arabic and English names (names can be switched off). On a phone the print screen can save a PDF |
+| Real sounds | The studio's "Find real sounds and photos" lists Pixabay candidates (free for apps, no credit needed) for every sound still on a tone: you listen, choose, trim and save; each file's source goes in `public/assets/licenses/sources.csv`. Nothing is downloaded until you choose it |
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.

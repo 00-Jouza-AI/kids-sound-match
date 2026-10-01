@@ -162,12 +162,14 @@ export function Trimmer({
   onRetry,
   onUse,
   useLabel,
+  retryLabel,
   keyboard = false,
 }: {
   audio: MonoAudio;
   onRetry: () => void;
   onUse: (clip: Blob) => void;
   useLabel?: string;
+  retryLabel?: string;
   keyboard?: boolean;
 }) {
   const { t } = useI18n();
@@ -250,7 +252,7 @@ export function Trimmer({
           {useLabel ?? t('useRecording')}
         </button>
         <button type="button" className="btn ghost" onClick={onRetry}>
-          {t('recordAgain')}
+          {retryLabel ?? t('recordAgain')}
         </button>
       </div>
     </div>

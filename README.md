@@ -72,6 +72,18 @@ instead. Recordings are WAV (`cat_name_ar.wav` stands in for `cat_name_ar.mp3`; 
 Anything a recording replaces is moved to `dev-assets/replaced`, never deleted. Reload the app to hear
 the new clips. The studio only exists on the development server and only accepts this computer.
 
+**Find real sounds and photos** (the studio's second tab) lists sound effects and baby-animal photos
+found on Pixabay for everything still on a placeholder. Listen or look, press **Use this**, trim the
+sound or crop the photo, and save; the file goes into `public/assets` and its source into
+`public/assets/licenses/sources.csv`. The candidate list lives in `dev-assets/studio-candidates.json`.
+
+## Games
+
+Besides the matching game (START) and Explore, Home has **Memory** (pairs face down; 3 pairs, more
+when the child is ready) and **Odd one out** (easy across packs, harder inside a pack, chosen from the
+child's results). Every finished game earns a sticker for the child's **sticker album**, opened from
+the end screen. **Print flashcards** (for parents) prints any pack on A4 for play away from the screen.
+
 ## My packs (your own pictures and voice)
 
 Home → **My packs** (behind the PIN): create packs like "Family" or "Toys". Each item has a picture

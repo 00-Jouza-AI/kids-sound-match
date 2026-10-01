@@ -8,8 +8,10 @@ import { choosePictures } from '../kid/layout';
 import { Row, Screen, Segmented, Toggle } from './components';
 import { Trimmer } from './SoundEditor';
 import { LINES, studioClips, studioSavePath, type StudioClip } from './studioClips';
+import { StudioFind } from './StudioFind';
 
-type Phase = { kind: 'ready' } | { kind: 'recording'; since: number } | { kind: 'review'; audio: MonoAudio } | { kind: 'saving' };
+type Phase =
+  { kind: 'ready' } | { kind: 'recording'; since: number } | { kind: 'review'; audio: MonoAudio } | { kind: 'saving' };
 
 /** Above this the microphone hears a voice; below the quiet level for a moment, the word is over. */
 const VOICE_LEVEL = 0.18;
@@ -30,6 +32,7 @@ export function Studio({ packs, onBack }: { packs: readonly LoadedPack[]; onBack
   const [autoStop, setAutoStop] = useState(true);
   const [saved, setSaved] = useState<ReadonlySet<string>>(new Set());
   const [position, setPosition] = useState(0);
+  const [mode, setMode] = useState<'record' | 'find'>('record');
 
   const done = (c: StudioClip) => c.real || saved.has(c.path);
   const inFilter = clips.filter((c) => (packId === 'all' || c.packId === packId) && c.kind === kind);
@@ -56,10 +59,30 @@ export function Studio({ packs, onBack }: { packs: readonly LoadedPack[]; onBack
 
   return (
     <Screen title={t('studio')} onBack={onBack}>
-      <p className="hint">{t('studioIntro')}</p>
-      <div className="chips">
-        {[{ id: 'all', name: t('presetAll') }, ...packs.map((p) => ({ id: p.id, name: p.name[lang] })), { id: LINES, name: t('gameLines') }].map(
-          (c) => (
+      <Segmented
+        label={t('studio')}
+        value={mode}
+        options={[
+          { value: 'record', label: t('studioRecordMode') },
+          { value: 'find', label: t('studioFind') },
+        ]}
+        onChange={setMode}
+      />
+      {mode === 'find' ? <StudioFind packs={packs} /> : recordView()}
+    </Screen>
+  );
+
+  // A plain function, not a component: a component declared here would remount on every render.
+  function recordView() {
+    return (
+      <>
+        <p className="hint">{t('studioIntro')}</p>
+        <div className="chips">
+          {[
+            { id: 'all', name: t('presetAll') },
+            ...packs.map((p) => ({ id: p.id, name: p.name[lang] })),
+            { id: LINES, name: t('gameLines') },
+          ].map((c) => (
             <button
               type="button"
               key={c.id}
@@ -68,47 +91,52 @@ export function Studio({ packs, onBack }: { packs: readonly LoadedPack[]; onBack
             >
               {c.name}
             </button>
-          ),
-        )}
-      </div>
-      <section className="card">
-        <Segmented
-          label={t('studio')}
-          value={kind}
-          options={[
-            { value: 'ar', label: t('langArabic') },
-            { value: 'en', label: t('langEnglish') },
-            { value: 'sound', label: t('studioSounds') },
-          ]}
-          onChange={(k) => choose(() => setKind(k))}
-        />
-        <Row label={t('studioShowDone')}>
-          <Toggle label={t('studioShowDone')} checked={showDone} onChange={(v) => choose(() => setShowDone(v))} />
-        </Row>
-        <Row label={t('studioAutoStop')}>
-          <Toggle label={t('studioAutoStop')} checked={autoStop} onChange={setAutoStop} />
-        </Row>
-        <p className="muted">{t('studioProgress', { n: inFilter.filter(done).length, m: inFilter.length })}</p>
-      </section>
+          ))}
+        </div>
+        <section className="card">
+          <Segmented
+            label={t('studio')}
+            value={kind}
+            options={[
+              { value: 'ar', label: t('langArabic') },
+              { value: 'en', label: t('langEnglish') },
+              { value: 'sound', label: t('studioSounds') },
+            ]}
+            onChange={(k) => choose(() => setKind(k))}
+          />
+          <Row label={t('studioShowDone')}>
+            <Toggle label={t('studioShowDone')} checked={showDone} onChange={(v) => choose(() => setShowDone(v))} />
+          </Row>
+          <Row label={t('studioAutoStop')}>
+            <Toggle label={t('studioAutoStop')} checked={autoStop} onChange={setAutoStop} />
+          </Row>
+          <p className="muted">
+            {t('studioProgress', {
+              n: inFilter.filter(done).length,
+              m: inFilter.length,
+            })}
+          </p>
+        </section>
 
-      {current ? (
-        <Take
-          key={`${current.path}:${saved.has(current.path)}`}
-          clip={current}
-          number={at + 1}
-          total={list.length}
-          recorded={done(current)}
-          autoStop={autoStop}
-          onSave={(wav) => save(current, wav)}
-          onPrev={() => setPosition(Math.max(0, at - 1))}
-          onNext={() => setPosition(Math.min(list.length - 1, at + 1))}
-        />
-      ) : (
-        <p className="empty">{t('studioAllDone')}</p>
-      )}
-      <p className="hint">{t('studioKeys')}</p>
-    </Screen>
-  );
+        {current ? (
+          <Take
+            key={`${current.path}:${saved.has(current.path)}`}
+            clip={current}
+            number={at + 1}
+            total={list.length}
+            recorded={done(current)}
+            autoStop={autoStop}
+            onSave={(wav) => save(current, wav)}
+            onPrev={() => setPosition(Math.max(0, at - 1))}
+            onNext={() => setPosition(Math.min(list.length - 1, at + 1))}
+          />
+        ) : (
+          <p className="empty">{t('studioAllDone')}</p>
+        )}
+        <p className="hint">{t('studioKeys')}</p>
+      </>
+    );
+  }
 }
 
 function Take({
@@ -152,7 +180,9 @@ function Take({
     audioEngine.stopAll();
     const found = recordingProblem();
     if (found) {
-      setProblem(t(found === 'insecure' ? 'micNeedsSecure' : found === 'unsupported' ? 'micUnsupported' : 'micBlocked'));
+      setProblem(
+        t(found === 'insecure' ? 'micNeedsSecure' : found === 'unsupported' ? 'micUnsupported' : 'micBlocked'),
+      );
       return;
     }
     try {
@@ -223,7 +253,11 @@ function Take({
 
   useEffect(() => () => recording.current?.cancel(), []);
 
-  const kindLabel = { ar: t('langArabic'), en: t('langEnglish'), sound: t('studioSounds') }[clip.kind];
+  const kindLabel = {
+    ar: t('langArabic'),
+    en: t('langEnglish'),
+    sound: t('studioSounds'),
+  }[clip.kind];
   return (
     <section className="card studio-take">
       <div className="studio-head">

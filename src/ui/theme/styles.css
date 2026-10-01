@@ -2545,6 +2545,39 @@ html.kid-locked body {
   }
 }
 
+/* ---------- Recording studio: real sounds and photos ---------- */
+
+.photo-candidates {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.photo-candidate {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--primary-strong);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.photo-candidate img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.photo-candidate:hover {
+  border-color: var(--primary);
+}
+
 /* ---------- Kid Mode: "Who eats what?" ---------- */
 
 .assoc {

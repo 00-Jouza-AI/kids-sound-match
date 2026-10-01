@@ -128,6 +128,97 @@ const STUDIO_PATH = /^(packs\/[a-z0-9-]+\/[a-z0-9_-]+|feedback\/[a-z0-9_-]+)\.wa
 const OTHER_AUDIO = ['.mp3', '.m4a', '.ogg', '.opus', '.webm', '.wav'];
 const MAX_CLIP_BYTES = 5 * 1024 * 1024;
 
+function fromThisComputer(req: IncomingMessage): boolean {
+  return ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress ?? '');
+}
+
+function forbid(res: ServerResponse): void {
+  res.statusCode = 403;
+  res.end('The studio only works from this computer');
+}
+
+/** Pixabay's file server: the only place the studio fetches from. */
+const PROXY_HOST = 'https://cdn.pixabay.com/';
+const BABY_PHOTO_PATH = /^packs\/[a-z0-9-]+\/[a-z0-9_-]+\.jpg$/;
+
+/**
+ * Lets the studio trim a candidate sound or crop a candidate photo: the browser can't read another
+ * site's file into an editor, so the development server fetches it (from Pixabay's file server only).
+ */
+async function studioProxy(req: IncomingMessage, res: ServerResponse): Promise<void> {
+  if (!fromThisComputer(req)) return forbid(res);
+  const target = new URL(req.url ?? '', 'http://localhost').searchParams.get('url') ?? '';
+  if (!target.startsWith(PROXY_HOST)) {
+    res.statusCode = 400;
+    res.end('Only Pixabay files');
+    return;
+  }
+  try {
+    const upstream = await fetch(target);
+    if (!upstream.ok) throw new Error(`${upstream.status}`);
+    res.setHeader('Content-Type', upstream.headers.get('content-type') ?? 'application/octet-stream');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end(Buffer.from(await upstream.arrayBuffer()));
+  } catch (e) {
+    res.statusCode = 502;
+    res.end(`Could not fetch: ${String(e)}`);
+  }
+}
+
+/** Keeps a note of where each approved sound or photo came from (Pixabay asks for no credit, but it's good to know). */
+function noteSource(assetsDir: string, rel: string, source: string | null): void {
+  if (!source || !/^https:\/\/pixabay\.com\//.test(source)) return;
+  const file = path.join(assetsDir, 'licenses', 'sources.csv');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  if (!fs.existsSync(file)) fs.writeFileSync(file, 'file,source,licence\n');
+  fs.appendFileSync(file, `${rel},${source},Pixabay Content License\n`);
+}
+
+function readBody(req: IncomingMessage, onDone: (body: Buffer | null) => void): void {
+  const chunks: Buffer[] = [];
+  let size = 0;
+  req.on('data', (chunk: Buffer) => {
+    size += chunk.length;
+    if (size <= MAX_CLIP_BYTES) chunks.push(chunk);
+  });
+  req.on('end', () => onDone(size > MAX_CLIP_BYTES ? null : Buffer.concat(chunks)));
+}
+
+function backUp(assetsDir: string, backupDir: string, base: string, exts: readonly string[]): void {
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  for (const ext of exts) {
+    const old = path.join(assetsDir, base + ext);
+    if (!fs.existsSync(old)) continue;
+    const kept = path.join(backupDir, `${base}${ext}.${stamp}`);
+    fs.mkdirSync(path.dirname(kept), { recursive: true });
+    fs.renameSync(old, kept);
+  }
+}
+
+/** An approved baby photo, cropped square in the studio: written as JPEG next to its manifest path. */
+function studioSaveImage(req: IncomingMessage, res: ServerResponse, assetsDir: string, backupDir: string): void {
+  if (!fromThisComputer(req)) return forbid(res);
+  const params = new URL(req.url ?? '', 'http://localhost').searchParams;
+  const rel = params.get('path') ?? '';
+  if (req.method !== 'POST' || !BABY_PHOTO_PATH.test(rel)) {
+    res.statusCode = 400;
+    res.end('Not a photo path');
+    return;
+  }
+  readBody(req, (body) => {
+    if (!body || body[0] !== 0xff || body[1] !== 0xd8) {
+      res.statusCode = 400;
+      res.end('Not a JPEG');
+      return;
+    }
+    backUp(assetsDir, backupDir, rel.replace(/\.jpg$/, ''), ['.jpg', '.jpeg', '.png', '.webp']);
+    fs.writeFileSync(path.join(assetsDir, rel), body);
+    noteSource(assetsDir, rel, params.get('source'));
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ saved: rel }));
+  });
+}
+
 /**
  * The recording studio's save (development server only). Writes one WAV into public/assets. Only
  * accepted from this computer, never from other devices on the Wi-Fi. A file it replaces (an older
@@ -138,36 +229,22 @@ function studioSave(req: IncomingMessage, res: ServerResponse, assetsDir: string
     res.statusCode = status;
     res.end(message);
   };
-  const from = req.socket.remoteAddress ?? '';
-  if (!['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(from)) return fail(403, 'The studio only saves from this computer');
+  if (!fromThisComputer(req)) return fail(403, 'The studio only saves from this computer');
   if (req.method !== 'POST') return fail(405, 'POST only');
-  const rel = new URL(req.url ?? '', 'http://localhost').searchParams.get('path') ?? '';
+  const params = new URL(req.url ?? '', 'http://localhost').searchParams;
+  const rel = params.get('path') ?? '';
   if (!STUDIO_PATH.test(rel)) return fail(400, 'Not a studio clip path');
 
-  const chunks: Buffer[] = [];
-  let size = 0;
-  req.on('data', (chunk: Buffer) => {
-    size += chunk.length;
-    if (size <= MAX_CLIP_BYTES) chunks.push(chunk);
-  });
-  req.on('end', () => {
-    if (size > MAX_CLIP_BYTES) return fail(413, 'Clip too long');
-    const body = Buffer.concat(chunks);
+  readBody(req, (body) => {
+    if (!body) return fail(413, 'Clip too long');
     if (body.subarray(0, 4).toString('ascii') !== 'RIFF' || body.subarray(8, 12).toString('ascii') !== 'WAVE') {
       return fail(400, 'Not a WAV file');
     }
-    const base = rel.replace(/\.wav$/, '');
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    for (const ext of OTHER_AUDIO) {
-      const old = path.join(assetsDir, base + ext);
-      if (!fs.existsSync(old)) continue;
-      const kept = path.join(backupDir, `${base}${ext}.${stamp}`);
-      fs.mkdirSync(path.dirname(kept), { recursive: true });
-      fs.renameSync(old, kept);
-    }
+    backUp(assetsDir, backupDir, rel.replace(/\.wav$/, ''), OTHER_AUDIO);
     const file = path.join(assetsDir, rel);
     fs.mkdirSync(path.dirname(file), { recursive: true });
     fs.writeFileSync(file, body);
+    noteSource(assetsDir, rel, params.get('source'));
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ saved: rel }));
   });
@@ -191,6 +268,22 @@ export function ksmPlugin(opts: Options): Plugin {
         const url = decodeURIComponent((req.url ?? '').split('?')[0]);
         if (url === '/__studio/save') {
           studioSave(req, res, assetsDir, path.join(root, 'dev-assets', 'replaced'));
+          return;
+        }
+        if (url === '/__studio/save-image') {
+          studioSaveImage(req, res, assetsDir, path.join(root, 'dev-assets', 'replaced'));
+          return;
+        }
+        if (url === '/__studio/candidates') {
+          if (!fromThisComputer(req)) return void forbid(res);
+          const file = path.join(root, 'dev-assets', 'studio-candidates.json');
+          res.setHeader('Content-Type', 'application/json');
+          res.setHeader('Cache-Control', 'no-store');
+          res.end(fs.existsSync(file) ? fs.readFileSync(file) : '{"sounds":{},"photos":{}}');
+          return;
+        }
+        if (url === '/__studio/proxy') {
+          void studioProxy(req, res);
           return;
         }
         // Studio recordings are written while the server runs, and left out of the file watcher so
