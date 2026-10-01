@@ -153,7 +153,23 @@ export function SoundEditor({
   );
 }
 
-function Trimmer({ audio, onRetry, onUse }: { audio: MonoAudio; onRetry: () => void; onUse: (clip: Blob) => void }) {
+/**
+ * The waveform with two handles. `keyboard` (the recording studio): Enter uses the clip, P plays it,
+ * R records again.
+ */
+export function Trimmer({
+  audio,
+  onRetry,
+  onUse,
+  useLabel,
+  keyboard = false,
+}: {
+  audio: MonoAudio;
+  onRetry: () => void;
+  onUse: (clip: Blob) => void;
+  useLabel?: string;
+  keyboard?: boolean;
+}) {
   const { t } = useI18n();
   const duration = audio.samples.length / audio.sampleRate;
   const peaks = useMemo(() => waveformPeaks(audio.samples, BARS), [audio]);
@@ -161,6 +177,22 @@ function Trimmer({ audio, onRetry, onUse }: { audio: MonoAudio; onRetry: () => v
   const [range, setRange] = useState(() => suggestTrim(audio));
   const track = useRef<HTMLDivElement>(null);
   const dragging = useRef<'start' | 'end' | null>(null);
+  const latest = useRef(range);
+  latest.current = range;
+
+  useEffect(() => {
+    if (!keyboard) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.repeat) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onUse(clipToWav(audio, latest.current.start, latest.current.end));
+      } else if (e.key.toLowerCase() === 'p') play();
+      else if (e.key.toLowerCase() === 'r') onRetry();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [keyboard, audio, onUse, onRetry]);
 
   const timeAt = (clientX: number) => {
     const box = track.current!.getBoundingClientRect();
@@ -181,12 +213,12 @@ function Trimmer({ audio, onRetry, onUse }: { audio: MonoAudio; onRetry: () => v
     dragging.current = which;
   };
 
-  const play = () => {
+  function play() {
     audioEngine.unlock();
     audioEngine.stopAll();
-    const clip = clipToWav(audio, range.start, range.end);
+    const clip = clipToWav(audio, latest.current.start, latest.current.end);
     void audioEngine.play({ kind: 'file', url: blobUrl(clip), category: 'name', label: 'trim-preview' }, () => false);
-  };
+  }
 
   const pct = (s: number) => `${(s / duration) * 100}%`;
   return (
@@ -215,7 +247,7 @@ function Trimmer({ audio, onRetry, onUse }: { audio: MonoAudio; onRetry: () => v
           ▶ {t('play')}
         </button>
         <button type="button" className="btn primary" onClick={() => onUse(clipToWav(audio, range.start, range.end))}>
-          {t('useRecording')}
+          {useLabel ?? t('useRecording')}
         </button>
         <button type="button" className="btn ghost" onClick={onRetry}>
           {t('recordAgain')}

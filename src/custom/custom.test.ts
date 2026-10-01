@@ -115,8 +115,10 @@ class FakeRemote implements Remote {
   async listItems() {
     return [...this.items.values()];
   }
+  /** False: a cloud set up before "Your voice and photos". */
+  voiceTable = true;
   async listOverrides() {
-    return [...this.overrides.values()];
+    return this.voiceTable ? [...this.overrides.values()] : null;
   }
   async upsertOverride(o: RemoteOverride) {
     this.overrides.set(o.path, o);
@@ -247,6 +249,18 @@ describe('cloud sync', () => {
     expect(cloud.overrideFiles.has('packs/family/mama.webp')).toBe(false);
     await runSync(phoneB, cloud, 'u');
     expect([...overrideMap(await phoneB.overrides()).keys()]).toEqual(['packs/family/mama_name_ar.mp3']);
+  });
+
+  it('still backs up the packs when the cloud was set up before "Your voice and photos"', async () => {
+    const phone = new MemoryCustomStore();
+    const cloud = new FakeRemote();
+    cloud.voiceTable = false;
+    await customOps(phone).createPack({ en: 'A', ar: 'A' });
+    await overrideOps(phone).save('packs/family/mama_name_ar.mp3', blob('mama'));
+    expect(await runSync(phone, cloud, 'u')).toEqual({ pushed: 1, pulled: 0 });
+    expect(cloud.packs.size).toBe(1);
+    // The recording waits on the phone until schema.sql has been run again.
+    expect((await phone.overrides())[0].syncedAt).toBeUndefined();
   });
 });
 

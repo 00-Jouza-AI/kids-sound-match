@@ -5,9 +5,11 @@ matching one, in Arabic or English. No ads, no tracking; results stay on the dev
 `App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
 for every change agreed since.
 
-Packs: Animals (54), Things at home, Vehicles, Musical instruments, Food, Body parts, Family,
-**Who eats what?** (see an animal, tap its food), a **Mixed** game of everything, and the parent's own
-packs. Parents can also put their own voice and photos into the built-in packs.
+Packs: Animals (54), Things at home, Vehicles, Musical instruments, Food, Body parts, Family, Colours,
+Shapes, Feelings, Counting 1 to 5, **Who eats what?** (see an animal, tap its food), **Where does it
+live?** (tap its home), a **Mixed** game, and the parent's own packs. Parents can also put their own
+voice and photos into the built-in packs. Brothers and sisters each get a profile (an animal on a
+colour) with their own settings and Report, and the Report can be shared as a picture.
 
 ## Run it
 
@@ -55,6 +57,17 @@ placeholder, no code changes needed.
 
 Until real files exist, development builds use emoji pictures, tones, and the device's own voice
 (on-device voices only). Release builds refuse to show anything that isn't real.
+
+### Recording studio (the fastest way to add real voices)
+
+Run `npm run dev`, open http://localhost:5173 on this PC, then Home → **Recording studio** (behind the
+PIN). It lists every name, sound and line that still uses the stand-in voice. Pick a pack and Arabic /
+English / Sounds, press **Space** to record (it stops by itself after the word), check the trim, and
+press **Enter**: the clip is saved straight into `public/assets` with the right name and the next one
+comes up. **P** plays, **R** records again, **← →** move between clips. Sounds can be loaded from a file
+instead. Recordings are WAV (`cat_name_ar.wav` stands in for `cat_name_ar.mp3`; the app accepts both).
+Anything a recording replaces is moved to `dev-assets/replaced`, never deleted. Reload the app to hear
+the new clips. The studio only exists on the development server and only accepts this computer.
 
 ### Photos
 

@@ -51,11 +51,17 @@ export function fitSquares(box: { w: number; h: number }, rows: readonly (readon
  * clue instead of the sound. Shows photos only when every animal shown has one.
  */
 export function choosePictures(items: readonly LoadedItem[], random: () => number = Math.random): Record<string, string> {
-  const allPhotos = items.every((i) => i.images.some((a) => a.real));
+  const real = items.map((i) => i.images.filter((a) => a.real));
+  const allPhotos = real.every((r) => r.length > 0);
   const pickFrom = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)];
+  // Pictures drawn as a series (Counting: dots, apples, stars...) use the same one across the
+  // question, so "3" and "5" are both apples.
+  const series = allPhotos && real[0].length > 1 && real.every((r) => r.length === real[0].length);
+  const index = series ? Math.floor(random() * real[0].length) : 0;
   return Object.fromEntries(
-    items.map((i) => {
-      if (allPhotos) return [i.key, pickFrom(i.images.filter((a) => a.real)).url];
+    items.map((i, k) => {
+      if (series) return [i.key, real[k][index].url];
+      if (allPhotos) return [i.key, pickFrom(real[k]).url];
       return [i.key, (i.placeholderImage ?? pickFrom(i.images)).url];
     }),
   );

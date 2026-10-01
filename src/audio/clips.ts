@@ -28,6 +28,10 @@ export const FEEDBACK_SPEECH: Record<string, string> = {
   'feedback/eat_question_ar.mp3': 'ماذا يأكل؟',
   'feedback/eat_question_ar_f.mp3': 'ماذا تأكل؟',
   'feedback/eat_question_en.mp3': 'What does it eat?',
+  // "Where does it live?"
+  'feedback/home_question_ar.mp3': 'أين يعيش؟',
+  'feedback/home_question_ar_f.mp3': 'أين تعيش؟',
+  'feedback/home_question_en.mp3': 'Where does it live?',
 };
 
 /**

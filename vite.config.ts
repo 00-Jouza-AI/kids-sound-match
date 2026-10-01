@@ -26,7 +26,13 @@ export default defineConfig(({ command, mode }) => {
       // Keep bundled code out of /assets, which holds the content packs.
       assetsDir: 'app',
     },
-    server: { host: true, port: 5173, strictPort: true },
+    server: {
+      host: true,
+      port: 5173,
+      strictPort: true,
+      // Recordings saved by the studio must not reload the page mid-session (the plugin serves them).
+      watch: { ignored: ['**/public/assets/**/*.wav', '**/dev-assets/replaced/**'] },
+    },
     preview: { host: true, port: 4173, strictPort: true },
     test: {
       include: ['src/**/*.test.ts'],

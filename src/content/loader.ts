@@ -47,8 +47,18 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       ? { path: assetPath, url: `${opts.baseUrl}placeholders/${encodePath(placeholder)}`, real: false }
       : null;
   };
+  // A recording may be saved in another format than the manifest says (the recording studio saves
+  // cat_name_ar.wav for cat_name_ar.mp3). `path` stays the manifest's, so everything keyed by it
+  // (a parent's own voice, the Report) is unaffected.
+  const realFile = (assetPath: string): string | null => {
+    if (realFiles.has(assetPath)) return assetPath;
+    if (!AUDIO_EXT.test(assetPath)) return null;
+    const base = assetPath.replace(AUDIO_EXT, '');
+    return AUDIO_FORMATS.map((ext) => base + ext).find((p) => realFiles.has(p)) ?? null;
+  };
   const resolve = (assetPath: string): ResolvedAsset | null => {
-    if (realFiles.has(assetPath)) return { path: assetPath, url: `${opts.baseUrl}assets/${encodePath(assetPath)}`, real: true };
+    const file = realFile(assetPath);
+    if (file) return { path: assetPath, url: `${opts.baseUrl}assets/${encodePath(file)}`, real: true };
     return placeholderOf(assetPath);
   };
 
@@ -127,6 +137,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
             question: perLang((lang) => feedbackAsset(assoc.question_audio?.[lang])),
             questionFeminine: perLang((lang) => feedbackAsset(assoc.question_audio_feminine?.[lang])),
             reward: feedbackAsset(assoc.reward_audio),
+            celebration: assoc.celebration === 'home' ? 'home' : 'eat',
           }
         : undefined;
     if (manifest.kind === 'association' && !assoc) {
@@ -140,6 +151,8 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       name: manifest.name,
       kind: association ? 'association' : 'match',
       order: typeof manifest.order === 'number' ? manifest.order : DEFAULT_ORDER,
+      inMix: manifest.in_mix !== false,
+      mixAlone: manifest.mix_alone === true,
       ...(association ? { association } : {}),
       items,
       groups: (manifest.groups ?? []).map((g) => ({ ...g, items: g.items.filter((k) => validation.validKeys.has(k)) })),
@@ -158,6 +171,8 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
 }
 
 const DEFAULT_ORDER = 1000;
+const AUDIO_EXT = /\.(mp3|wav|ogg|oga|m4a|aac|opus|webm)$/i;
+const AUDIO_FORMATS = ['.wav', '.mp3', '.m4a', '.ogg', '.opus', '.webm'];
 
 /** Arabic nouns ending in ة are feminine; a manifest can say so for the others (أفعى). */
 function arabicFeminine(item: ManifestItem): boolean {

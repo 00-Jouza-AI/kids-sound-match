@@ -16,7 +16,26 @@ import { ParentGate } from './lock/ParentGate';
 import { loadPinRecord } from './lock/pin';
 import { reportStore } from './report/db';
 import { practiceWeights, readyForMore, type NextLevel } from './report/practice';
-import { enabledItemKeys, loadSettings, saveSettings, spokenLanguages, uiLanguage, type Settings } from './settings/settings';
+import {
+  forProfile,
+  loadProfiles,
+  newProfile,
+  profileKey,
+  saveProfiles,
+  type Profile,
+  type ProfileState,
+} from './settings/profiles';
+import { forgetReplays } from './settings/replays';
+import {
+  effectiveMode,
+  enabledItemKeys,
+  forgetSettings,
+  loadSettings,
+  saveSettings,
+  spokenLanguages,
+  uiLanguage,
+  type Settings,
+} from './settings/settings';
 import { local } from './settings/storage';
 import { telemetry } from './telemetry/telemetry';
 import { KidMode } from './ui/kid/KidMode';
@@ -29,6 +48,7 @@ import { Personalize } from './ui/parent/Personalize';
 import { ReportScreen } from './ui/parent/ReportScreen';
 import { SettingsScreen } from './ui/parent/SettingsScreen';
 import { StartFlow, type StartStep } from './ui/parent/StartFlow';
+import { Studio } from './ui/parent/Studio';
 
 type Screen =
   | 'loading'
@@ -41,6 +61,7 @@ type Screen =
   | 'about'
   | 'myPacks'
   | 'personalize'
+  | 'studio'
   | 'start'
   | 'kid';
 
@@ -81,8 +102,23 @@ function composePacks(builtin: readonly LoadedPack[], custom: CustomData) {
   return { customViews, allPacks: [...voiced, ...(mixed ? [mixed] : []), ...own] };
 }
 
+/** What the parent screens can do with the children's profiles. */
+export interface ProfileControls {
+  state: ProfileState;
+  /** Switch to another child: their settings, Report and practice. */
+  select: (id: string) => void;
+  /** A new child, selected straight away so the parent can set them up. */
+  add: () => void;
+  edit: (profile: Profile) => void;
+  /** Also deletes that child's results on this phone. */
+  remove: (id: string) => Promise<void>;
+}
+
 export function App() {
-  const [settings, setSettings] = useState<Settings>(loadSettings);
+  const [profiles, setProfiles] = useState<ProfileState>(loadProfiles);
+  // Read by `update`, which never changes, so it always saves to the child on screen.
+  const activeRef = useRef(profiles.activeId);
+  const [settings, setSettings] = useState<Settings>(() => loadSettings(profiles.activeId));
   const lang = uiLanguage(settings);
 
   useEffect(() => {
@@ -93,20 +129,58 @@ export function App() {
   const update = useCallback((patch: Partial<Settings>) => {
     setSettings((prev) => {
       const next = { ...prev, ...patch };
-      saveSettings(next);
+      saveSettings(next, activeRef.current);
       return next;
     });
     if (patch.telemetryEnabled === false) telemetry.discard();
   }, []);
 
+  const change = useCallback((next: ProfileState) => {
+    saveProfiles(next);
+    setProfiles(next);
+    if (next.activeId !== activeRef.current) {
+      activeRef.current = next.activeId;
+      setSettings(loadSettings(next.activeId));
+    }
+  }, []);
+
+  const controls: ProfileControls = {
+    state: profiles,
+    select: (id) => change({ ...profiles, activeId: id }),
+    add: () => {
+      const child = newProfile(profiles.profiles);
+      change({ profiles: [...profiles.profiles, child], activeId: child.id });
+    },
+    edit: (profile) => change({ ...profiles, profiles: profiles.profiles.map((p) => (p.id === profile.id ? profile : p)) }),
+    remove: async (id) => {
+      const rest = profiles.profiles.filter((p) => p.id !== id);
+      if (!rest.length) return;
+      const games = forProfile(await reportStore.sessions(), id);
+      await reportStore.deleteSessions(games.map((g) => g.id));
+      forgetSettings(id);
+      forgetReplays(id);
+      local.remove(profileKey(NUDGE_DISMISSED_KEY, id));
+      change({ profiles: rest, activeId: profiles.activeId === id ? rest[0].id : profiles.activeId });
+    },
+  };
+
   return (
     <I18nProvider lang={lang}>
-      <Shell settings={settings} update={update} />
+      <Shell settings={settings} update={update} profiles={controls} />
     </I18nProvider>
   );
 }
 
-function Shell({ settings, update }: { settings: Settings; update: (patch: Partial<Settings>) => void }) {
+function Shell({
+  settings,
+  update,
+  profiles,
+}: {
+  settings: Settings;
+  update: (patch: Partial<Settings>) => void;
+  profiles: ProfileControls;
+}) {
+  const profileId = profiles.state.activeId;
   const { t } = useI18n();
   const [builtin, setBuiltin] = useState<LoadedContent | null>(null);
   const [custom, setCustom] = useState<CustomData>(NO_CUSTOM);
@@ -210,8 +284,8 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     Promise.all([reportStore.sessions(), reportStore.questions()])
       .then(([sessions, questions]) => {
         if (cancelled) return;
-        const next = readyForMore(sessions, questions, settings.choiceCount);
-        const dismissed = local.getJson<{ level: number; games: number }>(NUDGE_DISMISSED_KEY);
+        const next = readyForMore(forProfile(sessions, profileId), questions, settings.choiceCount);
+        const dismissed = local.getJson<{ level: number; games: number }>(profileKey(NUDGE_DISMISSED_KEY, profileId));
         const snoozed =
           next && dismissed?.level === next.from && next.gamesAtLevel < dismissed.games + NUDGE_AGAIN_AFTER_GAMES;
         setNudge(next && !snoozed ? next : null);
@@ -220,7 +294,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     return () => {
       cancelled = true;
     };
-  }, [screen, settings.choiceCount]);
+  }, [screen, settings.choiceCount, profileId]);
 
   const open = (link: HomeLink) => {
     if (link === 'about') setScreen('about');
@@ -237,7 +311,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
     if (kind === 'game' && settings.adaptive && !toddlerMode) {
       const packIds = pack.parts ? pack.parts.map((p) => p.id) : [pack.id];
       try {
-        weights = practiceWeights(await reportStore.sessions(), await reportStore.questions(), packIds);
+        weights = practiceWeights(forProfile(await reportStore.sessions(), profileId), await reportStore.questions(), packIds);
       } catch {
         // No history available: every animal equally often.
       }
@@ -247,12 +321,14 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
       pack,
       config: {
         kind,
+        profileId,
         packId: pack.id,
         itemKeys: enabledItemKeys(pack, settings),
         choiceCount: settings.choiceCount,
         questionsPerSession: settings.questionsPerSession,
         toddlerMode,
-        mode: settings.mode,
+        // Packs without sounds (Food, Colours...) are played by name whatever the setting says.
+        mode: effectiveMode(pack, settings.mode),
         language: settings.language,
         repeatIntervalSec: settings.repeatIntervalSec,
         hints: settings.hints,
@@ -311,10 +387,12 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
       body = <FirstRun update={update} onDone={home} />;
       break;
     case 'settings':
-      body = pack ? <SettingsScreen content={content} pack={pack} settings={settings} update={update} onBack={home} /> : null;
+      body = pack ? (
+        <SettingsScreen content={content} pack={pack} settings={settings} update={update} profiles={profiles} onBack={home} />
+      ) : null;
       break;
     case 'report':
-      body = <ReportScreen packs={allPacks} onBack={home} />;
+      body = <ReportScreen packs={allPacks} profiles={profiles.state} onBack={home} />;
       break;
     case 'privacy':
       body = <PrivacyScreen onBack={home} />;
@@ -341,6 +419,9 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
           onBack={() => setScreen('myPacks')}
         />
       );
+      break;
+    case 'studio':
+      body = <Studio packs={builtin?.packs ?? []} onBack={home} />;
       break;
     case 'start':
       body = pack && (
@@ -386,6 +467,8 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
           // Explore is for hearing things; "Who eats what?" is only a question game.
           canExplore={playableCount > 0 && pack?.kind !== 'association'}
           showParentsGroup={PARENTS_GROUP_URL !== ''}
+          profiles={profiles.state}
+          onProfile={profiles.select}
           nudge={nudge}
           onStart={() => begin('game')}
           onExplore={() => begin('explore')}
@@ -397,7 +480,7 @@ function Shell({ settings, update }: { settings: Settings; update: (patch: Parti
             })
           }
           onNudgeDismiss={(next) => {
-            local.setJson(NUDGE_DISMISSED_KEY, { level: next.from, games: next.gamesAtLevel });
+            local.setJson(profileKey(NUDGE_DISMISSED_KEY, profileId), { level: next.from, games: next.gamesAtLevel });
             setNudge(null);
           }}
         />

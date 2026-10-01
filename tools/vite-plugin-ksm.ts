@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
 import type { Plugin, ResolvedConfig } from 'vite';
 
@@ -122,6 +123,56 @@ self.addEventListener('fetch', (event) => {
 `;
 }
 
+/** Only clip files the studio makes: a pack's name or sound, or a game line. */
+const STUDIO_PATH = /^(packs\/[a-z0-9-]+\/[a-z0-9_-]+|feedback\/[a-z0-9_-]+)\.wav$/;
+const OTHER_AUDIO = ['.mp3', '.m4a', '.ogg', '.opus', '.webm', '.wav'];
+const MAX_CLIP_BYTES = 5 * 1024 * 1024;
+
+/**
+ * The recording studio's save (development server only). Writes one WAV into public/assets. Only
+ * accepted from this computer, never from other devices on the Wi-Fi. A file it replaces (an older
+ * recording, or the same clip in another format) is moved to dev-assets/replaced, never deleted.
+ */
+function studioSave(req: IncomingMessage, res: ServerResponse, assetsDir: string, backupDir: string): void {
+  const fail = (status: number, message: string) => {
+    res.statusCode = status;
+    res.end(message);
+  };
+  const from = req.socket.remoteAddress ?? '';
+  if (!['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(from)) return fail(403, 'The studio only saves from this computer');
+  if (req.method !== 'POST') return fail(405, 'POST only');
+  const rel = new URL(req.url ?? '', 'http://localhost').searchParams.get('path') ?? '';
+  if (!STUDIO_PATH.test(rel)) return fail(400, 'Not a studio clip path');
+
+  const chunks: Buffer[] = [];
+  let size = 0;
+  req.on('data', (chunk: Buffer) => {
+    size += chunk.length;
+    if (size <= MAX_CLIP_BYTES) chunks.push(chunk);
+  });
+  req.on('end', () => {
+    if (size > MAX_CLIP_BYTES) return fail(413, 'Clip too long');
+    const body = Buffer.concat(chunks);
+    if (body.subarray(0, 4).toString('ascii') !== 'RIFF' || body.subarray(8, 12).toString('ascii') !== 'WAVE') {
+      return fail(400, 'Not a WAV file');
+    }
+    const base = rel.replace(/\.wav$/, '');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    for (const ext of OTHER_AUDIO) {
+      const old = path.join(assetsDir, base + ext);
+      if (!fs.existsSync(old)) continue;
+      const kept = path.join(backupDir, `${base}${ext}.${stamp}`);
+      fs.mkdirSync(path.dirname(kept), { recursive: true });
+      fs.renameSync(old, kept);
+    }
+    const file = path.join(assetsDir, rel);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, body);
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ saved: rel }));
+  });
+}
+
 export function ksmPlugin(opts: Options): Plugin {
   const root = process.cwd();
   const assetsDir = path.join(root, 'public', 'assets');
@@ -138,6 +189,21 @@ export function ksmPlugin(opts: Options): Plugin {
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
         const url = decodeURIComponent((req.url ?? '').split('?')[0]);
+        if (url === '/__studio/save') {
+          studioSave(req, res, assetsDir, path.join(root, 'dev-assets', 'replaced'));
+          return;
+        }
+        // Studio recordings are written while the server runs, and left out of the file watcher so
+        // saving one doesn't reload the page; serve them here.
+        if (req.method === 'GET' && url.startsWith('/assets/') && url.endsWith('.wav')) {
+          const file = path.resolve(assetsDir, url.slice('/assets/'.length));
+          if (file.startsWith(assetsDir + path.sep) && fs.existsSync(file)) {
+            res.setHeader('Content-Type', 'audio/wav');
+            res.setHeader('Cache-Control', 'no-store');
+            fs.createReadStream(file).pipe(res);
+            return;
+          }
+        }
         if (url === '/assets/packs/index.json') {
           res.setHeader('Content-Type', 'application/json');
           res.setHeader('Cache-Control', 'no-store');

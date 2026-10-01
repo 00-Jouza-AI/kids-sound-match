@@ -1,0 +1,138 @@
+{
+  "pack_id": "where-lives",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 13,
+  "kind": "association",
+  "association": {
+    "prompt_pack": "animals",
+    "question_audio": { "en": "feedback/home_question_en.mp3", "ar": "feedback/home_question_ar.mp3" },
+    "question_audio_feminine": { "ar": "feedback/home_question_ar_f.mp3" },
+    "celebration": "home"
+  },
+  "name": { "en": "Where does it live?", "ar": "أين يعيش الحيوان؟" },
+  "items": [
+    {
+      "item_key": "farm",
+      "name": { "en": "Farm", "ar": "مزرعة" },
+      "image": "where-lives/farm.webp",
+      "name_audio": {
+        "en": "where-lives/farm_name_en.mp3",
+        "ar": "where-lives/farm_name_ar.mp3"
+      },
+      "prompts": ["cow", "sheep", "goat", "horse", "donkey", "hen", "rooster", "chick", "turkey", "goose", "duck"],
+      "confusable_with": ["house"]
+    },
+    {
+      "item_key": "house",
+      "name": { "en": "House", "ar": "بيت" },
+      "image": "where-lives/house.webp",
+      "name_audio": {
+        "en": "where-lives/house_name_en.mp3",
+        "ar": "where-lives/house_name_ar.mp3"
+      },
+      "prompts": ["cat", "dog", "mouse"],
+      "confusable_with": ["farm"]
+    },
+    {
+      "item_key": "sea",
+      "name": { "en": "Sea", "ar": "بحر" },
+      "image": "where-lives/sea.webp",
+      "name_audio": {
+        "en": "where-lives/sea_name_en.mp3",
+        "ar": "where-lives/sea_name_ar.mp3"
+      },
+      "prompts": ["fish", "dolphin", "whale", "seal", "turtle", "penguin"],
+      "confusable_with": ["river"]
+    },
+    {
+      "item_key": "river",
+      "name": { "en": "River", "ar": "نهر" },
+      "image": "where-lives/river.webp",
+      "name_audio": {
+        "en": "where-lives/river_name_en.mp3",
+        "ar": "where-lives/river_name_ar.mp3"
+      },
+      "prompts": ["frog", "hippo", "crocodile", "duck", "goose", "fish", "turtle"],
+      "confusable_with": ["sea"]
+    },
+    {
+      "item_key": "jungle",
+      "name": { "en": "Jungle", "ar": "غابة" },
+      "image": "where-lives/jungle.webp",
+      "name_audio": {
+        "en": "where-lives/jungle_name_en.mp3",
+        "ar": "where-lives/jungle_name_ar.mp3"
+      },
+      "prompts": ["lion", "tiger", "monkey", "gorilla", "elephant", "parrot", "leopard", "snake", "giraffe", "zebra"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "desert",
+      "name": { "en": "Desert", "ar": "صحراء" },
+      "image": "where-lives/desert.webp",
+      "name_audio": {
+        "en": "where-lives/desert_name_en.mp3",
+        "ar": "where-lives/desert_name_ar.mp3"
+      },
+      "prompts": ["camel", "snake"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "snow",
+      "name": { "en": "Snow", "ar": "ثلج" },
+      "image": "where-lives/snow.webp",
+      "name_audio": {
+        "en": "where-lives/snow_name_en.mp3",
+        "ar": "where-lives/snow_name_ar.mp3"
+      },
+      "prompts": ["penguin", "seal"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "nest",
+      "name": { "en": "Nest", "ar": "عش" },
+      "image": "where-lives/nest.webp",
+      "name_audio": {
+        "en": "where-lives/nest_name_en.mp3",
+        "ar": "where-lives/nest_name_ar.mp3"
+      },
+      "prompts": ["bird", "pigeon", "eagle", "owl"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "hive",
+      "name": { "en": "Hive", "ar": "خلية" },
+      "image": "where-lives/hive.webp",
+      "name_audio": {
+        "en": "where-lives/hive_name_en.mp3",
+        "ar": "where-lives/hive_name_ar.mp3"
+      },
+      "prompts": ["bee"],
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

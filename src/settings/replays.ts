@@ -1,3 +1,4 @@
+import { FIRST_PROFILE_ID, profileKey } from './profiles';
 import { local } from './storage';
 
 /** Games the child may start from the end screen each day. 99 means no limit; 0 means parent only. */
@@ -27,10 +28,16 @@ export function afterReplay(stored: ReplayCount | null, now: Date): ReplayCount 
   return { day, count: stored && stored.day === day ? stored.count + 1 : 1 };
 }
 
-export function replaysLeft(limit: number, now = new Date()): number {
-  return replaysLeftFrom(local.getJson<ReplayCount>(KEY), limit, now);
+/** Each child has their own daily count. */
+export function replaysLeft(limit: number, profileId = FIRST_PROFILE_ID, now = new Date()): number {
+  return replaysLeftFrom(local.getJson<ReplayCount>(profileKey(KEY, profileId)), limit, now);
 }
 
-export function countReplay(now = new Date()): void {
-  local.setJson(KEY, afterReplay(local.getJson<ReplayCount>(KEY), now));
+export function countReplay(profileId = FIRST_PROFILE_ID, now = new Date()): void {
+  const key = profileKey(KEY, profileId);
+  local.setJson(key, afterReplay(local.getJson<ReplayCount>(key), now));
+}
+
+export function forgetReplays(profileId: string): void {
+  local.remove(profileKey(KEY, profileId));
 }

@@ -13,6 +13,8 @@ export interface SessionEntity {
   mode: GameMode;
   /** False when a parent left Kid Mode before the last question. */
   completed: boolean;
+  /** The child who played (see settings/profiles). Missing in games saved before profiles: the first child. */
+  profileId?: string;
 }
 
 /** Spec 8.1 QuestionResultEntity. */

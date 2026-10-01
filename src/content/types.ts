@@ -55,7 +55,11 @@ export interface ManifestAssociation {
   question_audio_feminine?: Partial<Record<Lang, string>>;
   /** Played after a right answer, before the praise (a happy "yum"). */
   reward_audio?: string;
+  /** What a right answer looks like: the answer is eaten (default), or the animal is shown at home. */
+  celebration?: AssociationCelebration;
 }
+
+export type AssociationCelebration = 'eat' | 'home';
 
 export interface PackManifest {
   pack_id: string;
@@ -63,6 +67,13 @@ export interface PackManifest {
   schema_version: number;
   /** Position in the parent's pack list (lowest first). */
   order?: number;
+  /** False keeps the pack out of the Mixed game (Counting: "three" beside a cat teaches nothing). */
+  in_mix?: boolean;
+  /**
+   * In the Mixed game, its questions only show its own pictures: "Where is yellow?" must not show
+   * a banana, and "Where is happy?" must not show a smiling Mama.
+   */
+  mix_alone?: boolean;
   kind?: PackKind;
   association?: ManifestAssociation;
   name: LocalizedText;
@@ -114,6 +125,8 @@ export interface LoadedAssociation {
   readonly question: Readonly<Record<Lang, ResolvedAsset | null>>;
   readonly questionFeminine: Readonly<Record<Lang, ResolvedAsset | null>>;
   readonly reward: ResolvedAsset | null;
+  /** Missing means 'eat'. */
+  readonly celebration?: AssociationCelebration;
 }
 
 export interface LoadedPack {
@@ -127,6 +140,10 @@ export interface LoadedPack {
   readonly association?: LoadedAssociation;
   /** The Mixed game: the packs its items come from. */
   readonly parts?: readonly LoadedPack[];
+  /** See PackManifest.in_mix; missing means true. */
+  readonly inMix?: boolean;
+  /** See PackManifest.mix_alone. */
+  readonly mixAlone?: boolean;
   /** Only items whose every asset resolved. */
   readonly items: readonly LoadedItem[];
   readonly groups: readonly ManifestGroup[];

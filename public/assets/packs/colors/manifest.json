@@ -1,0 +1,93 @@
+{
+  "pack_id": "colors",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 8,
+  "mix_alone": true,
+  "name": { "en": "Colours", "ar": "الألوان" },
+  "items": [
+    {
+      "item_key": "color_red",
+      "name": { "en": "Red", "ar": "أحمر" },
+      "image": "colors/color_red.svg",
+      "name_audio": {
+        "en": "colors/color_red_name_en.mp3",
+        "ar": "colors/color_red_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "color_yellow",
+      "name": { "en": "Yellow", "ar": "أصفر" },
+      "image": "colors/color_yellow.svg",
+      "name_audio": {
+        "en": "colors/color_yellow_name_en.mp3",
+        "ar": "colors/color_yellow_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "color_blue",
+      "name": { "en": "Blue", "ar": "أزرق" },
+      "image": "colors/color_blue.svg",
+      "name_audio": {
+        "en": "colors/color_blue_name_en.mp3",
+        "ar": "colors/color_blue_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "color_green",
+      "name": { "en": "Green", "ar": "أخضر" },
+      "image": "colors/color_green.svg",
+      "name_audio": {
+        "en": "colors/color_green_name_en.mp3",
+        "ar": "colors/color_green_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "color_orange",
+      "name": { "en": "Orange", "ar": "برتقالي" },
+      "image": "colors/color_orange.svg",
+      "name_audio": {
+        "en": "colors/color_orange_name_en.mp3",
+        "ar": "colors/color_orange_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "color_purple",
+      "name": { "en": "Purple", "ar": "بنفسجي" },
+      "image": "colors/color_purple.svg",
+      "name_audio": {
+        "en": "colors/color_purple_name_en.mp3",
+        "ar": "colors/color_purple_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

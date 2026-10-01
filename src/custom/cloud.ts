@@ -29,6 +29,11 @@ function supabase(): Promise<SupabaseClient> {
   return client;
 }
 
+/** The database was set up from an older schema.sql (PostgREST: unknown table / Postgres: no relation). */
+function missingTable(error: { code?: string; message?: string }): boolean {
+  return error.code === 'PGRST205' || error.code === '42P01' || /custom_overrides/.test(error.message ?? '');
+}
+
 function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
   const path = (itemId: string, name: MediaName) => `${uid}/${itemId}/${name}`;
   // "Your voice and photos": stored under the path of the built-in file each one replaces.
@@ -49,7 +54,12 @@ function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
       ) as RemoteItem[];
     },
     async listOverrides() {
-      return check(await sb.from('custom_overrides').select('path,media_version,updated_at,deleted')) as RemoteOverride[];
+      const r = await sb.from('custom_overrides').select('path,media_version,updated_at,deleted');
+      if (r.error && missingTable(r.error)) {
+        console.warn('[cloud] run supabase/schema.sql again to back up your voice and photos');
+        return null;
+      }
+      return check(r) as RemoteOverride[];
     },
     async upsertPack(pack) {
       check(await sb.from('custom_packs').upsert({ ...pack, user_id: uid }));
@@ -86,10 +96,12 @@ function supabaseRemote(sb: SupabaseClient, uid: string): Remote {
     },
     async deleteEverything() {
       const items = check(await sb.from('custom_items').select('id')) as { id: string }[];
-      const overrides = check(await sb.from('custom_overrides').select('path')) as { path: string }[];
+      const listed = await sb.from('custom_overrides').select('path');
+      const hasOverrides = !(listed.error && missingTable(listed.error));
+      const overrides = (hasOverrides ? check(listed) : []) as { path: string }[];
       const paths = [...items.flatMap((i) => ALL_MEDIA.map((n) => path(i.id, n))), ...overrides.map((o) => overridePath(o.path))];
       for (let i = 0; i < paths.length; i += 100) check(await sb.storage.from(BUCKET).remove(paths.slice(i, i + 100)));
-      check(await sb.from('custom_overrides').delete().eq('user_id', uid));
+      if (hasOverrides) check(await sb.from('custom_overrides').delete().eq('user_id', uid));
       check(await sb.from('custom_items').delete().eq('user_id', uid));
       check(await sb.from('custom_packs').delete().eq('user_id', uid));
     },

@@ -1,4 +1,5 @@
 import type { ChoiceCount, SessionSnapshot } from '../../engine';
+import { FIRST_PROFILE_ID } from '../../settings/profiles';
 import type { GameLanguage, GameMode } from '../../settings/settings';
 import { session as tabStorage } from '../../settings/storage';
 
@@ -7,6 +8,8 @@ export type KidKind = 'game' | 'explore';
 /** The settings a game was started with. Changing Settings mid-game doesn't affect it. */
 export interface KidConfig {
   kind: KidKind;
+  /** The child playing (see settings/profiles): their Report and play-again count. */
+  profileId: string;
   packId: string;
   itemKeys: string[];
   choiceCount: ChoiceCount;
@@ -41,8 +44,15 @@ const KEY = 'ksm.kid.v1';
 export function loadKidSnapshot(): KidSnapshot | null {
   const s = tabStorage.getJson<KidSnapshot>(KEY);
   if (!s || s.v !== 1 || !s.config || !Array.isArray(s.config.itemKeys)) return null;
-  // Snapshots saved before Explore, hints and adaptive practice existed.
-  s.config = { ...s.config, kind: s.config.kind ?? 'game', hints: s.config.hints ?? true, weights: s.config.weights ?? {}, replaysPerDay: s.config.replaysPerDay ?? 0 };
+  // Snapshots saved before Explore, hints, adaptive practice and child profiles existed.
+  s.config = {
+    ...s.config,
+    kind: s.config.kind ?? 'game',
+    hints: s.config.hints ?? true,
+    weights: s.config.weights ?? {},
+    replaysPerDay: s.config.replaysPerDay ?? 0,
+    profileId: s.config.profileId ?? FIRST_PROFILE_ID,
+  };
   return s;
 }
 

@@ -1,0 +1,83 @@
+{
+  "pack_id": "counting",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 11,
+  "in_mix": false,
+  "name": { "en": "Counting 1 to 5", "ar": "العدّ من 1 إلى 5" },
+  "items": [
+    {
+      "item_key": "count_1",
+      "name": { "en": "One", "ar": "واحد" },
+      "images": ["counting/count_1_dots.svg", "counting/count_1_apples.svg", "counting/count_1_stars.svg", "counting/count_1_balloons.svg", "counting/count_1_fish.svg"],
+      "name_audio": {
+        "en": "counting/count_1_name_en.mp3",
+        "ar": "counting/count_1_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "count_2",
+      "name": { "en": "Two", "ar": "اثنان" },
+      "images": ["counting/count_2_dots.svg", "counting/count_2_apples.svg", "counting/count_2_stars.svg", "counting/count_2_balloons.svg", "counting/count_2_fish.svg"],
+      "name_audio": {
+        "en": "counting/count_2_name_en.mp3",
+        "ar": "counting/count_2_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "count_3",
+      "name": { "en": "Three", "ar": "ثلاثة" },
+      "images": ["counting/count_3_dots.svg", "counting/count_3_apples.svg", "counting/count_3_stars.svg", "counting/count_3_balloons.svg", "counting/count_3_fish.svg"],
+      "name_audio": {
+        "en": "counting/count_3_name_en.mp3",
+        "ar": "counting/count_3_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "count_4",
+      "name": { "en": "Four", "ar": "أربعة" },
+      "images": ["counting/count_4_dots.svg", "counting/count_4_apples.svg", "counting/count_4_stars.svg", "counting/count_4_balloons.svg", "counting/count_4_fish.svg"],
+      "name_audio": {
+        "en": "counting/count_4_name_en.mp3",
+        "ar": "counting/count_4_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "count_5",
+      "name": { "en": "Five", "ar": "خمسة" },
+      "images": ["counting/count_5_dots.svg", "counting/count_5_apples.svg", "counting/count_5_stars.svg", "counting/count_5_balloons.svg", "counting/count_5_fish.svg"],
+      "name_audio": {
+        "en": "counting/count_5_name_en.mp3",
+        "ar": "counting/count_5_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

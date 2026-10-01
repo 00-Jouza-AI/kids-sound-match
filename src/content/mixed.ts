@@ -24,11 +24,13 @@ const CROSS_PACK_CONFUSABLE: readonly (readonly [string, string])[] = [
 
 /**
  * The Mixed game: every ready "match" pack in one game (animals, things at home, the parent's own
- * packs...). Each question's wrong answers come from the same side as the right one, so the
- * parent's photos are only asked with each other (see `mixedGroup`).
+ * packs...), except packs that opt out (Counting). Each question's wrong answers come from the same
+ * group as the right one (see `mixedGroups`).
  */
 export function buildMixedPack(packs: readonly LoadedPack[], feedback: LoadedFeedback): LoadedPack | null {
-  const parts = packs.filter((p) => p.kind === 'match' && !p.parts && p.items.length >= MIN_ITEMS_PER_PACK);
+  const parts = packs.filter(
+    (p) => p.kind === 'match' && !p.parts && p.inMix !== false && p.items.length >= MIN_ITEMS_PER_PACK,
+  );
   if (parts.length < 2) return null;
   const seen = new Set<string>();
   const items: LoadedItem[] = [];
@@ -66,7 +68,16 @@ export function sourcePacks(pack: LoadedPack): Map<string, string> {
   return map;
 }
 
-/** Mixed game: the parent's own packs form one group, the built-in packs another. */
-export function mixedGroup(sourcePackId: string): string {
-  return isCustomPackId(sourcePackId) ? 'custom' : 'builtin';
+/**
+ * Mixed game: which pictures may share a question. The built-in packs of things form one group;
+ * the parent's own packs another (their photos stay together); and colours, shapes and feelings
+ * each keep to themselves. Empty for other packs.
+ */
+export function mixedGroups(pack: LoadedPack): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const part of pack.parts ?? []) {
+    const group = part.mixAlone ? `pack:${part.id}` : isCustomPackId(part.id) ? 'custom' : 'builtin';
+    for (const item of part.items) if (!map.has(item.key)) map.set(item.key, group);
+  }
+  return map;
 }

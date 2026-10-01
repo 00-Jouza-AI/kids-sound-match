@@ -2032,6 +2032,151 @@ html.kid-locked body {
   font-weight: 700;
 }
 
+/* ---------- Children (profiles) ---------- */
+
+.avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--avatar);
+  font-family: var(--emoji);
+  line-height: 1;
+}
+
+.profile-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+}
+
+.profile {
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.profile.on {
+  border-color: var(--avatar);
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+.who-plays {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.child-preview {
+  display: grid;
+  place-items: center;
+  margin: 4px 0 12px;
+}
+
+.animal-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.pick {
+  padding: 6px 0;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: #faf6ef;
+  font-family: var(--emoji);
+  font-size: 1.7rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.pick.on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.color-picker {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+.swatch {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--avatar);
+  box-shadow: 0 0 0 2px var(--line);
+  cursor: pointer;
+}
+
+.swatch.on {
+  box-shadow: 0 0 0 3px var(--ink);
+}
+
+/* ---------- Report picture ---------- */
+
+.share-preview {
+  display: block;
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Recording studio ---------- */
+
+.studio-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.studio-head img {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+}
+
+.studio-words {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.studio-say {
+  margin: 2px 0;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.studio-path {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ---------- Kid Mode: "Who eats what?" ---------- */
 
 .assoc {
@@ -2083,8 +2228,56 @@ html.kid-locked body {
   -webkit-user-drag: none;
 }
 
-.prompt-card.eating > img:first-child {
+.prompt-card.eating > img.about {
   animation: munch 0.9s ease-in-out 0.45s;
+}
+
+/* "Where does it live?": the home fills the circle behind the animal, and the animal hops. */
+.prompt-card > img.home-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0;
+  animation: home-in 0.6s ease-out forwards;
+}
+
+.prompt-card.at-home > img.about {
+  position: relative;
+  width: 52%;
+  height: 52%;
+  margin-top: 18%;
+  transition: width 0.4s ease, height 0.4s ease, margin 0.4s ease;
+  animation: hop 0.9s ease-in-out 0.35s;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.18));
+}
+
+@keyframes home-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-14%);
+  }
+  55% {
+    transform: translateY(0);
+  }
+  75% {
+    transform: translateY(-6%);
+  }
 }
 
 /* The right food moves into the animal and disappears: eaten. */

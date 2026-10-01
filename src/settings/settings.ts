@@ -1,6 +1,7 @@
 import type { LoadedItem, LoadedPack, Lang } from '../content/types';
 import { MIN_ITEMS_PER_PACK } from '../content/validate';
 import type { ChoiceCount } from '../engine';
+import { FIRST_PROFILE_ID } from './profiles';
 import { REPLAY_LIMITS } from './replays';
 import { local } from './storage';
 
@@ -118,13 +119,41 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
   };
 }
 
-export function loadSettings(): Settings {
-  return sanitizeSettings(local.getJson(STORAGE_KEY), deviceLanguage(browserLanguages()));
+/**
+ * Each child has their own settings; the app language and "Help us improve" are shared. Before
+ * profiles existed every setting lived under STORAGE_KEY: the first child inherits them.
+ */
+export function loadSettings(profileId: string = FIRST_PROFILE_ID): Settings {
+  migrateLegacySettings();
+  const shared = local.getJson<Record<string, unknown>>(STORAGE_KEY) ?? {};
+  const own = local.getJson<Record<string, unknown>>(childKey(profileId)) ?? {};
+  return sanitizeSettings(
+    { ...own, telemetryEnabled: shared.telemetryEnabled, uiLanguageOverride: shared.uiLanguageOverride },
+    deviceLanguage(browserLanguages()),
+  );
 }
 
-export function saveSettings(settings: Settings): void {
-  local.setJson(STORAGE_KEY, settings);
+export function saveSettings(settings: Settings, profileId: string = FIRST_PROFILE_ID): void {
+  migrateLegacySettings();
+  const { telemetryEnabled, uiLanguageOverride, ...own } = settings;
+  local.setJson(STORAGE_KEY, { telemetryEnabled, uiLanguageOverride });
+  local.setJson(childKey(profileId), own);
 }
+
+/** Once: the settings saved before profiles become the first child's, before anything overwrites them. */
+function migrateLegacySettings(): void {
+  if (local.get(childKey(FIRST_PROFILE_ID)) !== null) return;
+  const legacy = local.getJson<Record<string, unknown>>(STORAGE_KEY);
+  if (!legacy || !('packId' in legacy)) return;
+  const { telemetryEnabled: _telemetry, uiLanguageOverride: _language, ...own } = legacy;
+  local.setJson(childKey(FIRST_PROFILE_ID), own);
+}
+
+export function forgetSettings(profileId: string): void {
+  local.remove(childKey(profileId));
+}
+
+const childKey = (profileId: string) => `${STORAGE_KEY}.child.${profileId}`;
 
 export function uiLanguage(settings: Settings): Lang {
   return settings.uiLanguageOverride === 'system' ? deviceLanguage(browserLanguages()) : settings.uiLanguageOverride;
@@ -146,20 +175,39 @@ export function defaultSelection(pack: LoadedPack, mode: GameMode = 'SOUND_AND_N
 }
 
 /**
+ * The mode a pack is really played in. Packs with fewer than 5 sounds (Food, Colours, Family, a
+ * parent's pack of photos) are always played by name, whatever "What your child hears" says.
+ * The Mixed game keeps the setting: in sound modes, quiet pictures simply stay out of the mix.
+ */
+export function effectiveMode(pack: LoadedPack, mode: GameMode): GameMode {
+  if (pack.parts || pack.kind === 'association') return mode;
+  return pack.items.filter((i) => i.sound !== null).length >= MIN_ITEMS_PER_PACK ? mode : 'NAME_ONLY';
+}
+
+/** Whether "What your child hears" means anything for this pack. */
+export function soundModesAvailable(pack: LoadedPack): boolean {
+  return pack.kind !== 'association' && effectiveMode(pack, 'SOUND_ONLY') === 'SOUND_ONLY';
+}
+
+/**
  * The animals the game will use: the parent's choice if it still has enough usable animals, else the default.
  * The Mixed game uses each pack's own choice, for every pack left in the mix.
  */
 export function enabledItemKeys(pack: LoadedPack, settings: Settings): string[] {
   if (pack.parts) {
-    const keys = pack.parts.filter((p) => !settings.mixedExcluded.includes(p.id)).flatMap((p) => enabledItemKeys(p, settings));
+    const keys = pack.parts.filter((p) => !settings.mixedExcluded.includes(p.id)).flatMap((p) => selection(p, settings.mode, settings));
     const inMix = new Set(pack.items.map((i) => i.key));
     return [...new Set(keys)].filter((k) => inMix.has(k));
   }
-  const usable = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
+  return selection(pack, effectiveMode(pack, settings.mode), settings);
+}
+
+function selection(pack: LoadedPack, mode: GameMode, settings: Settings): string[] {
+  const usable = pack.items.filter((i) => usableInMode(i, mode)).map((i) => i.key);
   const chosen = settings.enabledItems[pack.id];
   if (chosen) {
     const keys = usable.filter((k) => chosen.includes(k));
     if (keys.length >= MIN_ITEMS_PER_PACK) return keys;
   }
-  return defaultSelection(pack, settings.mode);
+  return defaultSelection(pack, mode);
 }

@@ -2,11 +2,13 @@ import type { LoadedPack } from '../../content/types';
 import type { ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import type { NextLevel } from '../../report/practice';
-import { enabledItemKeys, type Settings } from '../../settings/settings';
+import type { ProfileState } from '../../settings/profiles';
+import { effectiveMode, enabledItemKeys, type Settings } from '../../settings/settings';
 import { ExploreIcon } from '../kid/icons';
 import { ChevronIcon } from './components';
+import { ProfileRow } from './ProfileRow';
 
-export type HomeLink = 'report' | 'settings' | 'myPacks' | 'parentsGroup' | 'privacy' | 'about';
+export type HomeLink = 'report' | 'settings' | 'myPacks' | 'studio' | 'parentsGroup' | 'privacy' | 'about';
 
 /** Spec 5.2: title, settings summary, a large START button, and the parent links. */
 export function Home({
@@ -15,6 +17,8 @@ export function Home({
   canStart,
   canExplore,
   showParentsGroup,
+  profiles,
+  onProfile,
   nudge,
   onStart,
   onExplore,
@@ -28,6 +32,8 @@ export function Home({
   canStart: boolean;
   canExplore: boolean;
   showParentsGroup: boolean;
+  profiles: ProfileState;
+  onProfile: (id: string) => void;
   nudge: NextLevel | null;
   onStart: () => void;
   onExplore: () => void;
@@ -37,7 +43,7 @@ export function Home({
 }) {
   const { t, lang } = useI18n();
   const modeLabel = { SOUND_AND_NAME: t('modeSoundAndName'), SOUND_ONLY: t('modeSoundOnly'), NAME_ONLY: t('modeNameOnly') }[
-    settings.mode
+    pack ? effectiveMode(pack, settings.mode) : settings.mode
   ];
   const languageLabel = { ar: 'العربية', en: 'English', both: 'العربية + English' }[settings.language];
   // "Who eats what?" always asks about the animal, and has no Toddler mode.
@@ -57,6 +63,8 @@ export function Home({
     { id: 'report', label: t('report'), icon: '📊' },
     { id: 'settings', label: t('settings'), icon: '⚙️' },
     { id: 'myPacks', label: t('myPacks'), icon: '🎨' },
+    // The recording studio saves into the app's files, so it only exists on the PC's dev server.
+    ...(import.meta.env.DEV ? [{ id: 'studio' as const, label: t('studio'), icon: '🎙️' }] : []),
     ...(showParentsGroup ? [{ id: 'parentsGroup' as const, label: t('parentsGroup'), icon: '💬' }] : []),
     { id: 'privacy', label: t('privacyPolicy'), icon: '🔒' },
     { id: 'about', label: t('about'), icon: 'ℹ️' },
@@ -69,6 +77,13 @@ export function Home({
         <h1>{t('appName')}</h1>
         <p className="tagline">{t('appTagline')}</p>
       </header>
+
+      {profiles.profiles.length > 1 && (
+        <div className="who-plays">
+          <span className="muted">{t('whoIsPlaying')}</span>
+          <ProfileRow profiles={profiles.profiles} activeId={profiles.activeId} onSelect={onProfile} />
+        </div>
+      )}
 
       <button type="button" className="start-btn" onClick={onStart} disabled={!canStart}>
         {t('start')}

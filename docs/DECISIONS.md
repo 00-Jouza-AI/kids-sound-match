@@ -86,6 +86,30 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
   Uncle and Aunt are one of each (عمّو, خالتو), and families can record their own word in "Your voice and photos".
 - Pictures still to draw: dates (the placeholder is a palm tree), labneh and hummus have no emoji of their own.
 
+## Added on 1 October 2026
+
+| Feature | Decision |
+|---|---|
+| Where does it live? | A second association pack: see and hear an animal, then "أين يعيش؟ / أين تعيش؟ / Where does it live?", and tap its home. 9 homes: farm, house, sea, river, jungle, desert, snow, nest, hive. Animals with two homes (duck: farm and river; penguin: sea and snow) never see their other home as a wrong answer; farm/house and sea/river are never shown together. A right answer shows the home behind the animal, which hops |
+| Colours, Shapes, Feelings | Starter sets of 6: red, yellow, blue, green, orange, purple; circle, square, triangle, star, heart, moon; happy, sad, angry, scared, sleepy, surprised. Colours are paint splats (never a circle) and the shapes are all one grey-blue, so only the shape differs; both are drawn as final art. Feelings have sounds (laugh, sob, "hmph", gasp, yawn, "wow"); scared and surprised are never shown together. The Arabic feeling words are the usual masculine forms (سعيد), describing the face |
+| Counting 1 to 5 | واحد … خمسة. Each number is drawn five ways as final art: dice dots, apples, stars, balloons, fish. A question always uses one kind (3 apples next to 5 apples) |
+| Mixed game | Colours, shapes and feelings join the mix, but their questions only show their own kind (no banana next to "yellow", no smiling Mama next to "happy"). Counting stays out |
+| Packs without sounds | Packs with fewer than 5 sounds (Food, Body, Family, Colours, Shapes, Counting, a parent's pack of photos) are always played by name; "What your child hears" is hidden for them instead of warning |
+| Child profiles | Up to 4 children, each an animal on a colour (no names or photos). Chosen above START on Home; Settings has a Children card (switch, change animal, add, delete). Each child has their own settings, Report, practice and daily play-again count; the PIN, My packs and your voice are shared. The first child keeps everything saved before profiles; deleting a child deletes their results on the phone |
+| Share the Report | "Share as a picture" draws one page on the phone (the child's animal, games, answers, first-try %, a bar per pack, what they know well and are still learning) and opens the share menu (WhatsApp, email…); where sharing isn't available, "Save picture". Arabic is drawn right to left |
+| Recording studio | Development only, on this PC (Home → Recording studio): every name, sound and line still using a stand-in, filtered by pack and Arabic / English / sounds. Space records (stops by itself after the word), Enter saves and moves on, P plays, R records again. Saves WAV straight into `public/assets` next to the manifest's file (`cat_name_ar.wav` for `cat_name_ar.mp3`; the app accepts either). Accepted only from this computer; a file it replaces is moved to `dev-assets/replaced`, never deleted |
+| Cloud backup | Packs keep backing up even if `schema.sql` hasn't been run again since "Your voice and photos"; only that part waits |
+
+### More clips for the voice session (fourth round)
+
+- **64 name recordings** for 32 new pictures: colours (أحمر، أصفر، أزرق، أخضر، برتقالي، بنفسجي), shapes
+  (دائرة، مربع، مثلث، نجمة، قلب، هلال), feelings (سعيد، حزين، غاضب، خائف، نعسان، متفاجئ), numbers
+  (واحد، اثنان، ثلاثة، أربعة، خمسة) and homes (مزرعة، بيت، بحر، نهر، غابة، صحراء، ثلج، عش، خلية).
+- **6 feeling sounds**: laugh, sob, "hmph", gasp, yawn, "wow".
+- **3 lines**: `home_question_ar.mp3` أين يعيش؟, `home_question_ar_f.mp3` أين تعيش؟, `home_question_en.mp3` "Where does it live?".
+- Pictures still to draw: the 6 feelings and the 9 homes (colours, shapes and counting are final).
+- The studio (`Home → Recording studio` on this PC) is the quickest way to record all of these.
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.

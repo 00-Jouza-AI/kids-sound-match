@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { audioEngine } from '../../audio/audioEngine';
 import { ClipResolver } from '../../audio/clips';
 import { GameAudio } from '../../audio/gameAudio';
-import { mixedGroup, sourcePacks } from '../../content/mixed';
-import type { LoadedItem, LoadedPack } from '../../content/types';
+import { mixedGroups, sourcePacks } from '../../content/mixed';
+import type { AssociationCelebration, LoadedItem, LoadedPack } from '../../content/types';
 import { isCustomPackId } from '../../custom/types';
 import { GameSession, type Question, type QuestionState, type SessionResult } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
@@ -55,12 +55,13 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   const items = useMemo(() => new Map(pack.items.map((i) => [i.key, i])), [pack]);
   // "Who eats what?": the animals the questions are about.
   const promptItems = useMemo(() => new Map(pack.items.flatMap((i) => i.prompts ?? []).map((p) => [p.key, p])), [pack]);
-  // Mixed game: which pack each picture came from.
+  // Mixed game: which pack each picture came from, and which pictures may share a question.
   const sources = useMemo(() => sourcePacks(pack), [pack]);
+  const groups = useMemo(() => mixedGroups(pack), [pack]);
 
   // The current game. Replaced by "play again", so everything reads it through the ref.
   const sessionRef = useRef<GameSession | null>(null);
-  if (!sessionRef.current) sessionRef.current = createSession(config, items, sources, snapshot);
+  if (!sessionRef.current) sessionRef.current = createSession(config, items, groups, snapshot);
   const game = () => sessionRef.current!;
 
   const audio = useMemo(
@@ -81,7 +82,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   const [pictures, setPictures] = useState<Record<string, string>>({});
   const [promptPicture, setPromptPicture] = useState<string | null>(null);
   const [hint, setHint] = useState<{ key: string; pulse: number } | null>(null);
-  const [canReplay, setCanReplay] = useState(() => replaysLeft(config.replaysPerDay) > 0);
+  const [canReplay, setCanReplay] = useState(() => replaysLeft(config.replaysPerDay, config.profileId) > 0);
 
   // Refs mirror state for async callbacks (timers, audio promises).
   const stageRef = useRef(stage);
@@ -189,6 +190,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
           language: config.language,
           mode: config.mode,
           completed,
+          profileId: config.profileId,
         },
         result.questions.map((q) => {
           const source = sources.get(q.itemKey);
@@ -222,7 +224,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     const began = performance.now();
     void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
       later(() => {
-        setCanReplay(replaysLeft(config.replaysPerDay) > 0);
+        setCanReplay(replaysLeft(config.replaysPerDay, config.profileId) > 0);
         setStage('idle');
       }, Math.max(0, SESSION_END_MS - (performance.now() - began)));
     });
@@ -277,10 +279,10 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
 
   /** "Play again" from the end screen: a new game with the same settings, counted against today's limit. */
   const playAgain = () => {
-    if (stageRef.current !== 'idle' || gateRef.current || replaysLeft(config.replaysPerDay) <= 0) return;
-    countReplay();
+    if (stageRef.current !== 'idle' || gateRef.current || replaysLeft(config.replaysPerDay, config.profileId) <= 0) return;
+    countReplay(config.profileId);
     audioEngine.unlock();
-    sessionRef.current = createSession(config, items, sources, null);
+    sessionRef.current = createSession(config, items, groups, null);
     startedAt.current = Date.now();
     setStage('playing');
     persist('playing');
@@ -370,7 +372,8 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
         <AskAbout
           questionNo={questionNo}
           picture={promptPicture}
-          eating={view.celebratedKey ? pictures[view.celebratedKey] : null}
+          answer={view.celebratedKey ? pictures[view.celebratedKey] : null}
+          celebration={pack.association?.celebration ?? 'eat'}
           onTap={replay}
         >
           {grid}
@@ -393,19 +396,23 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
 }
 
 /**
- * "Who eats what?": the animal in a round frame above the pictures (beside them when the phone is
- * sideways). Tapping it asks again. After a right answer the food moves into it and it munches.
+ * "Who eats what?" and "Where does it live?": the animal in a round frame above the pictures
+ * (beside them when the phone is sideways). Tapping it asks again. After a right answer the food
+ * moves into it and it munches, or its home appears around it and it hops.
  */
 function AskAbout({
   questionNo,
   picture,
-  eating,
+  answer,
+  celebration,
   onTap,
   children,
 }: {
   questionNo: number;
   picture: string;
-  eating: string | null;
+  /** The right answer's picture, once it's found. */
+  answer: string | null;
+  celebration: AssociationCelebration;
   onTap: () => void;
   children: ReactNode;
 }) {
@@ -420,7 +427,7 @@ function AskAbout({
           type="button"
           // Its own key space: the pictures next to it are keyed by the question number too.
           key={`about-${questionNo}`}
-          className={eating ? 'prompt-card eating' : 'prompt-card'}
+          className={answer ? `prompt-card ${celebration === 'home' ? 'at-home' : 'eating'}` : 'prompt-card'}
           style={{ width: size, height: size }}
           tabIndex={-1}
           aria-hidden="true"
@@ -429,8 +436,9 @@ function AskAbout({
             onTap();
           }}
         >
-          <img src={picture} alt="" draggable={false} />
-          {eating && <img className="bite" src={eating} alt="" draggable={false} />}
+          {answer && celebration === 'home' && <img className="home-bg" src={answer} alt="" draggable={false} />}
+          <img className="about" src={picture} alt="" draggable={false} />
+          {answer && celebration === 'eat' && <img className="bite" src={answer} alt="" draggable={false} />}
         </button>
       )}
       {children}
@@ -441,19 +449,19 @@ function AskAbout({
 function createSession(
   config: KidConfig,
   items: Map<string, LoadedItem>,
-  sources: Map<string, string>,
+  groups: Map<string, string>,
   snapshot: KidSnapshot | null,
 ): GameSession {
   const engineItems = config.itemKeys
     .filter((k) => items.has(k))
     .map((k) => {
       const it = items.get(k)!;
-      const source = sources.get(k);
+      const group = groups.get(k);
       return {
         key: k,
         confusableWith: it.confusableWith.filter((c) => config.itemKeys.includes(c)),
         ...(it.prompts ? { prompts: it.prompts.map((p) => p.key) } : {}),
-        ...(source ? { group: mixedGroup(source) } : {}),
+        ...(group ? { group } : {}),
       };
     });
   const sessionConfig = {

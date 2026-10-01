@@ -37,7 +37,8 @@ export interface RemoteOverride {
 export interface Remote {
   listPacks(): Promise<RemotePack[]>;
   listItems(): Promise<RemoteItem[]>;
-  listOverrides(): Promise<RemoteOverride[]>;
+  /** Null when the cloud was set up before "Your voice and photos" (schema.sql not run again yet). */
+  listOverrides(): Promise<RemoteOverride[] | null>;
   upsertPack(pack: RemotePack): Promise<void>;
   upsertItem(item: RemoteItem): Promise<void>;
   upsertOverride(override: RemoteOverride): Promise<void>;
@@ -134,9 +135,11 @@ export async function runSync(store: CustomStore, remote: Remote, uid: string): 
     remote.listItems(),
     remote.listOverrides(),
   ]);
+  // An older cloud setup without the voice-and-photos table: back up the packs, leave the rest here.
+  const voiceInCloud = remoteOverrides !== null;
   const plan = planSync(
-    { packs, items, overrides },
-    { packs: remotePacks, items: remoteItems, overrides: remoteOverrides },
+    { packs, items, overrides: voiceInCloud ? overrides : [] },
+    { packs: remotePacks, items: remoteItems, overrides: remoteOverrides ?? [] },
     uid,
   );
   const localItem = new Map(items.map((i) => [i.id, i]));

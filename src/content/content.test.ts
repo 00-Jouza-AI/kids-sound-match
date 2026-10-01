@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 import manifestJson from '../../public/assets/packs/animals/manifest.json';
 import { defaultSettings, enabledItemKeys } from '../settings/settings';
 import { loadContent, type AssetIndex } from './loader';
-import { buildMixedPack, sourcePacks } from './mixed';
+import { buildMixedPack, mixedGroups, sourcePacks } from './mixed';
 import { placeholderPathFor } from './paths';
 import type { PackManifest } from './types';
 import { validatePack } from './validate';
@@ -192,7 +192,10 @@ describe('all packs', () => {
   it('load in order, and link every food to the animals that eat it', async () => {
     const content = await load();
     expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
-    expect(content.packs.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'who-eats-what']);
+    expect(content.packs.map((p) => p.id)).toEqual([
+      'animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family',
+      'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives',
+    ]);
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
     expect(whoEats.kind).toBe('association');
     expect(whoEats.items).toHaveLength(15);
@@ -217,17 +220,54 @@ describe('all packs', () => {
   it('make a Mixed game from every ready "match" pack, with each pack\'s own choice', async () => {
     const content = await load();
     const mixed = buildMixedPack(content.packs, content.packs[0].feedback)!;
-    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family']);
+    // Counting stays out of the mix.
+    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'colors', 'shapes', 'feelings']);
     expect(new Set(mixed.items.map((i) => i.key)).size).toBe(mixed.items.length);
     expect(mixed.items.find((i) => i.key === 'bell')!.confusableWith).toContain('doorbell');
 
     const settings = defaultSettings('ar');
-    // Sound modes: the 8 animals with real sounds, plus every home, vehicle and instrument sound.
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11);
+    // Sound modes: the 8 animals with real sounds, plus every home, vehicle, instrument and feeling sound.
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 6);
     settings.mode = 'NAME_ONLY';
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 25 + 13 + 9);
-    settings.mixedExcluded = ['animals', 'home', 'vehicles', 'instruments', 'body', 'family'];
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 25 + 13 + 9 + 6 + 6 + 6);
+    settings.mixedExcluded = ['animals', 'home', 'vehicles', 'instruments', 'body', 'family', 'colors', 'shapes', 'feelings'];
     expect(enabledItemKeys(mixed, settings)).toEqual(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));
     expect(sourcePacks(mixed).get('drum')).toBe('instruments');
+    // Colours, shapes and feelings only appear with their own kind; the other built-in packs mix.
+    const groups = mixedGroups(mixed);
+    expect([groups.get('cat'), groups.get('drum'), groups.get('color_red'), groups.get('happy')]).toEqual([
+      'builtin', 'builtin', 'pack:colors', 'pack:feelings',
+    ]);
+  });
+
+  it('link every home to the animals that live there, shown at home when found', async () => {
+    const content = await load();
+    const homes = content.packs.find((p) => p.id === 'where-lives')!;
+    expect(homes.kind).toBe('association');
+    expect(homes.association!.celebration).toBe('home');
+    expect(homes.items.map((i) => i.key)).toEqual(['farm', 'house', 'sea', 'river', 'jungle', 'desert', 'snow', 'nest', 'hive']);
+    expect(homes.items.find((i) => i.key === 'hive')!.prompts!.map((p) => p.key)).toEqual(['bee']);
+    expect(content.packs.find((p) => p.id === 'who-eats-what')!.association!.celebration).toBe('eat');
+  });
+
+  it('draw colours, shapes and counting as final pictures, so they need no artist', async () => {
+    const content = await load();
+    for (const id of ['colors', 'shapes', 'counting']) {
+      const pack = content.packs.find((p) => p.id === id)!;
+      expect(pack.items.every((i) => i.images.every((a) => a.real)), id).toBe(true);
+    }
+    const three = content.packs.find((p) => p.id === 'counting')!.items.find((i) => i.key === 'count_3')!;
+    expect(three.images.map((a) => a.path.split('_').pop())).toEqual(['dots.svg', 'apples.svg', 'stars.svg', 'balloons.svg', 'fish.svg']);
+  });
+
+  it('use a recording saved in another format than the manifest says (the studio saves WAV)', async () => {
+    const withWav = { ...index, files: [...index.files, 'packs/animals/cow_name_ar.wav'] };
+    const content = await loadContent({
+      baseUrl: '/',
+      allowPlaceholders: true,
+      fetchJson: async (url) => (url.endsWith('packs/index.json') ? withWav : fetchAll(url)),
+    });
+    const cow = content.packs[0].items.find((i) => i.key === 'cow')!;
+    expect(cow.nameAudio.ar).toEqual({ path: 'packs/animals/cow_name_ar.mp3', url: '/assets/packs/animals/cow_name_ar.wav', real: true });
   });
 });

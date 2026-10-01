@@ -6,6 +6,8 @@ export interface ReportStore {
   sessions(): Promise<SessionEntity[]>;
   questions(): Promise<QuestionResultEntity[]>;
   clearAll(): Promise<void>;
+  /** Deletes these games and their answers (one child's history). */
+  deleteSessions(ids: readonly number[]): Promise<void>;
 }
 
 const DB_NAME = 'ksm-report';
@@ -78,6 +80,19 @@ class IndexedDbReportStore implements ReportStore {
     tx.objectStore(QUESTIONS).clear();
     await done(tx);
   }
+
+  async deleteSessions(ids: readonly number[]): Promise<void> {
+    if (!ids.length) return;
+    const db = await this.open();
+    const tx = db.transaction([SESSIONS, QUESTIONS], 'readwrite');
+    const questions = tx.objectStore(QUESTIONS);
+    for (const id of ids) {
+      tx.objectStore(SESSIONS).delete(id);
+      const keys = questions.index('bySession').getAllKeys(id);
+      keys.onsuccess = () => keys.result.forEach((k) => questions.delete(k));
+    }
+    await done(tx);
+  }
 }
 
 /** Used when IndexedDB is unavailable (some private-browsing modes): the report lasts for this visit only. */
@@ -105,6 +120,14 @@ export class MemoryReportStore implements ReportStore {
   async clearAll(): Promise<void> {
     this.allSessions.length = 0;
     this.allQuestions.length = 0;
+  }
+
+  async deleteSessions(ids: readonly number[]): Promise<void> {
+    const gone = new Set(ids);
+    const keepSessions = this.allSessions.filter((s) => !gone.has(s.id));
+    const keepQuestions = this.allQuestions.filter((q) => !gone.has(q.sessionId));
+    this.allSessions.splice(0, this.allSessions.length, ...keepSessions);
+    this.allQuestions.splice(0, this.allQuestions.length, ...keepQuestions);
   }
 }
 
@@ -136,6 +159,10 @@ class FallbackReportStore implements ReportStore {
 
   clearAll() {
     return this.run((s) => s.clearAll());
+  }
+
+  deleteSessions(ids: readonly number[]) {
+    return this.run((s) => s.deleteSessions(ids));
   }
 }
 

@@ -1,0 +1,99 @@
+{
+  "pack_id": "feelings",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 10,
+  "mix_alone": true,
+  "name": { "en": "Feelings", "ar": "المشاعر" },
+  "items": [
+    {
+      "item_key": "happy",
+      "name": { "en": "Happy", "ar": "سعيد" },
+      "image": "feelings/happy.webp",
+      "sound": "feelings/happy_sound.mp3",
+      "name_audio": {
+        "en": "feelings/happy_name_en.mp3",
+        "ar": "feelings/happy_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "sad",
+      "name": { "en": "Sad", "ar": "حزين" },
+      "image": "feelings/sad.webp",
+      "sound": "feelings/sad_sound.mp3",
+      "name_audio": {
+        "en": "feelings/sad_name_en.mp3",
+        "ar": "feelings/sad_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "angry",
+      "name": { "en": "Angry", "ar": "غاضب" },
+      "image": "feelings/angry.webp",
+      "sound": "feelings/angry_sound.mp3",
+      "name_audio": {
+        "en": "feelings/angry_name_en.mp3",
+        "ar": "feelings/angry_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "scared",
+      "name": { "en": "Scared", "ar": "خائف" },
+      "image": "feelings/scared.webp",
+      "sound": "feelings/scared_sound.mp3",
+      "name_audio": {
+        "en": "feelings/scared_name_en.mp3",
+        "ar": "feelings/scared_name_ar.mp3"
+      },
+      "confusable_with": ["surprised"]
+    },
+    {
+      "item_key": "sleepy",
+      "name": { "en": "Sleepy", "ar": "نعسان" },
+      "image": "feelings/sleepy.webp",
+      "sound": "feelings/sleepy_sound.mp3",
+      "name_audio": {
+        "en": "feelings/sleepy_name_en.mp3",
+        "ar": "feelings/sleepy_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "surprised",
+      "name": { "en": "Surprised", "ar": "متفاجئ" },
+      "image": "feelings/surprised.webp",
+      "sound": "feelings/surprised_sound.mp3",
+      "name_audio": {
+        "en": "feelings/surprised_name_en.mp3",
+        "ar": "feelings/surprised_name_ar.mp3"
+      },
+      "confusable_with": ["scared"]
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

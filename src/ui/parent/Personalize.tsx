@@ -61,7 +61,7 @@ export function Personalize({
     { path: item.nameAudio.en.path, original: item.nameAudio.en, label: t('recNameEn'), say: item.name.en, lang: 'en', category: 'name' },
     ...(item.sound ? [{ path: item.sound.path, original: item.sound, label: t('soundLabel'), lang, category: 'sound' as const }] : []),
   ];
-  const gameLines = useMemo(() => buildGameLines(packs, t), [packs, t]);
+  const gameLines = useMemo(() => buildGameLines(packs, t, lang), [packs, t, lang]);
 
   const editingItem = editing?.kind === 'item' ? pack?.items.find((i) => i.key === editing.key) : undefined;
   if (editingItem) {
@@ -327,7 +327,7 @@ function Lines({ lines, mine, onChanged }: { lines: readonly Line[]; mine: Reado
 }
 
 /** Praise, the end-of-game line and the "Who eats what?" lines, from the built-in packs. */
-function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI18n>['t']) {
+function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI18n>['t'], lang: Lang) {
   const feedback = packs[0]?.feedback;
   const line = (asset: ResolvedAsset | null, lang: Lang, label: string, category: ClipCategory = 'feedback'): Line[] =>
     asset ? [{ path: asset.path, original: asset, label, say: FEEDBACK_SPEECH[asset.path], lang, category }] : [];
@@ -346,10 +346,12 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
       ),
     });
   }
-  const assoc = packs.find((p) => p.association)?.association;
-  if (assoc) {
+  // The question of each "Who eats what?"-style game.
+  for (const p of packs) {
+    const assoc = p.association;
+    if (!assoc) continue;
     sections.push({
-      title: t('linesWhoEats'),
+      title: p.name[lang],
       lines: [
         ...line(assoc.question.ar, 'ar', t('lineQuestionArM')),
         ...line(assoc.questionFeminine.ar, 'ar', t('lineQuestionArF')),

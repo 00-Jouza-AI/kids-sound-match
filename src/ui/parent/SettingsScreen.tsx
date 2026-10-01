@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
+import type { ProfileControls } from '../../App';
 import type { LoadedContent, LoadedItem, LoadedPack } from '../../content/types';
 import { MIN_ITEMS_PER_PACK } from '../../content/validate';
 import { isCustomPackId } from '../../custom/types';
@@ -6,11 +7,14 @@ import type { ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import { ParentGate } from '../../lock/ParentGate';
 import { PinSetup } from '../../lock/PinSetup';
+import { MAX_PROFILES, PROFILE_ANIMALS, PROFILE_COLORS, type Profile } from '../../settings/profiles';
 import {
   CHOICE_COUNTS,
+  effectiveMode,
   enabledItemKeys,
   QUESTIONS_PER_SESSION,
   REPEAT_INTERVALS,
+  soundModesAvailable,
   usableInMode,
   type Settings,
 } from '../../settings/settings';
@@ -18,25 +22,32 @@ import { NO_REPLAY_LIMIT, REPLAY_LIMITS } from '../../settings/replays';
 import { telemetry } from '../../telemetry/telemetry';
 import { choosePictures } from '../kid/layout';
 import { Overlay, Row, Screen, Segmented, Toggle } from './components';
+import { Avatar, ProfileRow } from './ProfileRow';
 
 export function SettingsScreen({
   content,
   pack,
   settings,
   update,
+  profiles,
   onBack,
 }: {
   content: LoadedContent;
   pack: LoadedPack;
   settings: Settings;
   update: (patch: Partial<Settings>) => void;
+  profiles: ProfileControls;
   onBack: () => void;
 }) {
   const { t, lang } = useI18n();
   const [pinStep, setPinStep] = useState<'verify' | 'new' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [nudge, setNudge] = useState(false);
+  const [editingChild, setEditingChild] = useState<Profile | null>(null);
   const association = pack.kind === 'association';
+  const byName = !association && !soundModesAvailable(pack);
+  const children = profiles.state.profiles;
+  const child = children.find((p) => p.id === profiles.state.activeId) ?? children[0];
 
   /** Too few pictures left: shake the card instead of saving. */
   const refuse = () => {
@@ -51,6 +62,22 @@ export function SettingsScreen({
 
   return (
     <Screen title={t('settings')} onBack={onBack}>
+      <section className="card">
+        <h2>{t('children')}</h2>
+        <ProfileRow profiles={children} activeId={child.id} onSelect={profiles.select} label={t('children')} />
+        <div className="nudge-actions">
+          <button type="button" className="btn" onClick={() => setEditingChild(child)}>
+            ✎ {t('editChild')}
+          </button>
+          {children.length < MAX_PROFILES && (
+            <button type="button" className="btn ghost" onClick={profiles.add}>
+              + {t('addChild')}
+            </button>
+          )}
+        </div>
+        <p className="hint">{children.length > 1 ? t('childrenHintMany') : t('childrenHintOne')}</p>
+      </section>
+
       {content.packs.length > 1 && (
         <section className="card">
           <h2>{t('settingsPack')}</h2>
@@ -100,7 +127,8 @@ export function SettingsScreen({
       )}
 
       <section className="card">
-        {!association && (
+        {byName && <p className="hint">{t('nameOnlyPack')}</p>}
+        {!association && !byName && (
           <Row label={t('settingsHears')}>
             <Segmented
               label={t('settingsHears')}
@@ -226,12 +254,109 @@ export function SettingsScreen({
           />
         </Overlay>
       )}
+      {editingChild && (
+        <ChildEditor
+          child={editingChild}
+          canDelete={children.length > 1}
+          onSave={(p) => {
+            profiles.edit(p);
+            setEditingChild(null);
+          }}
+          onDelete={async () => {
+            await profiles.remove(editingChild.id);
+            setEditingChild(null);
+          }}
+          onClose={() => setEditingChild(null)}
+        />
+      )}
       {toast && (
         <div className="toast" role="status">
           {toast}
         </div>
       )}
     </Screen>
+  );
+}
+
+/** A child's animal and colour, and deleting them (with their results on this phone). */
+function ChildEditor({
+  child,
+  canDelete,
+  onSave,
+  onDelete,
+  onClose,
+}: {
+  child: Profile;
+  canDelete: boolean;
+  onSave: (child: Profile) => void;
+  onDelete: () => Promise<void>;
+  onClose: () => void;
+}) {
+  const { t } = useI18n();
+  const [draft, setDraft] = useState(child);
+  const [confirm, setConfirm] = useState(false);
+  if (confirm) {
+    return (
+      <Overlay label={t('deleteChild')} onDismiss={() => setConfirm(false)}>
+        <h2>{t('deleteChild')}</h2>
+        <Avatar profile={child} size={64} />
+        <p>{t('deleteChildBody')}</p>
+        <div className="pin-footer">
+          <button type="button" className="btn ghost" onClick={() => setConfirm(false)}>
+            {t('cancel')}
+          </button>
+          <button type="button" className="btn danger" onClick={() => void onDelete()}>
+            {t('delete')}
+          </button>
+        </div>
+      </Overlay>
+    );
+  }
+  return (
+    <Overlay label={t('editChild')} onDismiss={onClose}>
+      <h2>{t('editChild')}</h2>
+      <div className="child-preview">
+        <Avatar profile={draft} size={84} />
+      </div>
+      <div className="animal-picker" role="radiogroup" aria-label={t('childAnimal')}>
+        {PROFILE_ANIMALS.map((a) => (
+          <button
+            type="button"
+            key={a}
+            role="radio"
+            aria-checked={draft.animal === a}
+            className={draft.animal === a ? 'pick on' : 'pick'}
+            onClick={() => setDraft({ ...draft, animal: a })}
+          >
+            {a}
+          </button>
+        ))}
+      </div>
+      <div className="color-picker" role="radiogroup" aria-label={t('childColor')}>
+        {PROFILE_COLORS.map((c) => (
+          <button
+            type="button"
+            key={c}
+            role="radio"
+            aria-checked={draft.color === c}
+            aria-label={c}
+            className={draft.color === c ? 'swatch on' : 'swatch'}
+            style={{ '--avatar': c } as CSSProperties}
+            onClick={() => setDraft({ ...draft, color: c })}
+          />
+        ))}
+      </div>
+      <div className="pin-footer">
+        {canDelete && (
+          <button type="button" className="btn danger-outline" onClick={() => setConfirm(true)}>
+            {t('deleteChild')}
+          </button>
+        )}
+        <button type="button" className="btn primary" onClick={() => onSave(draft)}>
+          {t('save')}
+        </button>
+      </div>
+    </Overlay>
   );
 }
 
@@ -248,8 +373,9 @@ function ItemsCard({ pack, settings, update, nudge, onRefuse }: CardProps) {
   const { t, lang } = useI18n();
   const association = pack.kind === 'association';
   const enabled = enabledItemKeys(pack, settings);
+  const mode = effectiveMode(pack, settings.mode);
   // Only pictures that work in the current mode (quiet ones need "Name only").
-  const allKeys = pack.items.filter((i) => usableInMode(i, settings.mode)).map((i) => i.key);
+  const allKeys = pack.items.filter((i) => usableInMode(i, mode)).map((i) => i.key);
 
   const setEnabled = (keys: string[]) => {
     if (keys.length < MIN_ITEMS_PER_PACK) {
@@ -269,6 +395,7 @@ function ItemsCard({ pack, settings, update, nudge, onRefuse }: CardProps) {
   ];
   const tag = (item: LoadedItem) => {
     if (item.prompts) return <span className="tag eaters">{eaters(item, lang)}</span>;
+    if (mode === 'NAME_ONLY' && !soundModesAvailable(pack)) return null; // the whole pack is played by name
     if (!item.sound) return <span className="tag">{t('nameOnlyTag')}</span>;
     return item.sound.real ? null : <span className="tag">{t('noSoundYet')}</span>;
   };
@@ -302,7 +429,7 @@ function ItemsCard({ pack, settings, update, nudge, onRefuse }: CardProps) {
               key={item.key}
               className={on ? 'animal on' : 'animal'}
               aria-pressed={on}
-              disabled={!usableInMode(item, settings.mode)}
+              disabled={!usableInMode(item, mode)}
               onClick={() => toggleItem(item.key)}
             >
               <img src={item.images[0].url} alt="" draggable={false} />

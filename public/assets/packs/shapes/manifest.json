@@ -1,0 +1,93 @@
+{
+  "pack_id": "shapes",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 9,
+  "mix_alone": true,
+  "name": { "en": "Shapes", "ar": "الأشكال" },
+  "items": [
+    {
+      "item_key": "shape_circle",
+      "name": { "en": "Circle", "ar": "دائرة" },
+      "image": "shapes/shape_circle.svg",
+      "name_audio": {
+        "en": "shapes/shape_circle_name_en.mp3",
+        "ar": "shapes/shape_circle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "shape_square",
+      "name": { "en": "Square", "ar": "مربع" },
+      "image": "shapes/shape_square.svg",
+      "name_audio": {
+        "en": "shapes/shape_square_name_en.mp3",
+        "ar": "shapes/shape_square_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "shape_triangle",
+      "name": { "en": "Triangle", "ar": "مثلث" },
+      "image": "shapes/shape_triangle.svg",
+      "name_audio": {
+        "en": "shapes/shape_triangle_name_en.mp3",
+        "ar": "shapes/shape_triangle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "shape_star",
+      "name": { "en": "Star", "ar": "نجمة" },
+      "image": "shapes/shape_star.svg",
+      "name_audio": {
+        "en": "shapes/shape_star_name_en.mp3",
+        "ar": "shapes/shape_star_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "shape_heart",
+      "name": { "en": "Heart", "ar": "قلب" },
+      "image": "shapes/shape_heart.svg",
+      "name_audio": {
+        "en": "shapes/shape_heart_name_en.mp3",
+        "ar": "shapes/shape_heart_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "shape_moon",
+      "name": { "en": "Moon", "ar": "هلال" },
+      "image": "shapes/shape_moon.svg",
+      "name_audio": {
+        "en": "shapes/shape_moon_name_en.mp3",
+        "ar": "shapes/shape_moon_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}
