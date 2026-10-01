@@ -39,6 +39,7 @@ export function applyOverrides(
     correct: { ar: fb.correct.ar.map(swap), en: fb.correct.en.map(swap) },
     incorrectTone: fb.incorrectTone,
     sessionEnd: { ar: swap(fb.sessionEnd.ar), en: swap(fb.sessionEnd.en) },
+    ...(fb.oddQuestion ? { oddQuestion: { ar: swap(fb.oddQuestion.ar), en: swap(fb.oddQuestion.en) } } : {}),
   });
   const association = (a: LoadedAssociation): LoadedAssociation => ({
     ...a,

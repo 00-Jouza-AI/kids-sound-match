@@ -1,4 +1,4 @@
-import { resultPack, type QuestionResultEntity, type SessionEntity } from './types';
+import { isMatchGame, resultPack, type QuestionResultEntity, type SessionEntity } from './types';
 
 /** Below this many tries a percentage is noise ("حصان — 20%" from one try), so it isn't shown. */
 export const MIN_TRIES_FOR_PERCENT = 3;
@@ -22,7 +22,7 @@ export function itemSummary(
   sessions: readonly SessionEntity[],
   questions: readonly QuestionResultEntity[],
 ): ItemSummaryRow[] {
-  const counted = new Map(sessions.filter((s) => !s.toddlerMode).map((s) => [s.id, s]));
+  const counted = new Map(sessions.filter((s) => !s.toddlerMode && isMatchGame(s)).map((s) => [s.id, s]));
   const totals = new Map<string, ItemSummaryRow>();
   for (const q of questions) {
     const session = counted.get(q.sessionId);

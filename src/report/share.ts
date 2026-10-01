@@ -1,5 +1,5 @@
 import { firstTryPercent, itemSummary, type ItemSummaryRow } from './summary';
-import { resultPack, type QuestionResultEntity, type SessionEntity } from './types';
+import { isMatchGame, resultPack, type QuestionResultEntity, type SessionEntity } from './types';
 
 /** What the shared Report picture says about one child. Toddler games count as games only. */
 export interface ShareSummary {
@@ -23,7 +23,8 @@ const MAX_ROWS = 5;
 export function shareSummary(sessions: readonly SessionEntity[], questions: readonly QuestionResultEntity[]): ShareSummary {
   const ids = new Set(sessions.map((s) => s.id));
   const own = questions.filter((q) => ids.has(q.sessionId));
-  const counted = new Map(sessions.filter((s) => !s.toddlerMode).map((s) => [s.id, s]));
+  // Answers and percentages come from the matching games; Memory and Odd one out count as games.
+  const counted = new Map(sessions.filter((s) => !s.toddlerMode && isMatchGame(s)).map((s) => [s.id, s]));
   const answered = own.filter((q) => counted.has(q.sessionId));
 
   const byPack = new Map<string, QuestionResultEntity[]>();

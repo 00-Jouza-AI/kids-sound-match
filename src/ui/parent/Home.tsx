@@ -1,14 +1,15 @@
 import type { LoadedPack } from '../../content/types';
 import type { ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
+import type { MemoryNext } from '../../report/levels';
 import type { NextLevel } from '../../report/practice';
 import type { ProfileState } from '../../settings/profiles';
 import { effectiveMode, enabledItemKeys, type Settings } from '../../settings/settings';
-import { ExploreIcon } from '../kid/icons';
+import { ExploreIcon, MemoryIcon, OddIcon } from '../kid/icons';
 import { ChevronIcon } from './components';
 import { ProfileRow } from './ProfileRow';
 
-export type HomeLink = 'report' | 'settings' | 'myPacks' | 'studio' | 'parentsGroup' | 'privacy' | 'about';
+export type HomeLink = 'report' | 'settings' | 'myPacks' | 'flashcards' | 'studio' | 'parentsGroup' | 'privacy' | 'about';
 
 /** Spec 5.2: title, settings summary, a large START button, and the parent links. */
 export function Home({
@@ -20,11 +21,17 @@ export function Home({
   profiles,
   onProfile,
   nudge,
+  memoryNudge,
+  canOdd,
   onStart,
   onExplore,
+  onMemory,
+  onOdd,
   onOpen,
   onNudgeAccept,
   onNudgeDismiss,
+  onMemoryNudgeAccept,
+  onMemoryNudgeDismiss,
 }: {
   /** Undefined when no pack is ready to play yet (the parent can still make one in My packs). */
   pack: LoadedPack | undefined;
@@ -35,11 +42,18 @@ export function Home({
   profiles: ProfileState;
   onProfile: (id: string) => void;
   nudge: NextLevel | null;
+  /** "Ready for more memory cards?" */
+  memoryNudge: MemoryNext | null;
+  canOdd: boolean;
   onStart: () => void;
   onExplore: () => void;
+  onMemory: () => void;
+  onOdd: () => void;
   onOpen: (link: HomeLink) => void;
   onNudgeAccept: (to: ChoiceCount) => void;
   onNudgeDismiss: (nudge: NextLevel) => void;
+  onMemoryNudgeAccept: (to: number) => void;
+  onMemoryNudgeDismiss: (nudge: MemoryNext) => void;
 }) {
   const { t, lang } = useI18n();
   const modeLabel = { SOUND_AND_NAME: t('modeSoundAndName'), SOUND_ONLY: t('modeSoundOnly'), NAME_ONLY: t('modeNameOnly') }[
@@ -63,6 +77,7 @@ export function Home({
     { id: 'report', label: t('report'), icon: '📊' },
     { id: 'settings', label: t('settings'), icon: '⚙️' },
     { id: 'myPacks', label: t('myPacks'), icon: '🎨' },
+    { id: 'flashcards', label: t('flashcards'), icon: '🖨️' },
     // The recording studio saves into the app's files, so it only exists on the PC's dev server.
     ...(import.meta.env.DEV ? [{ id: 'studio' as const, label: t('studio'), icon: '🎙️' }] : []),
     ...(showParentsGroup ? [{ id: 'parentsGroup' as const, label: t('parentsGroup'), icon: '💬' }] : []),
@@ -88,13 +103,23 @@ export function Home({
       <button type="button" className="start-btn" onClick={onStart} disabled={!canStart}>
         {t('start')}
       </button>
-      <button type="button" className="explore-btn" onClick={onExplore} disabled={!canExplore}>
-        <ExploreIcon />
-        <span>
+      <div className="games-row">
+        <button type="button" className="game-tile" onClick={onExplore} disabled={!canExplore}>
+          <ExploreIcon />
           <strong>{t('explore')}</strong>
           <small>{t('exploreSub')}</small>
-        </span>
-      </button>
+        </button>
+        <button type="button" className="game-tile" onClick={onMemory} disabled={!canExplore}>
+          <MemoryIcon />
+          <strong>{t('memoryGame')}</strong>
+          <small>{t('memorySub', { n: settings.memoryPairs })}</small>
+        </button>
+        <button type="button" className="game-tile" onClick={onOdd} disabled={!canOdd}>
+          <OddIcon />
+          <strong>{t('oddOneOut')}</strong>
+          <small>{t('oddSub')}</small>
+        </button>
+      </div>
       {!pack ? (
         <p className="note">{t('noPackReady')}</p>
       ) : (
@@ -110,6 +135,21 @@ export function Home({
               {t('nudgeAccept', { to: nudge.to })}
             </button>
             <button type="button" className="btn ghost" onClick={() => onNudgeDismiss(nudge)}>
+              {t('nudgeDismiss')}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {memoryNudge && (
+        <section className="card nudge-card" role="status">
+          <h2>{t('memoryNudgeTitle')}</h2>
+          <p>{t('memoryNudgeBody', { from: memoryNudge.from, to: memoryNudge.to })}</p>
+          <div className="nudge-actions">
+            <button type="button" className="btn primary" onClick={() => onMemoryNudgeAccept(memoryNudge.to)}>
+              {t('memoryNudgeAccept', { to: memoryNudge.to })}
+            </button>
+            <button type="button" className="btn ghost" onClick={() => onMemoryNudgeDismiss(memoryNudge)}>
               {t('nudgeDismiss')}
             </button>
           </div>

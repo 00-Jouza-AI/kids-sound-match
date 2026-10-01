@@ -40,11 +40,14 @@ export class GameAudio {
    * ("Where's the cat?"). A pause, then again until stopped.
    * Association games (`about` = the animal): its sound, then "Cow! What does it eat?" in every mode.
    */
-  async prompt(target: LoadedItem, about?: LoadedItem): Promise<void> {
+  async prompt(target: LoadedItem, about?: LoadedItem, odd = false): Promise<void> {
     const token = this.begin();
     const { mode } = this.options;
     while (!token.cancelled) {
-      if (about) {
+      if (odd) {
+        // Odd one out: "Which one is different?"; the pictures say the rest.
+        await this.playAll(this.clips.oddQuestion(), token);
+      } else if (about) {
         await this.play(this.clips.sound(about), token);
         await this.playAll(this.clips.askAbout(about), token);
       } else {
@@ -56,10 +59,10 @@ export class GameAudio {
   }
 
   /** Wrong tap: the soft tone, then the question again straight away. */
-  async wrong(target: LoadedItem, about?: LoadedItem): Promise<void> {
+  async wrong(target: LoadedItem, about?: LoadedItem, odd = false): Promise<void> {
     const token = this.begin();
     await this.play(this.clips.incorrectTone(), token);
-    if (!token.cancelled) void this.prompt(target, about);
+    if (!token.cancelled) void this.prompt(target, about, odd);
   }
 
   /** Right tap: the name, then praise. Association games add a "yum" in between. Resolves when done or stopped. */

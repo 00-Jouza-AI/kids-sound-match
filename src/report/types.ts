@@ -15,6 +15,19 @@ export interface SessionEntity {
   completed: boolean;
   /** The child who played (see settings/profiles). Missing in games saved before profiles: the first child. */
   profileId?: string;
+  /** Missing: the matching game (any pack, including Who eats what?). */
+  game?: GameKind;
+  /** Odd one out: 'easy' or 'hard'. Memory: the number of pairs. */
+  variant?: string;
+  /** Memory: turns taken (two cards each) to find every pair. */
+  turns?: number;
+}
+
+export type GameKind = 'match' | 'memory' | 'odd';
+
+/** The matching game feeds the per-picture Report and practice; Memory and Odd one out don't. */
+export function isMatchGame(s: Pick<SessionEntity, 'game'>): boolean {
+  return !s.game || s.game === 'match';
 }
 
 /** Spec 8.1 QuestionResultEntity. */

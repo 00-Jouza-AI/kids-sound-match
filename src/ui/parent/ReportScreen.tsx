@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MIXED_PACK_ID, MIXED_PACK_NAME } from '../../content/mixed';
+import { ODD_PACK_ID, ODD_PACK_NAME } from '../../content/odd';
 import type { LoadedPack } from '../../content/types';
 import { blobUrl } from '../../custom/toLoaded';
 import { isCustomPackId } from '../../custom/types';
@@ -74,7 +75,22 @@ export function ReportScreen({
     names.byPack.get(packId)?.get(key) ?? names.any.get(key) ?? (/^[0-9a-f-]{36}$/.test(key) ? t('deletedItem') : key);
   const packName = (id: string) =>
     packs.find((p) => p.id === id)?.name[lang] ??
-    (id === MIXED_PACK_ID ? MIXED_PACK_NAME[lang] : isCustomPackId(id) ? t('deletedPack') : id);
+    (id === MIXED_PACK_ID
+      ? MIXED_PACK_NAME[lang]
+      : id === ODD_PACK_ID
+        ? ODD_PACK_NAME[lang]
+        : isCustomPackId(id)
+          ? t('deletedPack')
+          : id);
+  /** What a game was: the pack, or Memory / Odd one out with how it went. */
+  const gameLine = (g: SessionEntity, pct: number | null) => {
+    if (g.game === 'memory') {
+      return `${t('memoryGame')} · ${packName(g.packId)} · ${t('memoryRow', { n: g.variant ?? g.questionCount, turns: g.turns ?? 0 })}`;
+    }
+    const firstTry = g.toddlerMode ? t('toddlerMode') : pct === null ? '—' : t('gameFirstTry', { p: pct });
+    const what = g.game === 'odd' ? `${t('oddOneOut')} · ${g.variant === 'hard' ? t('oddHard') : t('oddEasy')}` : packName(g.packId);
+    return `${what} · ${t('gameQuestions', { n: g.questionCount })} · ${firstTry}`;
+  };
 
   const summary = mine ? itemSummary(mine.sessions, mine.questions) : [];
   // One section per pack, in the order the packs are listed in Settings.
@@ -200,11 +216,7 @@ export function ReportScreen({
                   <button type="button" className="game-row" onClick={() => setDetail(g)}>
                     <span className="report-name">{formatDateTime(g.startedAt, lang)}</span>
                     <span className="hint">
-                      {packName(g.packId)}
-                      {' · '}
-                      {t('gameQuestions', { n: g.questionCount })}
-                      {' · '}
-                      {g.toddlerMode ? t('toddlerMode') : pct === null ? '—' : t('gameFirstTry', { p: pct })}
+                      {gameLine(g, pct)}
                       {g.completed ? '' : ` · ${t('unfinishedGame')}`}
                     </span>
                   </button>

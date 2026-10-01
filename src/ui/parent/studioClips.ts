@@ -42,6 +42,7 @@ export function studioClips(packs: readonly LoadedPack[]): StudioClip[] {
       line(fb.sessionEnd[lang], lang);
     }
     line(fb.incorrectTone, 'sound', 'Soft "try again" tone');
+    if (fb.oddQuestion) for (const lang of ['ar', 'en'] as const) line(fb.oddQuestion[lang], lang);
   }
   for (const p of packs) {
     const a = p.association;

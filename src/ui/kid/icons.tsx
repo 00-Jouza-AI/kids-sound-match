@@ -33,3 +33,26 @@ export function ExploreIcon() {
     </svg>
   );
 }
+
+/** Two cards, one face up. */
+export function MemoryIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="2.5" y="5" width="9" height="13" rx="2" fill="currentColor" opacity="0.35" />
+      <rect x="12.5" y="5" width="9" height="13" rx="2" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17" cy="11.5" r="2.2" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Three circles and one triangle. */
+export function OddIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="6.5" cy="7" r="3.2" fill="currentColor" />
+      <circle cx="17.5" cy="7" r="3.2" fill="currentColor" />
+      <circle cx="6.5" cy="17.5" r="3.2" fill="currentColor" />
+      <path d="M17.5 13.6l3.8 6.6h-7.6z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  );
+}

@@ -4,7 +4,9 @@ import { describe, expect, it } from 'vitest';
 import manifestJson from '../../public/assets/packs/animals/manifest.json';
 import { defaultSettings, enabledItemKeys } from '../settings/settings';
 import { loadContent, type AssetIndex } from './loader';
+import { oddQuestion, seededRng } from '../engine';
 import { buildMixedPack, mixedGroups, sourcePacks } from './mixed';
+import { buildOddPack } from './odd';
 import { placeholderPathFor } from './paths';
 import type { PackManifest } from './types';
 import { validatePack } from './validate';
@@ -199,7 +201,7 @@ describe('all packs', () => {
     expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
     expect(content.packs.map((p) => p.id)).toEqual([
       'animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family',
-      'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives',
+      'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
     ]);
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
     expect(whoEats.kind).toBe('association');
@@ -254,6 +256,33 @@ describe('all packs', () => {
     expect(homes.items.map((i) => i.key)).toEqual(['farm', 'house', 'sea', 'river', 'jungle', 'desert', 'snow', 'nest', 'hive']);
     expect(homes.items.find((i) => i.key === 'hive')!.prompts!.map((p) => p.key)).toEqual(['bee']);
     expect(content.packs.find((p) => p.id === 'who-eats-what')!.association!.celebration).toBe('eat');
+  });
+
+  it('link every baby to its mother, shown beside her when found', async () => {
+    const content = await load();
+    const babies = content.packs.find((p) => p.id === 'animal-babies')!;
+    expect(babies.association!.celebration).toBe('baby');
+    const chick = babies.items.find((i) => i.key === 'chick')!;
+    expect(chick.prompts!.map((p) => p.key)).toEqual(['hen']);
+    expect(chick.images[0].path).toBe('packs/animals/chick.svg'); // the same drawing as in Animals
+    expect(babies.items.find((i) => i.key === 'calf')!.name.ar).toBe('عِجل');
+  });
+
+  it('make Odd one out from the packs of things: packs when easy, groups inside a pack when harder', async () => {
+    const content = await load();
+    const odd = buildOddPack(content.packs, content.packs[0].feedback)!;
+    expect(odd.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body']);
+    expect(odd.odd!.easy.families).toHaveLength(1);
+    expect(odd.odd!.easy.families[0]).toHaveLength(6);
+    // Harder: animals (farm, wild, birds, sea, bugs) and food (fruit, vegetables), never mixed.
+    expect(odd.odd!.hard.families.map((f) => f.length)).toEqual([5, 2]);
+    const food = new Set(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));
+    const rng = seededRng(3);
+    for (let i = 0; i < 500; i++) {
+      const q = oddQuestion(odd.odd!.hard, 4, rng, null);
+      const kinds = new Set(q.options.map((k) => food.has(k)));
+      expect(kinds.size).toBe(1);
+    }
   });
 
   it('draw colours, shapes and counting as final pictures, so they need no artist', async () => {

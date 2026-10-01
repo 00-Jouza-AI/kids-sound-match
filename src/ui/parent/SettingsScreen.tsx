@@ -3,7 +3,7 @@ import type { ProfileControls } from '../../App';
 import type { LoadedContent, LoadedItem, LoadedPack } from '../../content/types';
 import { MIN_ITEMS_PER_PACK } from '../../content/validate';
 import { isCustomPackId } from '../../custom/types';
-import type { ChoiceCount } from '../../engine';
+import { MEMORY_PAIRS, type ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
 import { ParentGate } from '../../lock/ParentGate';
 import { PinSetup } from '../../lock/PinSetup';
@@ -184,6 +184,14 @@ export function SettingsScreen({
         </Row>
         <Row label={t('settingsAdaptive')} hint={t('settingsAdaptiveHint')}>
           <Toggle label={t('settingsAdaptive')} checked={settings.adaptive} onChange={(adaptive) => update({ adaptive })} />
+        </Row>
+        <Row label={t('settingsMemory')} hint={t('settingsMemoryHint')}>
+          <Segmented
+            label={t('settingsMemory')}
+            value={settings.memoryPairs}
+            options={MEMORY_PAIRS.map((n) => ({ value: n, label: String(n) }))}
+            onChange={(memoryPairs) => update({ memoryPairs })}
+          />
         </Row>
         <Row label={t('settingsReplays')} hint={t('settingsReplaysHint')}>
           <Segmented

@@ -12,6 +12,7 @@ import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
 import { telemetry } from '../../telemetry/telemetry';
 import { PlayIcon, SpeakerIcon } from './icons';
+import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, useBoxSize } from './layout';
@@ -31,6 +32,8 @@ type Stage = 'paused' | 'playing' | 'ending' | 'idle';
 
 interface Props {
   pack: LoadedPack;
+  /** Every pack, for the sticker album. */
+  packs: readonly LoadedPack[];
   config: KidConfig;
   snapshot: KidSnapshot | null;
   telemetryEnabled: boolean;
@@ -50,8 +53,10 @@ function randomSeed(): number {
  * No text, no score, no timer, no negative feedback. In "Who eats what?" the animal sits above
  * the pictures and eats the right one.
  */
-export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Props) {
+export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExit }: Props) {
   const { t } = useI18n();
+  // Odd one out: "Which one is different?" instead of a sound or a name.
+  const odd = config.kind === 'odd';
   const items = useMemo(() => new Map(pack.items.map((i) => [i.key, i])), [pack]);
   // "Who eats what?": the animals the questions are about.
   const promptItems = useMemo(() => new Map(pack.items.flatMap((i) => i.prompts ?? []).map((p) => [p.key, p])), [pack]);
@@ -61,7 +66,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
 
   // The current game. Replaced by "play again", so everything reads it through the ref.
   const sessionRef = useRef<GameSession | null>(null);
-  if (!sessionRef.current) sessionRef.current = createSession(config, items, groups, snapshot);
+  if (!sessionRef.current) sessionRef.current = createSession(pack, config, items, groups, snapshot);
   const game = () => sessionRef.current!;
 
   const audio = useMemo(
@@ -83,6 +88,8 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   const [promptPicture, setPromptPicture] = useState<string | null>(null);
   const [hint, setHint] = useState<{ key: string; pulse: number } | null>(null);
   const [canReplay, setCanReplay] = useState(() => replaysLeft(config.replaysPerDay, config.profileId) > 0);
+  const [newSticker, setNewSticker] = useState<string | null>(null);
+  const [albumOpen, setAlbumOpen] = useState(false);
 
   // Refs mirror state for async callbacks (timers, audio promises).
   const stageRef = useRef(stage);
@@ -108,6 +115,8 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   /** "Who eats what?": the animal a question is about. Undefined in the other games. */
   const aboutOf = (q: Question) => (q.promptKey !== undefined ? promptItems.get(q.promptKey) : undefined);
   const about = () => aboutOf(game().current.question);
+  /** The question, said again until it's answered. */
+  const ask = () => audio.prompt(target(), about(), odd);
   const asking = () => ['presenting', 'awaitingTap'].includes(game().current.phase);
   const canPlay = () =>
     alive.current && stageRef.current === 'playing' && !gateRef.current && document.visibilityState === 'visible';
@@ -168,7 +177,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     setQuestionNo((n) => n + 1);
     const upcoming = game().upcoming;
     audio.preload([...shown(q.question), ...(upcoming ? shown(upcoming) : [])]);
-    if (canPlay()) void audio.prompt(target(), a);
+    if (canPlay()) void ask();
     later(() => {
       game().ready();
       setView(game().current);
@@ -191,6 +200,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
           mode: config.mode,
           completed,
           profileId: config.profileId,
+          ...(odd ? { game: 'odd' as const, variant: config.oddLevel ?? 'easy' } : {}),
         },
         result.questions.map((q) => {
           const source = sources.get(q.itemKey);
@@ -220,6 +230,12 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       telemetry.record(result, { packId: pack.id, lang: config.language, mode: config.mode }, telemetryEnabled);
     }
     persist('idle');
+    // A sticker of something the child just found, if there's one they don't have yet.
+    const sticker = awardSticker(
+      config.profileId,
+      result.questions.map((q) => ({ key: q.itemKey, packId: sources.get(q.itemKey) ?? pack.id })),
+    );
+    setNewSticker(sticker && items.has(sticker.key) ? stickerPicture(item(sticker.key)) : null);
     setStage('ending');
     const began = performance.now();
     void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
@@ -257,7 +273,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     if (outcome === 'ignored') return;
     setView(game().current);
     if (outcome === 'wrong') {
-      void audio.wrong(item(targetKey), askedAbout);
+      void audio.wrong(item(targetKey), askedAbout, odd);
       // Two wrong taps: help straight away. Otherwise the 8-second clock starts again.
       if (game().current.faded.length >= 2) showHint();
       else scheduleHint();
@@ -268,7 +284,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
   };
 
   const replay = () => {
-    if (stageRef.current === 'playing' && !gateRef.current && asking()) void audio.prompt(target(), about());
+    if (stageRef.current === 'playing' && !gateRef.current && asking()) void ask();
   };
 
   const resume = () => {
@@ -282,7 +298,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     if (stageRef.current !== 'idle' || gateRef.current || replaysLeft(config.replaysPerDay, config.profileId) <= 0) return;
     countReplay(config.profileId);
     audioEngine.unlock();
-    sessionRef.current = createSession(config, items, groups, null);
+    sessionRef.current = createSession(pack, config, items, groups, null);
     startedAt.current = Date.now();
     setStage('playing');
     persist('playing');
@@ -309,7 +325,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
     }
     const resumeSound = () => {
       if (!canPlay()) audio.stop();
-      else if (asking()) void audio.prompt(target(), about());
+      else if (asking()) void ask();
     };
     document.addEventListener('visibilitychange', resumeSound);
     // A phone call or another app can suspend audio; stop cleanly and resume the sound afterwards.
@@ -364,7 +380,7 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       }}
       onGateCancel={() => {
         gateRef.current = false;
-        if (canPlay() && asking()) void audio.prompt(target(), about());
+        if (canPlay() && asking()) void ask();
       }}
       onExit={exit}
     >
@@ -383,13 +399,22 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
       )}
       {stage === 'paused' && <PausedScreen label={t('resumeGame')} onResume={resume} />}
       {stage === 'ending' && <SessionEndScene />}
+      {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && canReplay && (
+      {stage === 'idle' && (
         <div className="kid-center play-again-layer">
-          <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-            <PlayIcon />
+          {canReplay && (
+            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
+              <PlayIcon />
+            </button>
+          )}
+          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
+            <AlbumIcon />
           </button>
         </div>
+      )}
+      {stage === 'idle' && albumOpen && (
+        <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}
     </KidFrame>
   );
@@ -400,6 +425,9 @@ export function KidGame({ pack, config, snapshot, telemetryEnabled, onExit }: Pr
  * (beside them when the phone is sideways). Tapping it asks again. After a right answer the food
  * moves into it and it munches, or its home appears around it and it hops.
  */
+/** Eaten, at home, or the baby beside its mother. */
+const CELEBRATION_CLASS: Record<AssociationCelebration, string> = { eat: 'eating', home: 'at-home', baby: 'with-baby' };
+
 function AskAbout({
   questionNo,
   picture,
@@ -427,7 +455,7 @@ function AskAbout({
           type="button"
           // Its own key space: the pictures next to it are keyed by the question number too.
           key={`about-${questionNo}`}
-          className={answer ? `prompt-card ${celebration === 'home' ? 'at-home' : 'eating'}` : 'prompt-card'}
+          className={answer ? `prompt-card ${CELEBRATION_CLASS[celebration]}` : 'prompt-card'}
           style={{ width: size, height: size }}
           tabIndex={-1}
           aria-hidden="true"
@@ -439,6 +467,7 @@ function AskAbout({
           {answer && celebration === 'home' && <img className="home-bg" src={answer} alt="" draggable={false} />}
           <img className="about" src={picture} alt="" draggable={false} />
           {answer && celebration === 'eat' && <img className="bite" src={answer} alt="" draggable={false} />}
+          {answer && celebration === 'baby' && <img className="baby" src={answer} alt="" draggable={false} />}
         </button>
       )}
       {children}
@@ -447,6 +476,7 @@ function AskAbout({
 }
 
 function createSession(
+  pack: LoadedPack,
   config: KidConfig,
   items: Map<string, LoadedItem>,
   groups: Map<string, string>,
@@ -464,12 +494,14 @@ function createSession(
         ...(group ? { group } : {}),
       };
     });
+  const odd = config.kind === 'odd' ? pack.odd?.[config.oddLevel ?? 'easy'] : undefined;
   const sessionConfig = {
     items: engineItems,
     choiceCount: config.choiceCount,
     questionsPerSession: config.questionsPerSession,
     toddlerMode: config.toddlerMode,
     weights: config.weights,
+    ...(odd ? { odd } : {}),
   };
   if (snapshot?.session) {
     try {

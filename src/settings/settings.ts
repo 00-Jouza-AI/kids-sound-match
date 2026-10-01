@@ -1,6 +1,6 @@
 import type { LoadedItem, LoadedPack, Lang } from '../content/types';
 import { MIN_ITEMS_PER_PACK } from '../content/validate';
-import type { ChoiceCount } from '../engine';
+import { MEMORY_PAIRS, type ChoiceCount, type MemoryPairs } from '../engine';
 import { FIRST_PROFILE_ID } from './profiles';
 import { REPLAY_LIMITS } from './replays';
 import { local } from './storage';
@@ -34,6 +34,8 @@ export interface Settings {
   enabledItems: Record<string, string[]>;
   /** Packs left out of the Mixed game. New packs join the mix automatically. */
   mixedExcluded: string[];
+  /** Memory game: pairs of cards. Starts at 3; Home suggests more when the child is ready. */
+  memoryPairs: MemoryPairs;
 }
 
 export const CHOICE_COUNTS = [2, 3, 4] as const;
@@ -81,6 +83,7 @@ export function defaultSettings(device: Lang): Settings {
     uiLanguageOverride: 'system',
     enabledItems: {},
     mixedExcluded: [],
+    memoryPairs: 3,
   };
 }
 
@@ -116,6 +119,7 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
     uiLanguageOverride: pick(r.uiLanguageOverride, UI_LANGUAGES, d.uiLanguageOverride),
     enabledItems,
     mixedExcluded: Array.isArray(r.mixedExcluded) ? r.mixedExcluded.filter((k): k is string => typeof k === 'string') : [],
+    memoryPairs: pick(r.memoryPairs, MEMORY_PAIRS, d.memoryPairs),
   };
 }
 

@@ -339,6 +339,13 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
         feedback.correct[lang].flatMap((a) => line(a, lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
       ),
     });
+    const odd = feedback.oddQuestion;
+    if (odd) {
+      sections.push({
+        title: t('oddOneOut'),
+        lines: (['ar', 'en'] as const).flatMap((lang) => line(odd[lang], lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
+      });
+    }
     sections.push({
       title: t('linesEnd'),
       lines: (['ar', 'en'] as const).flatMap((lang) =>

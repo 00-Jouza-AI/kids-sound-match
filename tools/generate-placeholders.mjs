@@ -200,7 +200,14 @@ for (const packId of packIds) {
   });
   const fb = manifest.feedback_audio;
   if (fb) {
-    const feedbackPaths = [...fb.correct.en, ...fb.correct.ar, fb.incorrect_tone, fb.session_end.en, fb.session_end.ar];
+    const feedbackPaths = [
+      ...fb.correct.en,
+      ...fb.correct.ar,
+      fb.incorrect_tone,
+      fb.session_end.en,
+      fb.session_end.ar,
+      ...Object.values(fb.odd_question ?? {}),
+    ];
     for (const p of feedbackPaths) count += write(p, wav(feedbackTone(p)));
   }
   // "Who eats what?": the question after the animal's name, and the "yum".

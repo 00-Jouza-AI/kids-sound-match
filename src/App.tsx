@@ -3,6 +3,8 @@ import { audioEngine } from './audio/audioEngine';
 import { placeholderPictureUsable } from './content/emojiSupport';
 import { loadContent } from './content/loader';
 import { buildMixedPack } from './content/mixed';
+import type { ChoiceCount, MemoryPairs } from './engine';
+import { buildOddPack } from './content/odd';
 import type { LoadedContent, LoadedFeedback, LoadedPack } from './content/types';
 import { MIN_ITEMS_PER_PACK } from './content/validate';
 import { cloud } from './custom/cloud';
@@ -15,6 +17,7 @@ import { enterFullscreen } from './lock/fullscreen';
 import { ParentGate } from './lock/ParentGate';
 import { loadPinRecord } from './lock/pin';
 import { reportStore } from './report/db';
+import { memoryReady, oddLevel, type MemoryNext, type OddLevel } from './report/levels';
 import { practiceWeights, readyForMore, type NextLevel } from './report/practice';
 import {
   forProfile,
@@ -26,6 +29,7 @@ import {
   type ProfileState,
 } from './settings/profiles';
 import { forgetReplays } from './settings/replays';
+import { forgetStickers } from './settings/stickers';
 import {
   effectiveMode,
   enabledItemKeys,
@@ -41,6 +45,7 @@ import { telemetry } from './telemetry/telemetry';
 import { KidMode } from './ui/kid/KidMode';
 import { clearKidSnapshot, loadKidSnapshot, type KidConfig, type KidKind, type KidSnapshot } from './ui/kid/kidSnapshot';
 import { FirstRun } from './ui/parent/FirstRun';
+import { Flashcards } from './ui/parent/Flashcards';
 import { Home, type HomeLink } from './ui/parent/Home';
 import { AboutScreen, ContentProblems, PrivacyScreen } from './ui/parent/InfoScreens';
 import { MyPacks } from './ui/parent/MyPacks';
@@ -62,6 +67,7 @@ type Screen =
   | 'myPacks'
   | 'personalize'
   | 'studio'
+  | 'flashcards'
   | 'start'
   | 'kid';
 
@@ -72,6 +78,8 @@ const LOCK_NOTE_KEY = 'ksm.lockNoteShown.v1';
 const NUDGE_DISMISSED_KEY = 'ksm.nudgeDismissed.v1';
 /** After "Not now", the suggestion comes back only after this many more games at that level. */
 const NUDGE_AGAIN_AFTER_GAMES = 3;
+/** "Not now" on the memory suggestion: the pairs, and how many games had been played with them. */
+const MEMORY_NUDGE_DISMISSED_KEY = 'ksm.memoryNudgeDismissed.v1';
 const PARENTS_GROUP_URL = (import.meta.env.VITE_PARENTS_GROUP_URL ?? '').trim();
 const NO_FEEDBACK: LoadedFeedback = { correct: { en: [], ar: [] }, incorrectTone: null, sessionEnd: { en: null, ar: null } };
 
@@ -99,7 +107,7 @@ function composePacks(builtin: readonly LoadedPack[], custom: CustomData) {
   const customViews = customToLoaded(custom.packs, custom.items, feedback);
   const own = customViews.map((v) => v.loaded);
   const mixed = buildMixedPack([...voiced, ...own], feedback);
-  return { customViews, allPacks: [...voiced, ...(mixed ? [mixed] : []), ...own] };
+  return { customViews, allPacks: [...voiced, ...(mixed ? [mixed] : []), ...own], oddPack: buildOddPack(voiced, feedback) };
 }
 
 /** What the parent screens can do with the children's profiles. */
@@ -159,6 +167,7 @@ export function App() {
       await reportStore.deleteSessions(games.map((g) => g.id));
       forgetSettings(id);
       forgetReplays(id);
+      forgetStickers(id);
       local.remove(profileKey(NUDGE_DISMISSED_KEY, id));
       change({ profiles: rest, activeId: profiles.activeId === id ? rest[0].id : profiles.activeId });
     },
@@ -190,10 +199,11 @@ function Shell({
   const [startStep, setStartStep] = useState<StartStep>('soundCheck');
   const [startKind, setStartKind] = useState<KidKind>('game');
   const [nudge, setNudge] = useState<NextLevel | null>(null);
+  const [memoryNudge, setMemoryNudge] = useState<MemoryNext | null>(null);
   const unlockedUntil = useRef(0);
   const soundChecked = useRef(false);
 
-  const { customViews, allPacks } = useMemo(() => composePacks(builtin?.packs ?? [], custom), [builtin, custom]);
+  const { customViews, allPacks, oddPack } = useMemo(() => composePacks(builtin?.packs ?? [], custom), [builtin, custom]);
   // Packs with enough finished items to play.
   const playablePacks = useMemo(() => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK), [allPacks]);
   const content: LoadedContent = { packs: playablePacks, issues: builtin?.issues ?? [] };
@@ -258,7 +268,11 @@ function Shell({
       if (loaded.issues.length) console.warn('[content]', loaded.issues);
       // Spec 3.4: fail loudly in development; in release, skip broken items and carry on.
       if (import.meta.env.DEV && loaded.issues.some((i) => i.level === 'error')) setScreen('problems');
-      else afterLoad(composePacks(loaded.packs, own).allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK));
+      else {
+        const composed = composePacks(loaded.packs, own);
+        // A reload during Odd one out finds its game too.
+        afterLoad([...composed.allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK), ...(composed.oddPack ? [composed.oddPack] : [])]);
+      }
       // Only contacts the cloud if a parent signed in before, or is coming back from Google.
       void cloud.init(() => void refreshCustom());
     })();
@@ -289,12 +303,20 @@ function Shell({
         const snoozed =
           next && dismissed?.level === next.from && next.gamesAtLevel < dismissed.games + NUDGE_AGAIN_AFTER_GAMES;
         setNudge(next && !snoozed ? next : null);
+        const memory = memoryReady(forProfile(sessions, profileId), settings.memoryPairs);
+        const memoryDismissed = local.getJson<{ level: number; games: number }>(profileKey(MEMORY_NUDGE_DISMISSED_KEY, profileId));
+        const memorySnoozed =
+          memory && memoryDismissed?.level === memory.from && memory.gamesAtLevel < memoryDismissed.games + NUDGE_AGAIN_AFTER_GAMES;
+        setMemoryNudge(memory && !memorySnoozed ? memory : null);
       })
-      .catch(() => setNudge(null));
+      .catch(() => {
+        setNudge(null);
+        setMemoryNudge(null);
+      });
     return () => {
       cancelled = true;
     };
-  }, [screen, settings.choiceCount, profileId]);
+  }, [screen, settings.choiceCount, settings.memoryPairs, profileId]);
 
   const open = (link: HomeLink) => {
     if (link === 'about') setScreen('about');
@@ -303,32 +325,40 @@ function Shell({
   };
 
   const startKid = async (kind: KidKind) => {
-    if (!pack) return;
-    // "Who eats what?" has a right answer even for the youngest, so Toddler mode doesn't apply.
-    const toddlerMode = settings.toddlerMode && pack.kind !== 'association';
-    // Adaptive practice: weights come from the Report on this device when the game starts.
+    // Odd one out plays with every pack of things; the other games with the chosen pack.
+    const gamePack = kind === 'odd' ? oddPack : pack;
+    if (!gamePack) return;
+    // Toddler mode is for the matching game: the others have a right answer even for the youngest.
+    const toddlerMode = settings.toddlerMode && kind === 'game' && gamePack.kind !== 'association';
     let weights: Record<string, number> = {};
-    if (kind === 'game' && settings.adaptive && !toddlerMode) {
-      const packIds = pack.parts ? pack.parts.map((p) => p.id) : [pack.id];
-      try {
-        weights = practiceWeights(forProfile(await reportStore.sessions(), profileId), await reportStore.questions(), packIds);
-      } catch {
-        // No history available: every animal equally often.
+    let level: OddLevel = 'easy';
+    try {
+      const sessions = forProfile(await reportStore.sessions(), profileId);
+      // Adaptive practice: weights come from the Report on this device when the game starts.
+      if (kind === 'game' && settings.adaptive && !toddlerMode) {
+        const packIds = gamePack.parts ? gamePack.parts.map((p) => p.id) : [gamePack.id];
+        weights = practiceWeights(sessions, await reportStore.questions(), packIds);
       }
+      if (kind === 'odd') level = oddLevel(sessions, await reportStore.questions());
+    } catch {
+      // No history available: every animal equally often, and an easy Odd one out.
     }
     unlockedUntil.current = 0;
     setKid({
-      pack,
+      pack: gamePack,
       config: {
         kind,
         profileId,
-        packId: pack.id,
-        itemKeys: enabledItemKeys(pack, settings),
-        choiceCount: settings.choiceCount,
+        packId: gamePack.id,
+        itemKeys: kind === 'odd' ? gamePack.items.map((i) => i.key) : enabledItemKeys(gamePack, settings),
+        // Odd one out always shows at least three: two alike and the different one.
+        choiceCount: kind === 'odd' ? (Math.max(3, settings.choiceCount) as ChoiceCount) : settings.choiceCount,
         questionsPerSession: settings.questionsPerSession,
+        memoryPairs: settings.memoryPairs,
+        oddLevel: level,
         toddlerMode,
         // Packs without sounds (Food, Colours...) are played by name whatever the setting says.
-        mode: effectiveMode(pack, settings.mode),
+        mode: effectiveMode(gamePack, settings.mode),
         language: settings.language,
         repeatIntervalSec: settings.repeatIntervalSec,
         hints: settings.hints,
@@ -423,6 +453,9 @@ function Shell({
     case 'studio':
       body = <Studio packs={builtin?.packs ?? []} onBack={home} />;
       break;
+    case 'flashcards':
+      body = <Flashcards packs={playablePacks.filter((p) => !p.parts)} initialPackId={pack?.id} onBack={home} />;
+      break;
     case 'start':
       body = pack && (
         <StartFlow
@@ -447,6 +480,7 @@ function Shell({
       body = kid && (
         <KidMode
           pack={kid.pack}
+          packs={allPacks}
           config={kid.config}
           snapshot={kid.snapshot}
           telemetryEnabled={settings.telemetryEnabled}
@@ -472,6 +506,20 @@ function Shell({
           nudge={nudge}
           onStart={() => begin('game')}
           onExplore={() => begin('explore')}
+          onMemory={() => begin('memory')}
+          onOdd={() => begin('odd')}
+          canOdd={oddPack !== null}
+          memoryNudge={memoryNudge}
+          onMemoryNudgeAccept={(to) =>
+            requireParent(() => {
+              update({ memoryPairs: to as MemoryPairs });
+              setMemoryNudge(null);
+            })
+          }
+          onMemoryNudgeDismiss={(next) => {
+            local.setJson(profileKey(MEMORY_NUDGE_DISMISSED_KEY, profileId), { level: next.from, games: next.gamesAtLevel });
+            setMemoryNudge(null);
+          }}
           onOpen={open}
           onNudgeAccept={(to) =>
             requireParent(() => {

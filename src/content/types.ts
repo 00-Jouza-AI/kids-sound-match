@@ -1,3 +1,5 @@
+import type { OddConfig } from '../engine/oddOneOut';
+
 export type Lang = 'en' | 'ar';
 export const LANGS: readonly Lang[] = ['en', 'ar'];
 
@@ -38,6 +40,8 @@ export interface ManifestFeedback {
   correct: Record<Lang, string[]>;
   incorrect_tone: string;
   session_end: Record<Lang, string>;
+  /** Odd one out: "Which one is different?". */
+  odd_question?: Record<Lang, string>;
 }
 
 /**
@@ -59,7 +63,7 @@ export interface ManifestAssociation {
   celebration?: AssociationCelebration;
 }
 
-export type AssociationCelebration = 'eat' | 'home';
+export type AssociationCelebration = 'eat' | 'home' | 'baby';
 
 export interface PackManifest {
   pack_id: string;
@@ -122,6 +126,8 @@ export interface LoadedFeedback {
   readonly correct: Readonly<Record<Lang, readonly ResolvedAsset[]>>;
   readonly incorrectTone: ResolvedAsset | null;
   readonly sessionEnd: Readonly<Record<Lang, ResolvedAsset | null>>;
+  /** Odd one out: "Which one is different?". Missing in packs without it. */
+  readonly oddQuestion?: Readonly<Record<Lang, ResolvedAsset | null>>;
 }
 
 export interface LoadedAssociation {
@@ -148,6 +154,8 @@ export interface LoadedPack {
   readonly inMix?: boolean;
   /** See PackManifest.mix_alone. */
   readonly mixAlone?: boolean;
+  /** Odd one out: the pools of pictures for an easy and a harder game. */
+  readonly odd?: { readonly easy: OddConfig; readonly hard: OddConfig };
   /** Only items whose every asset resolved. */
   readonly items: readonly LoadedItem[];
   readonly groups: readonly ManifestGroup[];

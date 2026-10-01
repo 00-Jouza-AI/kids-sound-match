@@ -127,6 +127,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       ),
       incorrectTone: feedbackAsset(fb?.incorrect_tone),
       sessionEnd: perLang((lang) => feedbackAsset(fb?.session_end?.[lang])),
+      ...(fb?.odd_question ? { oddQuestion: perLang((lang) => feedbackAsset(fb.odd_question?.[lang])) } : {}),
     };
 
     const assoc = manifest.association;
@@ -137,7 +138,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
             question: perLang((lang) => feedbackAsset(assoc.question_audio?.[lang])),
             questionFeminine: perLang((lang) => feedbackAsset(assoc.question_audio_feminine?.[lang])),
             reward: feedbackAsset(assoc.reward_audio),
-            celebration: assoc.celebration === 'home' ? 'home' : 'eat',
+            celebration: assoc.celebration === 'home' || assoc.celebration === 'baby' ? assoc.celebration : 'eat',
           }
         : undefined;
     if (manifest.kind === 'association' && !assoc) {

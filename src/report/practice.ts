@@ -1,5 +1,5 @@
 import { firstTryPercent } from './summary';
-import { resultPack, type QuestionResultEntity, type SessionEntity } from './types';
+import { isMatchGame, resultPack, type QuestionResultEntity, type SessionEntity } from './types';
 
 /** Adaptive practice looks at each animal's most recent tries, so improvement shows up quickly. */
 export const RECENT_TRIES = 10;
@@ -20,7 +20,7 @@ export function practiceWeights(
   packIds: string | readonly string[],
 ): Record<string, number> {
   const wanted = new Set(typeof packIds === 'string' ? [packIds] : packIds);
-  const counted = new Map(sessions.filter((s) => !s.toddlerMode).map((s) => [s.id, s]));
+  const counted = new Map(sessions.filter((s) => !s.toddlerMode && isMatchGame(s)).map((s) => [s.id, s]));
   const history = new Map<string, boolean[]>();
   for (const q of [...questions].sort((a, b) => a.id - b.id)) {
     const session = counted.get(q.sessionId);
@@ -57,7 +57,7 @@ export function readyForMore(
 ): NextLevel | null {
   if (choiceCount >= 4) return null;
   const games = sessions
-    .filter((s) => s.completed && !s.toddlerMode && s.choiceCount === choiceCount)
+    .filter((s) => s.completed && !s.toddlerMode && isMatchGame(s) && s.choiceCount === choiceCount)
     .sort((a, b) => b.startedAt - a.startedAt);
   if (games.length < NUDGE_GAMES) return null;
   const recent = new Set(games.slice(0, NUDGE_GAMES).map((g) => g.id));

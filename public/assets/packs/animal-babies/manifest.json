@@ -1,0 +1,149 @@
+{
+  "pack_id": "animal-babies",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 14,
+  "kind": "association",
+  "association": {
+    "prompt_pack": "animals",
+    "question_audio": { "en": "feedback/baby_question_en.mp3", "ar": "feedback/baby_question_ar.mp3" },
+    "question_audio_feminine": { "ar": "feedback/baby_question_ar_f.mp3" },
+    "celebration": "baby"
+  },
+  "name": { "en": "Animal babies", "ar": "صغار الحيوانات" },
+  "items": [
+    {
+      "item_key": "calf",
+      "name": { "en": "Calf", "ar": "عِجل" },
+      "image": "animal-babies/calf.jpg",
+      "name_audio": {
+        "en": "animal-babies/calf_name_en.mp3",
+        "ar": "animal-babies/calf_name_ar.mp3"
+      },
+      "prompts": ["cow"],
+      "confusable_with": ["camel_calf"]
+    },
+    {
+      "item_key": "lamb",
+      "name": { "en": "Lamb", "ar": "حَمَل" },
+      "image": "animal-babies/lamb.jpg",
+      "name_audio": {
+        "en": "animal-babies/lamb_name_en.mp3",
+        "ar": "animal-babies/lamb_name_ar.mp3"
+      },
+      "prompts": ["sheep"],
+      "confusable_with": ["kid"]
+    },
+    {
+      "item_key": "kid",
+      "name": { "en": "Kid", "ar": "جَدي" },
+      "image": "animal-babies/kid.jpg",
+      "name_audio": {
+        "en": "animal-babies/kid_name_en.mp3",
+        "ar": "animal-babies/kid_name_ar.mp3"
+      },
+      "prompts": ["goat"],
+      "confusable_with": ["lamb"]
+    },
+    {
+      "item_key": "foal",
+      "name": { "en": "Foal", "ar": "مُهر" },
+      "image": "animal-babies/foal.jpg",
+      "name_audio": {
+        "en": "animal-babies/foal_name_en.mp3",
+        "ar": "animal-babies/foal_name_ar.mp3"
+      },
+      "prompts": ["horse"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "puppy",
+      "name": { "en": "Puppy", "ar": "جَرو" },
+      "image": "animal-babies/puppy.jpg",
+      "name_audio": {
+        "en": "animal-babies/puppy_name_en.mp3",
+        "ar": "animal-babies/puppy_name_ar.mp3"
+      },
+      "prompts": ["dog"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "kitten",
+      "name": { "en": "Kitten", "ar": "هُرَيرة" },
+      "image": "animal-babies/kitten.jpg",
+      "name_audio": {
+        "en": "animal-babies/kitten_name_en.mp3",
+        "ar": "animal-babies/kitten_name_ar.mp3"
+      },
+      "prompts": ["cat"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "chick",
+      "name": { "en": "Chick", "ar": "كتكوت" },
+      "image": "animals/chick.svg",
+      "name_audio": {
+        "en": "animals/chick_name_en.mp3",
+        "ar": "animals/chick_name_ar.mp3"
+      },
+      "prompts": ["hen"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "cub",
+      "name": { "en": "Lion cub", "ar": "شِبل" },
+      "image": "animal-babies/cub.jpg",
+      "name_audio": {
+        "en": "animal-babies/cub_name_en.mp3",
+        "ar": "animal-babies/cub_name_ar.mp3"
+      },
+      "prompts": ["lion"],
+      "confusable_with": []
+    },
+    {
+      "item_key": "camel_calf",
+      "name": { "en": "Baby camel", "ar": "حُوار" },
+      "image": "animal-babies/camel_calf.jpg",
+      "name_audio": {
+        "en": "animal-babies/camel_calf_name_en.mp3",
+        "ar": "animal-babies/camel_calf_name_ar.mp3"
+      },
+      "prompts": ["camel"],
+      "confusable_with": ["calf"]
+    },
+    {
+      "item_key": "duckling",
+      "name": { "en": "Duckling", "ar": "فرخ البط" },
+      "image": "animal-babies/duckling.jpg",
+      "name_audio": {
+        "en": "animal-babies/duckling_name_en.mp3",
+        "ar": "animal-babies/duckling_name_ar.mp3"
+      },
+      "prompts": ["duck"],
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

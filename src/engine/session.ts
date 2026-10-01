@@ -1,4 +1,5 @@
 import { ConfusionGraph } from './confusion';
+import { oddQuestion, type OddConfig } from './oddOneOut';
 import { generateQuestion, type Question } from './questionGenerator';
 import { canHint, reduceQuestion, startQuestion, type QuestionState, type TapOutcome } from './questionMachine';
 import { seededRng, type SeededRng } from './random';
@@ -12,6 +13,8 @@ export interface SessionConfig {
   readonly toddlerMode: boolean;
   /** Adaptive practice: how often each item is dealt per round (see TargetBag). */
   readonly weights?: Readonly<Record<string, number>>;
+  /** Odd one out: questions come from these pools instead of a target and distractors. */
+  readonly odd?: OddConfig;
 }
 
 export interface QuestionResult {
@@ -170,6 +173,12 @@ export class GameSession {
   }
 
   private makeQuestion(): Question {
+    if (this.config.odd) {
+      // Always at least 3 pictures: two alike and the different one.
+      const question = oddQuestion(this.config.odd, Math.max(3, this.config.choiceCount), this.rng, this.lastTarget);
+      this.lastTarget = question.targetKey;
+      return question;
+    }
     const targetKey = this.bag.next(this.lastTarget);
     const question = generateQuestion({
       items: this.config.items,

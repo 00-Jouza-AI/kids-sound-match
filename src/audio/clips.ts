@@ -32,6 +32,13 @@ export const FEEDBACK_SPEECH: Record<string, string> = {
   'feedback/home_question_ar.mp3': 'أين يعيش؟',
   'feedback/home_question_ar_f.mp3': 'أين تعيش؟',
   'feedback/home_question_en.mp3': 'Where does it live?',
+  // "Animal babies"
+  'feedback/baby_question_ar.mp3': 'أين صغيره؟',
+  'feedback/baby_question_ar_f.mp3': 'أين صغيرها؟',
+  'feedback/baby_question_en.mp3': 'Where is its baby?',
+  // Odd one out
+  'feedback/odd_question_ar.mp3': 'أين المختلف؟',
+  'feedback/odd_question_en.mp3': 'Which one is different?',
 };
 
 /**
@@ -73,6 +80,16 @@ export class ClipResolver {
     // A name recorded once for both languages (parents' own items) is said once, before the questions.
     if (names.length < this.languages.length) return [...names, ...this.languages.map((l) => this.question(about, l)).filter(isClip)];
     return this.languages.flatMap((lang, i) => [names[i], this.question(about, lang)]).filter(isClip);
+  }
+
+  /** Odd one out: "Which one is different?" in each spoken language. */
+  oddQuestion(): Clip[] {
+    const lines = this.pack.feedback.oddQuestion;
+    if (!lines) return [];
+    return this.languages.flatMap((lang) => {
+      const asset = lines[lang];
+      return asset ? [this.voiced(asset, FEEDBACK_SPEECH[asset.path], lang, 'feedback', `odd:${lang}`)] : [];
+    });
   }
 
   /** Association games: a happy "yum" after a right answer. */
@@ -119,7 +136,7 @@ export class ClipResolver {
             .map((a) => this.voiced(a, FEEDBACK_SPEECH[a.path], lang, 'feedback', `question:${a.path}`)),
         )
       : [];
-    return [this.incorrectTone(), ...this.sessionEnd(), ...praise, ...questions, this.reward()].filter(isClip);
+    return [this.incorrectTone(), ...this.sessionEnd(), ...praise, ...questions, ...this.oddQuestion(), this.reward()].filter(isClip);
   }
 
   private voiced(asset: ResolvedAsset, text: string | undefined, lang: Lang, category: ClipCategory, label: string): Clip {

@@ -3,7 +3,8 @@ import { FIRST_PROFILE_ID } from '../../settings/profiles';
 import type { GameLanguage, GameMode } from '../../settings/settings';
 import { session as tabStorage } from '../../settings/storage';
 
-export type KidKind = 'game' | 'explore';
+/** The matching game, Explore, the memory game, or Odd one out. */
+export type KidKind = 'game' | 'explore' | 'memory' | 'odd';
 
 /** The settings a game was started with. Changing Settings mid-game doesn't affect it. */
 export interface KidConfig {
@@ -23,6 +24,10 @@ export interface KidConfig {
   replaysPerDay: number;
   /** Adaptive practice: how often each animal is dealt, fixed when the game starts. */
   weights: Record<string, number>;
+  /** Memory: pairs of cards. */
+  memoryPairs?: number;
+  /** Odd one out: easy (three animals and a car) or hard (three farm animals and a fish). */
+  oddLevel?: 'easy' | 'hard';
 }
 
 /**

@@ -114,6 +114,7 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
       ...LANGS.flatMap((lang) => fb.correct?.[lang] ?? []),
       fb.incorrect_tone,
       ...LANGS.map((lang) => fb.session_end?.[lang]),
+      ...LANGS.map((lang) => fb.odd_question?.[lang]),
     ];
     for (const p of feedbackPaths) {
       if (typeof p === 'string' && p && !exists(feedbackAssetPath(p))) warn(`Feedback audio not found: ${feedbackAssetPath(p)}`);
