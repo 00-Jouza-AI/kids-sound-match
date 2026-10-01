@@ -312,7 +312,7 @@ describe('your voice and photos', () => {
     for (const carrot of [f.items[0], w.items[0]]) {
       expect(carrot.nameAudio.ar).toEqual({ path: 'packs/food/carrot_name_ar.mp3', url: 'blob:6', real: true });
       expect(carrot.nameAudio.en.real).toBe(false); // not recorded: the original stays
-      expect(carrot.images).toEqual([{ path: 'packs/food/carrot.webp', url: 'blob:10', real: true }]);
+      expect(carrot.images).toEqual([{ path: 'packs/food/carrot.webp', url: 'blob:10', real: true, photo: true }]);
     }
     expect(w.items[0].prompts![0].nameAudio.ar.real).toBe(true);
     expect(f.feedback.correct.ar[0].real).toBe(true);

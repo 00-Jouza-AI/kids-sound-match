@@ -15,7 +15,7 @@
     {
       "item_key": "farm",
       "name": { "en": "Farm", "ar": "مزرعة" },
-      "image": "where-lives/farm.webp",
+      "image": "where-lives/farm.svg",
       "name_audio": {
         "en": "where-lives/farm_name_en.mp3",
         "ar": "where-lives/farm_name_ar.mp3"
@@ -26,7 +26,7 @@
     {
       "item_key": "house",
       "name": { "en": "House", "ar": "بيت" },
-      "image": "where-lives/house.webp",
+      "image": "where-lives/house.svg",
       "name_audio": {
         "en": "where-lives/house_name_en.mp3",
         "ar": "where-lives/house_name_ar.mp3"
@@ -37,7 +37,7 @@
     {
       "item_key": "sea",
       "name": { "en": "Sea", "ar": "بحر" },
-      "image": "where-lives/sea.webp",
+      "image": "where-lives/sea.svg",
       "name_audio": {
         "en": "where-lives/sea_name_en.mp3",
         "ar": "where-lives/sea_name_ar.mp3"
@@ -48,7 +48,7 @@
     {
       "item_key": "river",
       "name": { "en": "River", "ar": "نهر" },
-      "image": "where-lives/river.webp",
+      "image": "where-lives/river.svg",
       "name_audio": {
         "en": "where-lives/river_name_en.mp3",
         "ar": "where-lives/river_name_ar.mp3"
@@ -59,7 +59,7 @@
     {
       "item_key": "jungle",
       "name": { "en": "Jungle", "ar": "غابة" },
-      "image": "where-lives/jungle.webp",
+      "image": "where-lives/jungle.svg",
       "name_audio": {
         "en": "where-lives/jungle_name_en.mp3",
         "ar": "where-lives/jungle_name_ar.mp3"
@@ -70,7 +70,7 @@
     {
       "item_key": "desert",
       "name": { "en": "Desert", "ar": "صحراء" },
-      "image": "where-lives/desert.webp",
+      "image": "where-lives/desert.svg",
       "name_audio": {
         "en": "where-lives/desert_name_en.mp3",
         "ar": "where-lives/desert_name_ar.mp3"
@@ -81,7 +81,7 @@
     {
       "item_key": "snow",
       "name": { "en": "Snow", "ar": "ثلج" },
-      "image": "where-lives/snow.webp",
+      "image": "where-lives/snow.svg",
       "name_audio": {
         "en": "where-lives/snow_name_en.mp3",
         "ar": "where-lives/snow_name_ar.mp3"
@@ -92,7 +92,7 @@
     {
       "item_key": "nest",
       "name": { "en": "Nest", "ar": "عش" },
-      "image": "where-lives/nest.webp",
+      "image": "where-lives/nest.svg",
       "name_audio": {
         "en": "where-lives/nest_name_en.mp3",
         "ar": "where-lives/nest_name_ar.mp3"
@@ -103,7 +103,7 @@
     {
       "item_key": "hive",
       "name": { "en": "Hive", "ar": "خلية" },
-      "image": "where-lives/hive.webp",
+      "image": "where-lives/hive.svg",
       "name_audio": {
         "en": "where-lives/hive_name_en.mp3",
         "ar": "where-lives/hive_name_ar.mp3"

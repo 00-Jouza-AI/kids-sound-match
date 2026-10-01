@@ -8,7 +8,7 @@
     {
       "item_key": "apple",
       "name": { "en": "Apple", "ar": "تفاحة" },
-      "image": "food/apple.webp",
+      "image": "food/apple.svg",
       "name_audio": {
         "en": "food/apple_name_en.mp3",
         "ar": "food/apple_name_ar.mp3"
@@ -18,7 +18,7 @@
     {
       "item_key": "banana",
       "name": { "en": "Banana", "ar": "موزة" },
-      "image": "food/banana.webp",
+      "image": "food/banana.svg",
       "name_audio": {
         "en": "food/banana_name_en.mp3",
         "ar": "food/banana_name_ar.mp3"
@@ -28,7 +28,7 @@
     {
       "item_key": "orange",
       "name": { "en": "Orange", "ar": "برتقالة" },
-      "image": "food/orange.webp",
+      "image": "food/orange.svg",
       "name_audio": {
         "en": "food/orange_name_en.mp3",
         "ar": "food/orange_name_ar.mp3"
@@ -38,7 +38,7 @@
     {
       "item_key": "grapes",
       "name": { "en": "Grapes", "ar": "عنب" },
-      "image": "food/grapes.webp",
+      "image": "food/grapes.svg",
       "name_audio": {
         "en": "food/grapes_name_en.mp3",
         "ar": "food/grapes_name_ar.mp3"
@@ -48,7 +48,7 @@
     {
       "item_key": "watermelon",
       "name": { "en": "Watermelon", "ar": "بطيخ" },
-      "image": "food/watermelon.webp",
+      "image": "food/watermelon.svg",
       "name_audio": {
         "en": "food/watermelon_name_en.mp3",
         "ar": "food/watermelon_name_ar.mp3"
@@ -58,7 +58,7 @@
     {
       "item_key": "strawberry",
       "name": { "en": "Strawberry", "ar": "فراولة" },
-      "image": "food/strawberry.webp",
+      "image": "food/strawberry.svg",
       "name_audio": {
         "en": "food/strawberry_name_en.mp3",
         "ar": "food/strawberry_name_ar.mp3"
@@ -68,7 +68,7 @@
     {
       "item_key": "dates",
       "name": { "en": "Dates", "ar": "تمر" },
-      "image": "food/dates.webp",
+      "image": "food/dates.svg",
       "name_audio": {
         "en": "food/dates_name_en.mp3",
         "ar": "food/dates_name_ar.mp3"
@@ -78,7 +78,7 @@
     {
       "item_key": "olives",
       "name": { "en": "Olives", "ar": "زيتون" },
-      "image": "food/olives.webp",
+      "image": "food/olives.svg",
       "name_audio": {
         "en": "food/olives_name_en.mp3",
         "ar": "food/olives_name_ar.mp3"
@@ -88,7 +88,7 @@
     {
       "item_key": "carrot",
       "name": { "en": "Carrot", "ar": "جزرة" },
-      "image": "food/carrot.webp",
+      "image": "food/carrot.svg",
       "name_audio": {
         "en": "food/carrot_name_en.mp3",
         "ar": "food/carrot_name_ar.mp3"
@@ -98,7 +98,7 @@
     {
       "item_key": "tomato",
       "name": { "en": "Tomato", "ar": "طماطم" },
-      "image": "food/tomato.webp",
+      "image": "food/tomato.svg",
       "name_audio": {
         "en": "food/tomato_name_en.mp3",
         "ar": "food/tomato_name_ar.mp3"
@@ -108,7 +108,7 @@
     {
       "item_key": "cucumber",
       "name": { "en": "Cucumber", "ar": "خيار" },
-      "image": "food/cucumber.webp",
+      "image": "food/cucumber.svg",
       "name_audio": {
         "en": "food/cucumber_name_en.mp3",
         "ar": "food/cucumber_name_ar.mp3"
@@ -118,7 +118,7 @@
     {
       "item_key": "potato",
       "name": { "en": "Potato", "ar": "بطاطا" },
-      "image": "food/potato.webp",
+      "image": "food/potato.svg",
       "name_audio": {
         "en": "food/potato_name_en.mp3",
         "ar": "food/potato_name_ar.mp3"
@@ -128,7 +128,7 @@
     {
       "item_key": "bread",
       "name": { "en": "Bread", "ar": "خبز" },
-      "image": "food/bread.webp",
+      "image": "food/bread.svg",
       "name_audio": {
         "en": "food/bread_name_en.mp3",
         "ar": "food/bread_name_ar.mp3"
@@ -138,7 +138,7 @@
     {
       "item_key": "milk",
       "name": { "en": "Milk", "ar": "حليب" },
-      "image": "food/milk.webp",
+      "image": "food/milk.svg",
       "name_audio": {
         "en": "food/milk_name_en.mp3",
         "ar": "food/milk_name_ar.mp3"
@@ -148,7 +148,7 @@
     {
       "item_key": "water",
       "name": { "en": "Water", "ar": "ماء" },
-      "image": "food/water.webp",
+      "image": "food/water.svg",
       "name_audio": {
         "en": "food/water_name_en.mp3",
         "ar": "food/water_name_ar.mp3"
@@ -158,7 +158,7 @@
     {
       "item_key": "egg",
       "name": { "en": "Egg", "ar": "بيضة" },
-      "image": "food/egg.webp",
+      "image": "food/egg.svg",
       "name_audio": {
         "en": "food/egg_name_en.mp3",
         "ar": "food/egg_name_ar.mp3"
@@ -168,7 +168,7 @@
     {
       "item_key": "cheese",
       "name": { "en": "Cheese", "ar": "جبنة" },
-      "image": "food/cheese.webp",
+      "image": "food/cheese.svg",
       "name_audio": {
         "en": "food/cheese_name_en.mp3",
         "ar": "food/cheese_name_ar.mp3"
@@ -178,7 +178,7 @@
     {
       "item_key": "labneh",
       "name": { "en": "Labneh", "ar": "لبنة" },
-      "image": "food/labneh.webp",
+      "image": "food/labneh.svg",
       "name_audio": {
         "en": "food/labneh_name_en.mp3",
         "ar": "food/labneh_name_ar.mp3"
@@ -188,7 +188,7 @@
     {
       "item_key": "hummus",
       "name": { "en": "Hummus", "ar": "حمص" },
-      "image": "food/hummus.webp",
+      "image": "food/hummus.svg",
       "name_audio": {
         "en": "food/hummus_name_en.mp3",
         "ar": "food/hummus_name_ar.mp3"
@@ -198,7 +198,7 @@
     {
       "item_key": "falafel",
       "name": { "en": "Falafel", "ar": "فلافل" },
-      "image": "food/falafel.webp",
+      "image": "food/falafel.svg",
       "name_audio": {
         "en": "food/falafel_name_en.mp3",
         "ar": "food/falafel_name_ar.mp3"
@@ -208,7 +208,7 @@
     {
       "item_key": "rice",
       "name": { "en": "Rice", "ar": "أرز" },
-      "image": "food/rice.webp",
+      "image": "food/rice.svg",
       "name_audio": {
         "en": "food/rice_name_en.mp3",
         "ar": "food/rice_name_ar.mp3"
@@ -218,7 +218,7 @@
     {
       "item_key": "honey",
       "name": { "en": "Honey", "ar": "عسل" },
-      "image": "food/honey.webp",
+      "image": "food/honey.svg",
       "name_audio": {
         "en": "food/honey_name_en.mp3",
         "ar": "food/honey_name_ar.mp3"
@@ -228,7 +228,7 @@
     {
       "item_key": "juice",
       "name": { "en": "Juice", "ar": "عصير" },
-      "image": "food/juice.webp",
+      "image": "food/juice.svg",
       "name_audio": {
         "en": "food/juice_name_en.mp3",
         "ar": "food/juice_name_ar.mp3"
@@ -238,7 +238,7 @@
     {
       "item_key": "cookie",
       "name": { "en": "Cookie", "ar": "بسكويتة" },
-      "image": "food/cookie.webp",
+      "image": "food/cookie.svg",
       "name_audio": {
         "en": "food/cookie_name_en.mp3",
         "ar": "food/cookie_name_ar.mp3"
@@ -248,7 +248,7 @@
     {
       "item_key": "ice_cream",
       "name": { "en": "Ice cream", "ar": "آيس كريم" },
-      "image": "food/ice_cream.webp",
+      "image": "food/ice_cream.svg",
       "name_audio": {
         "en": "food/ice_cream_name_en.mp3",
         "ar": "food/ice_cream_name_ar.mp3"

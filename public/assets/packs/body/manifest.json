@@ -8,7 +8,7 @@
     {
       "item_key": "eye",
       "name": { "en": "Eye", "ar": "عين" },
-      "image": "body/eye.webp",
+      "image": "body/eye.svg",
       "name_audio": {
         "en": "body/eye_name_en.mp3",
         "ar": "body/eye_name_ar.mp3"
@@ -18,7 +18,7 @@
     {
       "item_key": "nose",
       "name": { "en": "Nose", "ar": "أنف" },
-      "image": "body/nose.webp",
+      "image": "body/nose.svg",
       "name_audio": {
         "en": "body/nose_name_en.mp3",
         "ar": "body/nose_name_ar.mp3"
@@ -28,7 +28,7 @@
     {
       "item_key": "mouth",
       "name": { "en": "Mouth", "ar": "فم" },
-      "image": "body/mouth.webp",
+      "image": "body/mouth.svg",
       "name_audio": {
         "en": "body/mouth_name_en.mp3",
         "ar": "body/mouth_name_ar.mp3"
@@ -38,7 +38,7 @@
     {
       "item_key": "ear",
       "name": { "en": "Ear", "ar": "أذن" },
-      "image": "body/ear.webp",
+      "image": "body/ear.svg",
       "name_audio": {
         "en": "body/ear_name_en.mp3",
         "ar": "body/ear_name_ar.mp3"
@@ -48,7 +48,7 @@
     {
       "item_key": "hand",
       "name": { "en": "Hand", "ar": "يد" },
-      "image": "body/hand.webp",
+      "image": "body/hand.svg",
       "name_audio": {
         "en": "body/hand_name_en.mp3",
         "ar": "body/hand_name_ar.mp3"
@@ -58,7 +58,7 @@
     {
       "item_key": "finger",
       "name": { "en": "Finger", "ar": "إصبع" },
-      "image": "body/finger.webp",
+      "image": "body/finger.svg",
       "name_audio": {
         "en": "body/finger_name_en.mp3",
         "ar": "body/finger_name_ar.mp3"
@@ -68,7 +68,7 @@
     {
       "item_key": "arm",
       "name": { "en": "Arm", "ar": "ذراع" },
-      "image": "body/arm.webp",
+      "image": "body/arm.svg",
       "name_audio": {
         "en": "body/arm_name_en.mp3",
         "ar": "body/arm_name_ar.mp3"
@@ -78,7 +78,7 @@
     {
       "item_key": "foot",
       "name": { "en": "Foot", "ar": "قدم" },
-      "image": "body/foot.webp",
+      "image": "body/foot.svg",
       "name_audio": {
         "en": "body/foot_name_en.mp3",
         "ar": "body/foot_name_ar.mp3"
@@ -88,7 +88,7 @@
     {
       "item_key": "leg",
       "name": { "en": "Leg", "ar": "رِجل" },
-      "image": "body/leg.webp",
+      "image": "body/leg.svg",
       "name_audio": {
         "en": "body/leg_name_en.mp3",
         "ar": "body/leg_name_ar.mp3"
@@ -98,7 +98,7 @@
     {
       "item_key": "teeth",
       "name": { "en": "Teeth", "ar": "أسنان" },
-      "image": "body/teeth.webp",
+      "image": "body/teeth.svg",
       "name_audio": {
         "en": "body/teeth_name_en.mp3",
         "ar": "body/teeth_name_ar.mp3"
@@ -108,7 +108,7 @@
     {
       "item_key": "tongue",
       "name": { "en": "Tongue", "ar": "لسان" },
-      "image": "body/tongue.webp",
+      "image": "body/tongue.svg",
       "name_audio": {
         "en": "body/tongue_name_en.mp3",
         "ar": "body/tongue_name_ar.mp3"
@@ -118,7 +118,7 @@
     {
       "item_key": "face",
       "name": { "en": "Face", "ar": "وجه" },
-      "image": "body/face.webp",
+      "image": "body/face.svg",
       "name_audio": {
         "en": "body/face_name_en.mp3",
         "ar": "body/face_name_ar.mp3"
@@ -128,7 +128,7 @@
     {
       "item_key": "heart",
       "name": { "en": "Heart", "ar": "قلب" },
-      "image": "body/heart.webp",
+      "image": "body/heart.svg",
       "name_audio": {
         "en": "body/heart_name_en.mp3",
         "ar": "body/heart_name_ar.mp3"

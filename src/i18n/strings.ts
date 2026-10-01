@@ -46,7 +46,7 @@ export const en = {
   summaryItems: '{n} items',
   toddlerMode: 'Toddler mode',
   testBuildNote:
-    'Test build: pictures are emoji, and the phone reads names aloud until the real recordings are added.',
+    'Test build: the phone reads names aloud, and some sounds are tones, until the real recordings are added.',
 
   settingsPictures: 'Pictures per question',
   settingsPicturesHint: 'Start with 2 for a 1-year-old and move up to 4 by about age 4.',
@@ -127,7 +127,7 @@ export const en = {
   aboutBody:
     'A free, ad-free game that helps young children match sounds and words to pictures, in Arabic or English.',
   aboutVersion: 'Version {v}',
-  aboutSounds: 'Animal sounds: Pixabay. Placeholder pictures: your device’s emoji.',
+  aboutSounds: 'Pictures: Microsoft Fluent Emoji (MIT licence), and drawings made for this app. Sounds: Pixabay.',
 
   replaySound: 'Play the sound again',
   parentExit: 'Parents: press and hold for 3 seconds',
@@ -349,7 +349,7 @@ export const ar: Record<StringKey, string> = {
   summaryAnimals: 'الحيوانات: {n}',
   summaryItems: 'العناصر: {n}',
   toddlerMode: 'وضع الصغار',
-  testBuildNote: 'نسخة تجريبية: الصور رموز تعبيرية، والهاتف يقرأ الأسماء بصوته إلى أن تُضاف التسجيلات الحقيقية.',
+  testBuildNote: 'نسخة تجريبية: الهاتف يقرأ الأسماء بصوته، وبعض الأصوات نغمات، إلى أن تُضاف التسجيلات الحقيقية.',
 
   settingsPictures: 'عدد الصور في كل سؤال',
   settingsPicturesHint: 'ابدأ بصورتين لطفل بعمر سنة، وزِد حتى 4 صور عند عمر 4 سنوات تقريباً.',
@@ -428,7 +428,7 @@ export const ar: Record<StringKey, string> = {
 
   aboutBody: 'لعبة مجانية بلا إعلانات تساعد الأطفال الصغار على مطابقة الأصوات والكلمات بصورها، بالعربية أو بالإنجليزية.',
   aboutVersion: 'الإصدار {v}',
-  aboutSounds: 'أصوات الحيوانات: Pixabay. الصور المؤقتة: الرموز التعبيرية في جهازك.',
+  aboutSounds: 'الصور: Microsoft Fluent Emoji (رخصة MIT)، ورسومات صُنعت لهذا التطبيق. الأصوات: Pixabay.',
 
   replaySound: 'أعد تشغيل الصوت',
   parentExit: 'للأهل: اضغط مطوّلاً لمدة 3 ثوانٍ',

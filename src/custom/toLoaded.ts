@@ -43,7 +43,7 @@ export function customToLoaded(
         return {
           key: i.id,
           name: { ar: i.name.ar || i.name.en, en: i.name.en || i.name.ar },
-          images: [asset(i.picture!, `custom/${i.id}/picture`)],
+          images: [{ ...asset(i.picture!, `custom/${i.id}/picture`), photo: i.pictureKind === 'photo' }],
           placeholderImage: null,
           sound: i.sound ? asset(i.sound, `custom/${i.id}/sound`) : null,
           nameAudio: { ar: asset(ar, `custom/${i.id}/name_ar`), en: asset(en, `custom/${i.id}/name_en`) },

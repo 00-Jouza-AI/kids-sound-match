@@ -8,7 +8,7 @@
     {
       "item_key": "car",
       "name": { "en": "Car", "ar": "سيارة" },
-      "image": "vehicles/car.webp",
+      "image": "vehicles/car.svg",
       "sound": "vehicles/car_sound.mp3",
       "name_audio": {
         "en": "vehicles/car_name_en.mp3",
@@ -19,7 +19,7 @@
     {
       "item_key": "bus",
       "name": { "en": "Bus", "ar": "حافلة" },
-      "image": "vehicles/bus.webp",
+      "image": "vehicles/bus.svg",
       "sound": "vehicles/bus_sound.mp3",
       "name_audio": {
         "en": "vehicles/bus_name_en.mp3",
@@ -30,7 +30,7 @@
     {
       "item_key": "train",
       "name": { "en": "Train", "ar": "قطار" },
-      "image": "vehicles/train.webp",
+      "image": "vehicles/train.svg",
       "sound": "vehicles/train_sound.mp3",
       "name_audio": {
         "en": "vehicles/train_name_en.mp3",
@@ -41,7 +41,7 @@
     {
       "item_key": "airplane",
       "name": { "en": "Airplane", "ar": "طائرة" },
-      "image": "vehicles/airplane.webp",
+      "image": "vehicles/airplane.svg",
       "sound": "vehicles/airplane_sound.mp3",
       "name_audio": {
         "en": "vehicles/airplane_name_en.mp3",
@@ -52,7 +52,7 @@
     {
       "item_key": "helicopter",
       "name": { "en": "Helicopter", "ar": "طائرة مروحية" },
-      "image": "vehicles/helicopter.webp",
+      "image": "vehicles/helicopter.svg",
       "sound": "vehicles/helicopter_sound.mp3",
       "name_audio": {
         "en": "vehicles/helicopter_name_en.mp3",
@@ -63,7 +63,7 @@
     {
       "item_key": "ambulance",
       "name": { "en": "Ambulance", "ar": "سيارة إسعاف" },
-      "image": "vehicles/ambulance.webp",
+      "image": "vehicles/ambulance.svg",
       "sound": "vehicles/ambulance_sound.mp3",
       "name_audio": {
         "en": "vehicles/ambulance_name_en.mp3",
@@ -74,7 +74,7 @@
     {
       "item_key": "fire_truck",
       "name": { "en": "Fire truck", "ar": "سيارة إطفاء" },
-      "image": "vehicles/fire_truck.webp",
+      "image": "vehicles/fire_truck.svg",
       "sound": "vehicles/fire_truck_sound.mp3",
       "name_audio": {
         "en": "vehicles/fire_truck_name_en.mp3",
@@ -85,7 +85,7 @@
     {
       "item_key": "police_car",
       "name": { "en": "Police car", "ar": "سيارة شرطة" },
-      "image": "vehicles/police_car.webp",
+      "image": "vehicles/police_car.svg",
       "sound": "vehicles/police_car_sound.mp3",
       "name_audio": {
         "en": "vehicles/police_car_name_en.mp3",
@@ -96,7 +96,7 @@
     {
       "item_key": "motorcycle",
       "name": { "en": "Motorbike", "ar": "دراجة نارية" },
-      "image": "vehicles/motorcycle.webp",
+      "image": "vehicles/motorcycle.svg",
       "sound": "vehicles/motorcycle_sound.mp3",
       "name_audio": {
         "en": "vehicles/motorcycle_name_en.mp3",
@@ -107,7 +107,7 @@
     {
       "item_key": "bicycle",
       "name": { "en": "Bicycle", "ar": "دراجة هوائية" },
-      "image": "vehicles/bicycle.webp",
+      "image": "vehicles/bicycle.svg",
       "sound": "vehicles/bicycle_sound.mp3",
       "name_audio": {
         "en": "vehicles/bicycle_name_en.mp3",
@@ -118,7 +118,7 @@
     {
       "item_key": "ship",
       "name": { "en": "Ship", "ar": "سفينة" },
-      "image": "vehicles/ship.webp",
+      "image": "vehicles/ship.svg",
       "sound": "vehicles/ship_sound.mp3",
       "name_audio": {
         "en": "vehicles/ship_name_en.mp3",
@@ -129,7 +129,7 @@
     {
       "item_key": "tractor",
       "name": { "en": "Tractor", "ar": "جرار زراعي" },
-      "image": "vehicles/tractor.webp",
+      "image": "vehicles/tractor.svg",
       "sound": "vehicles/tractor_sound.mp3",
       "name_audio": {
         "en": "vehicles/tractor_name_en.mp3",
@@ -140,7 +140,7 @@
     {
       "item_key": "truck",
       "name": { "en": "Truck", "ar": "شاحنة" },
-      "image": "vehicles/truck.webp",
+      "image": "vehicles/truck.svg",
       "sound": "vehicles/truck_sound.mp3",
       "name_audio": {
         "en": "vehicles/truck_name_en.mp3",
@@ -151,7 +151,7 @@
     {
       "item_key": "rocket",
       "name": { "en": "Rocket", "ar": "صاروخ" },
-      "image": "vehicles/rocket.webp",
+      "image": "vehicles/rocket.svg",
       "sound": "vehicles/rocket_sound.mp3",
       "name_audio": {
         "en": "vehicles/rocket_name_en.mp3",

@@ -58,6 +58,24 @@ describe('recording studio', () => {
   });
 });
 
+describe('one kind of picture per screen', () => {
+  const drawn = (key: string): LoadedItem => ({ ...item(key, 'family'), images: [asset(`packs/family/${key}.svg`, true)] });
+  const withPhoto = (key: string): LoadedItem => ({
+    ...drawn(key),
+    images: [{ path: `packs/family/${key}.svg`, url: `blob:${key}`, real: true, photo: true }],
+    drawings: [asset(`packs/family/${key}.svg`, true)],
+  });
+
+  it("shows a parent's photos only when every picture on screen is a photo", () => {
+    expect(choosePictures([withPhoto('mama'), withPhoto('baba')])).toEqual({ mama: 'blob:mama', baba: 'blob:baba' });
+    // Grandma has no photo: everyone is shown as a drawing, so Mama's photo can't become the clue.
+    expect(choosePictures([withPhoto('mama'), drawn('grandma')])).toEqual({
+      mama: '/packs/family/mama.svg',
+      grandma: '/packs/family/grandma.svg',
+    });
+  });
+});
+
 describe('pictures drawn as a series', () => {
   it('uses the same kind for every picture in a question (3 apples next to 5 apples)', () => {
     const counting = (n: number): LoadedItem => ({

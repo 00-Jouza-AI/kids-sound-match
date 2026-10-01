@@ -8,7 +8,7 @@
     {
       "item_key": "mama",
       "name": { "en": "Mama", "ar": "ماما" },
-      "image": "family/mama.webp",
+      "image": "family/mama.svg",
       "name_audio": {
         "en": "family/mama_name_en.mp3",
         "ar": "family/mama_name_ar.mp3"
@@ -18,7 +18,7 @@
     {
       "item_key": "baba",
       "name": { "en": "Baba", "ar": "بابا" },
-      "image": "family/baba.webp",
+      "image": "family/baba.svg",
       "name_audio": {
         "en": "family/baba_name_en.mp3",
         "ar": "family/baba_name_ar.mp3"
@@ -28,7 +28,7 @@
     {
       "item_key": "grandma",
       "name": { "en": "Grandma", "ar": "تيتا" },
-      "image": "family/grandma.webp",
+      "image": "family/grandma.svg",
       "name_audio": {
         "en": "family/grandma_name_en.mp3",
         "ar": "family/grandma_name_ar.mp3"
@@ -38,7 +38,7 @@
     {
       "item_key": "grandpa",
       "name": { "en": "Grandpa", "ar": "جدّو" },
-      "image": "family/grandpa.webp",
+      "image": "family/grandpa.svg",
       "name_audio": {
         "en": "family/grandpa_name_en.mp3",
         "ar": "family/grandpa_name_ar.mp3"
@@ -48,7 +48,7 @@
     {
       "item_key": "brother",
       "name": { "en": "Brother", "ar": "أخ" },
-      "image": "family/brother.webp",
+      "image": "family/brother.svg",
       "name_audio": {
         "en": "family/brother_name_en.mp3",
         "ar": "family/brother_name_ar.mp3"
@@ -58,7 +58,7 @@
     {
       "item_key": "sister",
       "name": { "en": "Sister", "ar": "أخت" },
-      "image": "family/sister.webp",
+      "image": "family/sister.svg",
       "name_audio": {
         "en": "family/sister_name_en.mp3",
         "ar": "family/sister_name_ar.mp3"
@@ -68,7 +68,7 @@
     {
       "item_key": "baby",
       "name": { "en": "Baby", "ar": "بيبي" },
-      "image": "family/baby.webp",
+      "image": "family/baby.svg",
       "name_audio": {
         "en": "family/baby_name_en.mp3",
         "ar": "family/baby_name_ar.mp3"
@@ -78,7 +78,7 @@
     {
       "item_key": "uncle",
       "name": { "en": "Uncle", "ar": "عمّو" },
-      "image": "family/uncle.webp",
+      "image": "family/uncle.svg",
       "name_audio": {
         "en": "family/uncle_name_en.mp3",
         "ar": "family/uncle_name_ar.mp3"
@@ -88,7 +88,7 @@
     {
       "item_key": "aunt",
       "name": { "en": "Aunt", "ar": "خالتو" },
-      "image": "family/aunt.webp",
+      "image": "family/aunt.svg",
       "name_audio": {
         "en": "family/aunt_name_en.mp3",
         "ar": "family/aunt_name_ar.mp3"

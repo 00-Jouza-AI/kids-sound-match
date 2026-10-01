@@ -8,7 +8,7 @@
     {
       "item_key": "doorbell",
       "name": { "en": "Doorbell", "ar": "جرس الباب" },
-      "image": "home/doorbell.webp",
+      "image": "home/doorbell.svg",
       "sound": "home/doorbell_sound.mp3",
       "name_audio": {
         "en": "home/doorbell_name_en.mp3",
@@ -19,7 +19,7 @@
     {
       "item_key": "phone",
       "name": { "en": "Phone", "ar": "هاتف" },
-      "image": "home/phone.webp",
+      "image": "home/phone.svg",
       "sound": "home/phone_sound.mp3",
       "name_audio": {
         "en": "home/phone_name_en.mp3",
@@ -30,7 +30,7 @@
     {
       "item_key": "alarm_clock",
       "name": { "en": "Alarm clock", "ar": "منبّه" },
-      "image": "home/alarm_clock.webp",
+      "image": "home/alarm_clock.svg",
       "sound": "home/alarm_clock_sound.mp3",
       "name_audio": {
         "en": "home/alarm_clock_name_en.mp3",
@@ -41,7 +41,7 @@
     {
       "item_key": "clock",
       "name": { "en": "Clock", "ar": "ساعة" },
-      "image": "home/clock.webp",
+      "image": "home/clock.svg",
       "sound": "home/clock_sound.mp3",
       "name_audio": {
         "en": "home/clock_name_en.mp3",
@@ -52,7 +52,7 @@
     {
       "item_key": "tap",
       "name": { "en": "Tap", "ar": "حنفية" },
-      "image": "home/tap.webp",
+      "image": "home/tap.svg",
       "sound": "home/tap_sound.mp3",
       "name_audio": {
         "en": "home/tap_name_en.mp3",
@@ -63,7 +63,7 @@
     {
       "item_key": "shower",
       "name": { "en": "Shower", "ar": "دُش" },
-      "image": "home/shower.webp",
+      "image": "home/shower.svg",
       "sound": "home/shower_sound.mp3",
       "name_audio": {
         "en": "home/shower_name_en.mp3",
@@ -74,7 +74,7 @@
     {
       "item_key": "kettle",
       "name": { "en": "Kettle", "ar": "إبريق" },
-      "image": "home/kettle.webp",
+      "image": "home/kettle.svg",
       "sound": "home/kettle_sound.mp3",
       "name_audio": {
         "en": "home/kettle_name_en.mp3",
@@ -85,7 +85,7 @@
     {
       "item_key": "frying_pan",
       "name": { "en": "Frying pan", "ar": "مقلاة" },
-      "image": "home/frying_pan.webp",
+      "image": "home/frying_pan.svg",
       "sound": "home/frying_pan_sound.mp3",
       "name_audio": {
         "en": "home/frying_pan_name_en.mp3",
@@ -96,7 +96,7 @@
     {
       "item_key": "door",
       "name": { "en": "Door", "ar": "باب" },
-      "image": "home/door.webp",
+      "image": "home/door.svg",
       "sound": "home/door_sound.mp3",
       "name_audio": {
         "en": "home/door_name_en.mp3",
@@ -107,7 +107,7 @@
     {
       "item_key": "keys",
       "name": { "en": "Keys", "ar": "مفاتيح" },
-      "image": "home/keys.webp",
+      "image": "home/keys.svg",
       "sound": "home/keys_sound.mp3",
       "name_audio": {
         "en": "home/keys_name_en.mp3",
@@ -118,7 +118,7 @@
     {
       "item_key": "vacuum",
       "name": { "en": "Vacuum cleaner", "ar": "مكنسة كهربائية" },
-      "image": "home/vacuum.webp",
+      "image": "home/vacuum.svg",
       "sound": "home/vacuum_sound.mp3",
       "name_audio": {
         "en": "home/vacuum_name_en.mp3",
@@ -129,7 +129,7 @@
     {
       "item_key": "toothbrush",
       "name": { "en": "Toothbrush", "ar": "فرشاة أسنان" },
-      "image": "home/toothbrush.webp",
+      "image": "home/toothbrush.svg",
       "sound": "home/toothbrush_sound.mp3",
       "name_audio": {
         "en": "home/toothbrush_name_en.mp3",
@@ -140,7 +140,7 @@
     {
       "item_key": "scissors",
       "name": { "en": "Scissors", "ar": "مقص" },
-      "image": "home/scissors.webp",
+      "image": "home/scissors.svg",
       "sound": "home/scissors_sound.mp3",
       "name_audio": {
         "en": "home/scissors_name_en.mp3",
@@ -151,7 +151,7 @@
     {
       "item_key": "camera",
       "name": { "en": "Camera", "ar": "كاميرا" },
-      "image": "home/camera.webp",
+      "image": "home/camera.svg",
       "sound": "home/camera_sound.mp3",
       "name_audio": {
         "en": "home/camera_name_en.mp3",
@@ -162,7 +162,7 @@
     {
       "item_key": "hammer",
       "name": { "en": "Hammer", "ar": "مطرقة" },
-      "image": "home/hammer.webp",
+      "image": "home/hammer.svg",
       "sound": "home/hammer_sound.mp3",
       "name_audio": {
         "en": "home/hammer_name_en.mp3",

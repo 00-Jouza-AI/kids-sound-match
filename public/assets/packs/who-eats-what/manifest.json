@@ -15,7 +15,7 @@
     {
       "item_key": "carrot",
       "name": { "en": "Carrot", "ar": "جزرة" },
-      "image": "food/carrot.webp",
+      "image": "food/carrot.svg",
       "name_audio": {
         "en": "food/carrot_name_en.mp3",
         "ar": "food/carrot_name_ar.mp3"
@@ -26,7 +26,7 @@
     {
       "item_key": "banana",
       "name": { "en": "Banana", "ar": "موزة" },
-      "image": "food/banana.webp",
+      "image": "food/banana.svg",
       "name_audio": {
         "en": "food/banana_name_en.mp3",
         "ar": "food/banana_name_ar.mp3"
@@ -37,7 +37,7 @@
     {
       "item_key": "cheese",
       "name": { "en": "Cheese", "ar": "جبنة" },
-      "image": "food/cheese.webp",
+      "image": "food/cheese.svg",
       "name_audio": {
         "en": "food/cheese_name_en.mp3",
         "ar": "food/cheese_name_ar.mp3"
@@ -48,7 +48,7 @@
     {
       "item_key": "milk",
       "name": { "en": "Milk", "ar": "حليب" },
-      "image": "food/milk.webp",
+      "image": "food/milk.svg",
       "name_audio": {
         "en": "food/milk_name_en.mp3",
         "ar": "food/milk_name_ar.mp3"
@@ -59,7 +59,7 @@
     {
       "item_key": "honey",
       "name": { "en": "Honey", "ar": "عسل" },
-      "image": "food/honey.webp",
+      "image": "food/honey.svg",
       "name_audio": {
         "en": "food/honey_name_en.mp3",
         "ar": "food/honey_name_ar.mp3"
@@ -70,7 +70,7 @@
     {
       "item_key": "apple",
       "name": { "en": "Apple", "ar": "تفاحة" },
-      "image": "food/apple.webp",
+      "image": "food/apple.svg",
       "name_audio": {
         "en": "food/apple_name_en.mp3",
         "ar": "food/apple_name_ar.mp3"
@@ -81,7 +81,7 @@
     {
       "item_key": "fish",
       "name": { "en": "Fish", "ar": "سمكة" },
-      "image": "animals/fish.webp",
+      "image": "animals/fish.svg",
       "name_audio": {
         "en": "animals/fish_name_en.mp3",
         "ar": "animals/fish_name_ar.mp3"
@@ -92,7 +92,7 @@
     {
       "item_key": "grass",
       "name": { "en": "Grass", "ar": "عشب" },
-      "image": "who-eats-what/grass.webp",
+      "image": "who-eats-what/grass.svg",
       "name_audio": {
         "en": "who-eats-what/grass_name_en.mp3",
         "ar": "who-eats-what/grass_name_ar.mp3"
@@ -103,7 +103,7 @@
     {
       "item_key": "bone",
       "name": { "en": "Bone", "ar": "عظمة" },
-      "image": "who-eats-what/bone.webp",
+      "image": "who-eats-what/bone.svg",
       "name_audio": {
         "en": "who-eats-what/bone_name_en.mp3",
         "ar": "who-eats-what/bone_name_ar.mp3"
@@ -114,7 +114,7 @@
     {
       "item_key": "seeds",
       "name": { "en": "Seeds", "ar": "حبوب" },
-      "image": "who-eats-what/seeds.webp",
+      "image": "who-eats-what/seeds.svg",
       "name_audio": {
         "en": "who-eats-what/seeds_name_en.mp3",
         "ar": "who-eats-what/seeds_name_ar.mp3"
@@ -125,7 +125,7 @@
     {
       "item_key": "bamboo",
       "name": { "en": "Bamboo", "ar": "خيزران" },
-      "image": "who-eats-what/bamboo.webp",
+      "image": "who-eats-what/bamboo.svg",
       "name_audio": {
         "en": "who-eats-what/bamboo_name_en.mp3",
         "ar": "who-eats-what/bamboo_name_ar.mp3"
@@ -136,7 +136,7 @@
     {
       "item_key": "leaves",
       "name": { "en": "Leaves", "ar": "أوراق الشجر" },
-      "image": "who-eats-what/leaves.webp",
+      "image": "who-eats-what/leaves.svg",
       "name_audio": {
         "en": "who-eats-what/leaves_name_en.mp3",
         "ar": "who-eats-what/leaves_name_ar.mp3"
@@ -147,7 +147,7 @@
     {
       "item_key": "flower",
       "name": { "en": "Flower", "ar": "زهرة" },
-      "image": "who-eats-what/flower.webp",
+      "image": "who-eats-what/flower.svg",
       "name_audio": {
         "en": "who-eats-what/flower_name_en.mp3",
         "ar": "who-eats-what/flower_name_ar.mp3"
@@ -158,7 +158,7 @@
     {
       "item_key": "meat",
       "name": { "en": "Meat", "ar": "لحم" },
-      "image": "who-eats-what/meat.webp",
+      "image": "who-eats-what/meat.svg",
       "name_audio": {
         "en": "who-eats-what/meat_name_en.mp3",
         "ar": "who-eats-what/meat_name_ar.mp3"
@@ -169,7 +169,7 @@
     {
       "item_key": "lettuce",
       "name": { "en": "Lettuce", "ar": "خس" },
-      "image": "who-eats-what/lettuce.webp",
+      "image": "who-eats-what/lettuce.svg",
       "name_audio": {
         "en": "who-eats-what/lettuce_name_en.mp3",
         "ar": "who-eats-what/lettuce_name_ar.mp3"

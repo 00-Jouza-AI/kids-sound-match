@@ -27,7 +27,9 @@ export function applyOverrides(
     const photo = i.picturePath ? overrides.get(i.picturePath) : undefined;
     return {
       ...i,
-      images: photo ? [{ path: i.picturePath!, url: urlFor(photo), real: true }] : i.images,
+      // The parent's photo; the drawings are kept for screens where not every picture is a photo.
+      images: photo ? [{ path: i.picturePath!, url: urlFor(photo), real: true, photo: true }] : i.images,
+      ...(photo ? { drawings: i.images.filter((a) => a.real) } : {}),
       sound: swap(i.sound),
       nameAudio: { ar: swap(i.nameAudio.ar), en: swap(i.nameAudio.en) },
       ...(i.prompts ? { prompts: i.prompts.map(item) } : {}),

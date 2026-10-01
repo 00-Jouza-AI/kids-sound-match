@@ -8,7 +8,7 @@
     {
       "item_key": "drum",
       "name": { "en": "Drum", "ar": "طبل" },
-      "image": "instruments/drum.webp",
+      "image": "instruments/drum.svg",
       "sound": "instruments/drum_sound.mp3",
       "name_audio": {
         "en": "instruments/drum_name_en.mp3",
@@ -19,7 +19,7 @@
     {
       "item_key": "darbuka",
       "name": { "en": "Darbuka", "ar": "دربكة" },
-      "image": "instruments/darbuka.webp",
+      "image": "instruments/darbuka.svg",
       "sound": "instruments/darbuka_sound.mp3",
       "name_audio": {
         "en": "instruments/darbuka_name_en.mp3",
@@ -30,7 +30,7 @@
     {
       "item_key": "oud",
       "name": { "en": "Oud", "ar": "عود" },
-      "image": "instruments/oud.webp",
+      "image": "instruments/oud.svg",
       "sound": "instruments/oud_sound.mp3",
       "name_audio": {
         "en": "instruments/oud_name_en.mp3",
@@ -41,7 +41,7 @@
     {
       "item_key": "piano",
       "name": { "en": "Piano", "ar": "بيانو" },
-      "image": "instruments/piano.webp",
+      "image": "instruments/piano.svg",
       "sound": "instruments/piano_sound.mp3",
       "name_audio": {
         "en": "instruments/piano_name_en.mp3",
@@ -52,7 +52,7 @@
     {
       "item_key": "guitar",
       "name": { "en": "Guitar", "ar": "غيتار" },
-      "image": "instruments/guitar.webp",
+      "image": "instruments/guitar.svg",
       "sound": "instruments/guitar_sound.mp3",
       "name_audio": {
         "en": "instruments/guitar_name_en.mp3",
@@ -63,7 +63,7 @@
     {
       "item_key": "trumpet",
       "name": { "en": "Trumpet", "ar": "بوق" },
-      "image": "instruments/trumpet.webp",
+      "image": "instruments/trumpet.svg",
       "sound": "instruments/trumpet_sound.mp3",
       "name_audio": {
         "en": "instruments/trumpet_name_en.mp3",
@@ -74,7 +74,7 @@
     {
       "item_key": "violin",
       "name": { "en": "Violin", "ar": "كمان" },
-      "image": "instruments/violin.webp",
+      "image": "instruments/violin.svg",
       "sound": "instruments/violin_sound.mp3",
       "name_audio": {
         "en": "instruments/violin_name_en.mp3",
@@ -85,7 +85,7 @@
     {
       "item_key": "nay",
       "name": { "en": "Nay flute", "ar": "ناي" },
-      "image": "instruments/nay.webp",
+      "image": "instruments/nay.svg",
       "sound": "instruments/nay_sound.mp3",
       "name_audio": {
         "en": "instruments/nay_name_en.mp3",
@@ -96,7 +96,7 @@
     {
       "item_key": "bell",
       "name": { "en": "Bell", "ar": "جرس" },
-      "image": "instruments/bell.webp",
+      "image": "instruments/bell.svg",
       "sound": "instruments/bell_sound.mp3",
       "name_audio": {
         "en": "instruments/bell_name_en.mp3",
@@ -107,7 +107,7 @@
     {
       "item_key": "saxophone",
       "name": { "en": "Saxophone", "ar": "ساكسفون" },
-      "image": "instruments/saxophone.webp",
+      "image": "instruments/saxophone.svg",
       "sound": "instruments/saxophone_sound.mp3",
       "name_audio": {
         "en": "instruments/saxophone_name_en.mp3",
@@ -118,7 +118,7 @@
     {
       "item_key": "accordion",
       "name": { "en": "Accordion", "ar": "أكورديون" },
-      "image": "instruments/accordion.webp",
+      "image": "instruments/accordion.svg",
       "sound": "instruments/accordion_sound.mp3",
       "name_audio": {
         "en": "instruments/accordion_name_en.mp3",

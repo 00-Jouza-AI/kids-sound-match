@@ -9,7 +9,7 @@
     {
       "item_key": "happy",
       "name": { "en": "Happy", "ar": "سعيد" },
-      "image": "feelings/happy.webp",
+      "image": "feelings/happy.svg",
       "sound": "feelings/happy_sound.mp3",
       "name_audio": {
         "en": "feelings/happy_name_en.mp3",
@@ -20,7 +20,7 @@
     {
       "item_key": "sad",
       "name": { "en": "Sad", "ar": "حزين" },
-      "image": "feelings/sad.webp",
+      "image": "feelings/sad.svg",
       "sound": "feelings/sad_sound.mp3",
       "name_audio": {
         "en": "feelings/sad_name_en.mp3",
@@ -31,7 +31,7 @@
     {
       "item_key": "angry",
       "name": { "en": "Angry", "ar": "غاضب" },
-      "image": "feelings/angry.webp",
+      "image": "feelings/angry.svg",
       "sound": "feelings/angry_sound.mp3",
       "name_audio": {
         "en": "feelings/angry_name_en.mp3",
@@ -42,7 +42,7 @@
     {
       "item_key": "scared",
       "name": { "en": "Scared", "ar": "خائف" },
-      "image": "feelings/scared.webp",
+      "image": "feelings/scared.svg",
       "sound": "feelings/scared_sound.mp3",
       "name_audio": {
         "en": "feelings/scared_name_en.mp3",
@@ -53,7 +53,7 @@
     {
       "item_key": "sleepy",
       "name": { "en": "Sleepy", "ar": "نعسان" },
-      "image": "feelings/sleepy.webp",
+      "image": "feelings/sleepy.svg",
       "sound": "feelings/sleepy_sound.mp3",
       "name_audio": {
         "en": "feelings/sleepy_name_en.mp3",
@@ -64,7 +64,7 @@
     {
       "item_key": "surprised",
       "name": { "en": "Surprised", "ar": "متفاجئ" },
-      "image": "feelings/surprised.webp",
+      "image": "feelings/surprised.svg",
       "sound": "feelings/surprised_sound.mp3",
       "name_audio": {
         "en": "feelings/surprised_name_en.mp3",

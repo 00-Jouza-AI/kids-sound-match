@@ -36,7 +36,6 @@ in the top corner for 3 seconds, then enter the PIN.
 | `npm run build:test` | A hostable test build that keeps the placeholders |
 | `npm run preview` | Serve the last build locally |
 | `npm run placeholders` | Regenerate development placeholders |
-| `npm run photos -- "<folder>"` | Shrink photos and add them to the animals (see below) |
 | `npm run deploy:login` / `deploy:setup` / `deploy` | Put the test build online with Cloudflare Pages (see below) |
 
 ## Adding the real content
@@ -44,9 +43,13 @@ in the top corner for 3 seconds, then enter the PIN.
 Drop files into `public/assets/` using the names in the manifest; a real file always replaces its
 placeholder, no code changes needed.
 
-- Pictures: `public/assets/packs/animals/cat.webp` (any of webp/png/jpg works if the manifest says so)
-- Several pictures of one animal: use `"images": ["animals/cat_1.webp", "animals/cat_2.webp"]` in
-  the manifest; one is picked at random each time
+- Pictures: every built-in picture is a real drawing now: Microsoft Fluent Emoji (MIT licence, see
+  `public/assets/licenses/`), plus colours, shapes, counting, dates, beehive, vacuum cleaner and oud
+  drawn for this app. To change one, replace `public/assets/packs/animals/cat.svg` (any of
+  svg/webp/png/jpg works if the manifest says so)
+- Several pictures of one item: use `"images": ["counting/count_3_dots.svg", ...]` in the manifest;
+  one is picked at random each time (all items in a question use the same one when they have the same
+  number, as in Counting)
 - Sounds: `public/assets/packs/animals/cat_sound.mp3`, names `cat_name_ar.mp3` / `cat_name_en.mp3`
 - Praise and end-of-game clips: `public/assets/feedback/correct_ar_1.mp3` etc.
 - A new pack: `public/assets/packs/<id>/manifest.json` plus its files. It's discovered automatically;
@@ -68,18 +71,6 @@ comes up. **P** plays, **R** records again, **← →** move between clips. Soun
 instead. Recordings are WAV (`cat_name_ar.wav` stands in for `cat_name_ar.mp3`; the app accepts both).
 Anything a recording replaces is moved to `dev-assets/replaced`, never deleted. Reload the app to hear
 the new clips. The studio only exists on the development server and only accepts this computer.
-
-### Photos
-
-```bash
-npm run photos -- "G:/path/to/photos"
-```
-
-Name the files after the animal (`cat-1.jpg`, `Cat 2.jpeg`, `duck_3.png`). The helper shrinks each
-photo to 720 px (1–15 MB becomes ~50–100 KB), fixes phone rotation, saves it in
-`public/assets/packs/animals/photos/`, and lists it under that animal's `"images"` in the manifest.
-Running it again replaces that animal's photos; files that aren't an animal are skipped. A question
-only shows photos when every picture in it has one, so photos and emoji never share a screen.
 
 ## My packs (your own pictures and voice)
 

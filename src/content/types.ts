@@ -90,6 +90,8 @@ export interface ResolvedAsset {
   readonly path: string;
   readonly url: string;
   readonly real: boolean;
+  /** A photo (a parent's own, or a photo in a My packs item), as opposed to a drawing. */
+  readonly photo?: boolean;
 }
 
 export interface LoadedItem {
@@ -112,6 +114,8 @@ export interface LoadedItem {
   readonly prompts?: readonly LoadedItem[];
   /** Arabic grammatical gender, for "ماذا يأكل؟" / "ماذا تأكل؟". */
   readonly arFeminine?: boolean;
+  /** The pack's own drawings, kept when a parent's photo replaces them (see choosePictures). */
+  readonly drawings?: readonly ResolvedAsset[];
 }
 
 export interface LoadedFeedback {

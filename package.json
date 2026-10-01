@@ -11,7 +11,6 @@
     "test": "node tools/generate-placeholders.mjs && vitest run",
     "typecheck": "tsc -b",
     "placeholders": "node tools/generate-placeholders.mjs",
-    "photos": "node tools/add-photos.mjs",
     "deploy:login": "npx --yes wrangler@4 login",
     "deploy:setup": "npx --yes wrangler@4 pages project create kids-sound-match --production-branch main",
     "deploy": "npm run build:test && npx --yes wrangler@4 pages deploy dist --project-name kids-sound-match --branch main --commit-dirty=true"

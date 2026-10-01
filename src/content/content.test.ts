@@ -126,24 +126,23 @@ describe('loader', () => {
     expect(animals.items).toHaveLength(54);
     const cat = animals.items.find((i) => i.key === 'cat')!;
     expect(cat.sound).toEqual({ path: 'packs/animals/cat_sound.mp3', url: '/assets/packs/animals/cat_sound.mp3', real: true });
-    // Real photos replace the emoji, which is kept only as the stand-in for mixed questions.
-    expect(cat.images).toHaveLength(15);
-    expect(cat.images.every((a) => a.real)).toBe(true);
-    expect(cat.images[0].url).toBe('/assets/packs/animals/photos/cat_1.jpg');
-    expect(cat.placeholderImage?.url).toBe('/placeholders/packs/animals/photos/cat_1.svg');
+    // Every picture is a real drawing now; the voice is still a stand-in.
+    expect(cat.images).toEqual([{ path: 'packs/animals/cat.svg', url: '/assets/packs/animals/cat.svg', real: true }]);
     expect(cat.nameAudio.ar.real).toBe(false);
     const cow = animals.items.find((i) => i.key === 'cow')!;
-    expect(cow.images.map((a) => a.url)).toEqual(['/placeholders/packs/animals/cow.svg']);
+    expect(cow.images[0].real).toBe(true);
     expect(cow.sound?.url).toBe('/placeholders/packs/animals/cow_sound.wav');
     expect(animals.feedback.incorrectTone?.url).toBe('/placeholders/feedback/incorrect_tone.wav');
     expect(animals.groups.map((g) => g.id)).toEqual(['first', 'farm', 'wild', 'birds', 'sea', 'bugs']);
   });
 
   it('drops an animal whose placeholder picture the device cannot draw', async () => {
+    // Only matters while a picture is still a placeholder: take the donkey's drawing away.
+    const withoutDonkey = { ...index, files: index.files.filter((f) => f !== 'packs/animals/donkey.svg') };
     const content = await loadContent({
       baseUrl: '/',
       allowPlaceholders: true,
-      fetchJson,
+      fetchJson: async (url) => (url.endsWith('packs/index.json') ? withoutDonkey : fetchJson(url)),
       placeholderPictureUsable: (key) => key !== 'donkey',
     });
     const keys = content.packs[0].items.map((i) => i.key);
@@ -167,8 +166,14 @@ describe('all packs', () => {
     if (url.endsWith('packs/index.json')) return index;
     return JSON.parse(fs.readFileSync(path.join(ASSETS, url.replace(/^\.?\/assets\//, '')), 'utf8'));
   };
-  const load = (usable?: (key: string) => boolean) =>
-    loadContent({ baseUrl: '/', allowPlaceholders: true, fetchJson: fetchAll, placeholderPictureUsable: usable });
+  const load = (usable?: (key: string) => boolean, missing: string[] = []) =>
+    loadContent({
+      baseUrl: '/',
+      allowPlaceholders: true,
+      fetchJson: async (url) =>
+        url.endsWith('packs/index.json') ? { ...index, files: index.files.filter((f) => !missing.includes(f)) } : fetchAll(url),
+      placeholderPictureUsable: usable,
+    });
 
   it('are all valid in development', () => {
     for (const id of packIds) {
@@ -210,7 +215,8 @@ describe('all packs', () => {
   });
 
   it('leave out a food when none of its animals can be shown', async () => {
-    const content = await load((key) => !['rabbit', 'donkey', 'horse'].includes(key));
+    const gone = ['rabbit', 'donkey', 'horse'];
+    const content = await load((key) => !gone.includes(key), gone.map((k) => `packs/animals/${k}.svg`));
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
     expect(whoEats.items.find((i) => i.key === 'carrot')).toBeUndefined();
     expect(whoEats.items.find((i) => i.key === 'apple')).toBeUndefined();

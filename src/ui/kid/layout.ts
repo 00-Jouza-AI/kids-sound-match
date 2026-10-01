@@ -51,18 +51,17 @@ export function fitSquares(box: { w: number; h: number }, rows: readonly (readon
  * clue instead of the sound. Shows photos only when every animal shown has one.
  */
 export function choosePictures(items: readonly LoadedItem[], random: () => number = Math.random): Record<string, string> {
-  const real = items.map((i) => i.images.filter((a) => a.real));
-  const allPhotos = real.every((r) => r.length > 0);
+  // One kind of picture per screen: photos if every item has one, else drawings if every item has
+  // one, else the development placeholders. A parent's photo of Grandma next to drawings would
+  // become the clue instead of the word.
+  const photos = items.map((i) => i.images.filter((a) => a.photo));
+  const drawings = items.map((i) => [...i.images.filter((a) => a.real && !a.photo), ...(i.drawings ?? [])]);
+  const tier = photos.every((p) => p.length) ? photos : drawings.every((d) => d.length) ? drawings : null;
   const pickFrom = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)];
+  if (!tier) return Object.fromEntries(items.map((i) => [i.key, (i.placeholderImage ?? pickFrom(i.images)).url]));
   // Pictures drawn as a series (Counting: dots, apples, stars...) use the same one across the
   // question, so "3" and "5" are both apples.
-  const series = allPhotos && real[0].length > 1 && real.every((r) => r.length === real[0].length);
-  const index = series ? Math.floor(random() * real[0].length) : 0;
-  return Object.fromEntries(
-    items.map((i, k) => {
-      if (series) return [i.key, real[k][index].url];
-      if (allPhotos) return [i.key, pickFrom(real[k]).url];
-      return [i.key, (i.placeholderImage ?? pickFrom(i.images)).url];
-    }),
-  );
+  const series = tier[0].length > 1 && tier.every((t) => t.length === tier[0].length);
+  const index = series ? Math.floor(random() * tier[0].length) : 0;
+  return Object.fromEntries(items.map((i, k) => [i.key, (series ? tier[k][index] : pickFrom(tier[k])).url]));
 }
