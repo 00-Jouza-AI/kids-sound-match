@@ -56,3 +56,39 @@ export function OddIcon() {
     </svg>
   );
 }
+
+/** A blanket with a pair of eyes peeking out. */
+export function PeekabooIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 9.5Q12 6.5 21 9.5V19q-2.2 1.6-4.5 0-2.2 1.6-4.5 0-2.2 1.6-4.5 0-2.2 1.6-4.5 0z" fill="currentColor" opacity="0.35" />
+      <circle cx="9" cy="6" r="2.1" fill="currentColor" />
+      <circle cx="15" cy="6" r="2.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** A little house with a sun: a scene to look around. */
+export function SceneIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12.5L10 6l7 6.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
+      <path d="M5 11.5V20h10v-8.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinejoin="round" />
+      <circle cx="19.5" cy="5" r="2.4" fill="currentColor" opacity="0.5" />
+      <path d="M2 20.5h20" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** A face with a finger pointing at its nose. */
+export function PointIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="10" cy="11" r="7.5" fill="none" stroke="currentColor" strokeWidth="2" />
+      <circle cx="7.5" cy="9.5" r="1.1" fill="currentColor" />
+      <circle cx="12.5" cy="9.5" r="1.1" fill="currentColor" />
+      <path d="M10 10.5v3h1.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M22 21l-6.5-6.5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+    </svg>
+  );
+}

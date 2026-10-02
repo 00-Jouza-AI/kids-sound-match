@@ -1,4 +1,4 @@
-import type { LoadedAssociation, LoadedFeedback, LoadedItem, LoadedPack, ResolvedAsset } from '../content/types';
+import type { LoadedAssociation, LoadedFeedback, LoadedItem, LoadedPack, PointLine, PointVoice, ResolvedAsset } from '../content/types';
 import type { CustomStore } from './store';
 import { blobUrl } from './toLoaded';
 import type { AssetOverride } from './types';
@@ -33,13 +33,19 @@ export function applyOverrides(
       sound: swap(i.sound),
       nameAudio: { ar: swap(i.nameAudio.ar), en: swap(i.nameAudio.en) },
       ...(i.prompts ? { prompts: i.prompts.map(item) } : {}),
+      ...(i.point ? { point: point(i.point) } : {}),
     };
   };
+  const point = (lines: NonNullable<LoadedItem['point']>) =>
+    Object.fromEntries(
+      Object.entries(lines).map(([voice, line]) => [voice, { ...line, audio: swap(line.audio) }]),
+    ) as Partial<Record<PointVoice, PointLine>>;
   const feedback = (fb: LoadedFeedback): LoadedFeedback => ({
     correct: { ar: fb.correct.ar.map(swap), en: fb.correct.en.map(swap) },
     incorrectTone: fb.incorrectTone,
     sessionEnd: { ar: swap(fb.sessionEnd.ar), en: swap(fb.sessionEnd.en) },
     ...(fb.oddQuestion ? { oddQuestion: { ar: swap(fb.oddQuestion.ar), en: swap(fb.oddQuestion.en) } } : {}),
+    ...(fb.peekaboo ? { peekaboo: { ar: swap(fb.peekaboo.ar), en: swap(fb.peekaboo.en) } } : {}),
   });
   const association = (a: LoadedAssociation): LoadedAssociation => ({
     ...a,

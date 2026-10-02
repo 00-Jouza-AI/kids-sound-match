@@ -17,8 +17,11 @@ export interface StudioClip {
 
 export const LINES = 'lines';
 
-/** Every clip, each file once (the carrot's name is shared by Food and Who eats what?). */
-export function studioClips(packs: readonly LoadedPack[]): StudioClip[] {
+/**
+ * Every clip, each file once (the carrot's name is shared by Food and Who eats what?). The boys'
+ * Arabic "Where's your…?" lines (أين أنفُكَ؟) are only listed when a child is a boy.
+ */
+export function studioClips(packs: readonly LoadedPack[], { boys = false }: { boys?: boolean } = {}): StudioClip[] {
   const seen = new Set<string>();
   const out: StudioClip[] = [];
   const add = (asset: ResolvedAsset | null, clip: Omit<StudioClip, 'path' | 'real'>) => {
@@ -32,6 +35,14 @@ export function studioClips(packs: readonly LoadedPack[]): StudioClip[] {
       add(i.nameAudio.en, { packId: p.id, kind: 'en', say: i.name.en, item: i });
       add(i.sound, { packId: p.id, kind: 'sound', say: i.name.en, item: i });
     }
+    // "Where's your nose?" (body parts), after the names.
+    for (const i of p.items) {
+      const point = i.point;
+      if (!point) continue;
+      if (point.ar_f) add(point.ar_f.audio, { packId: p.id, kind: 'ar', say: point.ar_f.text, item: i });
+      if (point.ar_m && boys) add(point.ar_m.audio, { packId: p.id, kind: 'ar', say: point.ar_m.text, item: i });
+      if (point.en) add(point.en.audio, { packId: p.id, kind: 'en', say: point.en.text, item: i });
+    }
   }
   const line = (asset: ResolvedAsset | null, kind: StudioClip['kind'], say?: string) =>
     add(asset, { packId: LINES, kind, say: say ?? (asset ? (FEEDBACK_SPEECH[asset.path] ?? asset.path) : '') });
@@ -43,6 +54,7 @@ export function studioClips(packs: readonly LoadedPack[]): StudioClip[] {
     }
     line(fb.incorrectTone, 'sound', 'Soft "try again" tone');
     if (fb.oddQuestion) for (const lang of ['ar', 'en'] as const) line(fb.oddQuestion[lang], lang);
+    if (fb.peekaboo) for (const lang of ['ar', 'en'] as const) line(fb.peekaboo[lang], lang);
   }
   for (const p of packs) {
     const a = p.association;

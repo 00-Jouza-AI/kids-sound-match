@@ -46,6 +46,19 @@ describe('child profiles', () => {
     expect(state.activeId).toBe('a');
   });
 
+  it('keeps girl or boy (for Arabic grammar) only when it is one of the two', () => {
+    const state = sanitizeProfiles({
+      profiles: [
+        { id: 'a', animal: '🐰', color: '#000', arGender: 'f' },
+        { id: 'b', animal: '🐻', color: '#111', arGender: 'x' },
+        { id: 'c', animal: '🐱', color: '#222' },
+      ],
+      activeId: 'a',
+    });
+    expect(state.profiles.map((p) => p.arGender)).toEqual(['f', undefined, undefined]);
+    expect('arGender' in state.profiles[1]).toBe(false);
+  });
+
   it('gives a new child an animal and colour nobody has yet', () => {
     const first = sanitizeProfiles(null).profiles;
     const second = newProfile(first);

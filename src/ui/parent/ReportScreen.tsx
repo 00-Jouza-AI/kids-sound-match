@@ -22,10 +22,13 @@ export function ReportScreen({
   packs,
   profiles,
   onBack,
+  onWords,
 }: {
   packs: readonly LoadedPack[];
   profiles: ProfileState;
   onBack: () => void;
+  /** Opens Words I know. */
+  onWords?: () => void;
 }) {
   const { t, lang } = useI18n();
   const [data, setData] = useState<{ sessions: SessionEntity[]; questions: QuestionResultEntity[] } | null>(null);
@@ -84,6 +87,12 @@ export function ReportScreen({
           : id);
   /** What a game was: the pack, or Memory / Odd one out with how it went. */
   const gameLine = (g: SessionEntity, pct: number | null) => {
+    if (g.game === 'peekaboo') return `${t('peekaboo')} · ${packName(g.packId)} · ${t('peekabooRow', { n: g.questionCount })}`;
+    if (g.game === 'point') return `${t('pointGame')} · ${t('pointRow', { n: g.questionCount })}`;
+    if (g.game === 'scene') {
+      const where = g.variant === 'house' ? t('sceneHouse') : t('sceneFarm');
+      return `${t('sceneGame')} · ${where} · ${t('gameQuestions', { n: g.questionCount })} · ${pct === null ? '—' : t('gameFirstTry', { p: pct })}`;
+    }
     if (g.game === 'memory') {
       return `${t('memoryGame')} · ${packName(g.packId)} · ${t('memoryRow', { n: g.variant ?? g.questionCount, turns: g.turns ?? 0 })}`;
     }
@@ -225,6 +234,18 @@ export function ReportScreen({
             })}
           </ul>
         </section>
+      )}
+
+      {onWords && (
+        <button type="button" className="card pack-card" onClick={onWords}>
+          <span className="link-icon big" aria-hidden="true">
+            🗣️
+          </span>
+          <span className="pack-text">
+            <strong>{t('wordsTitle')}</strong>
+            <span className="hint">{t('wordsReportHint')}</span>
+          </span>
+        </button>
       )}
 
       {!empty && mine && (

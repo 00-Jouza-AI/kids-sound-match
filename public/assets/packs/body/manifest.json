@@ -13,7 +13,12 @@
         "en": "body/eye_name_en.mp3",
         "ar": "body/eye_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": [],
+      "point": {
+        "en": { "text": "Where are your eyes?", "audio": "body/eye_point_en.mp3" },
+        "ar_f": { "text": "أين عيناكِ؟", "audio": "body/eye_point_ar_f.mp3" },
+        "ar_m": { "text": "أين عيناكَ؟", "audio": "body/eye_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "nose",
@@ -23,7 +28,12 @@
         "en": "body/nose_name_en.mp3",
         "ar": "body/nose_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": [],
+      "point": {
+        "en": { "text": "Where's your nose?", "audio": "body/nose_point_en.mp3" },
+        "ar_f": { "text": "أين أنفُكِ؟", "audio": "body/nose_point_ar_f.mp3" },
+        "ar_m": { "text": "أين أنفُكَ؟", "audio": "body/nose_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "mouth",
@@ -33,7 +43,12 @@
         "en": "body/mouth_name_en.mp3",
         "ar": "body/mouth_name_ar.mp3"
       },
-      "confusable_with": ["tongue", "teeth"]
+      "confusable_with": ["tongue", "teeth"],
+      "point": {
+        "en": { "text": "Where's your mouth?", "audio": "body/mouth_point_en.mp3" },
+        "ar_f": { "text": "أين فمُكِ؟", "audio": "body/mouth_point_ar_f.mp3" },
+        "ar_m": { "text": "أين فمُكَ؟", "audio": "body/mouth_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "ear",
@@ -43,7 +58,12 @@
         "en": "body/ear_name_en.mp3",
         "ar": "body/ear_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": [],
+      "point": {
+        "en": { "text": "Where are your ears?", "audio": "body/ear_point_en.mp3" },
+        "ar_f": { "text": "أين أُذُناكِ؟", "audio": "body/ear_point_ar_f.mp3" },
+        "ar_m": { "text": "أين أُذُناكَ؟", "audio": "body/ear_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "hand",
@@ -53,7 +73,12 @@
         "en": "body/hand_name_en.mp3",
         "ar": "body/hand_name_ar.mp3"
       },
-      "confusable_with": ["finger", "arm"]
+      "confusable_with": ["finger", "arm"],
+      "point": {
+        "en": { "text": "Where are your hands?", "audio": "body/hand_point_en.mp3" },
+        "ar_f": { "text": "أين يداكِ؟", "audio": "body/hand_point_ar_f.mp3" },
+        "ar_m": { "text": "أين يداكَ؟", "audio": "body/hand_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "finger",
@@ -63,7 +88,12 @@
         "en": "body/finger_name_en.mp3",
         "ar": "body/finger_name_ar.mp3"
       },
-      "confusable_with": ["hand"]
+      "confusable_with": ["hand"],
+      "point": {
+        "en": { "text": "Where's your finger?", "audio": "body/finger_point_en.mp3" },
+        "ar_f": { "text": "أين إصبعُكِ؟", "audio": "body/finger_point_ar_f.mp3" },
+        "ar_m": { "text": "أين إصبعُكَ؟", "audio": "body/finger_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "arm",
@@ -73,7 +103,12 @@
         "en": "body/arm_name_en.mp3",
         "ar": "body/arm_name_ar.mp3"
       },
-      "confusable_with": ["hand"]
+      "confusable_with": ["hand"],
+      "point": {
+        "en": { "text": "Where's your arm?", "audio": "body/arm_point_en.mp3" },
+        "ar_f": { "text": "أين ذراعُكِ؟", "audio": "body/arm_point_ar_f.mp3" },
+        "ar_m": { "text": "أين ذراعُكَ؟", "audio": "body/arm_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "foot",
@@ -83,7 +118,12 @@
         "en": "body/foot_name_en.mp3",
         "ar": "body/foot_name_ar.mp3"
       },
-      "confusable_with": ["leg"]
+      "confusable_with": ["leg"],
+      "point": {
+        "en": { "text": "Where are your feet?", "audio": "body/foot_point_en.mp3" },
+        "ar_f": { "text": "أين قدماكِ؟", "audio": "body/foot_point_ar_f.mp3" },
+        "ar_m": { "text": "أين قدماكَ؟", "audio": "body/foot_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "leg",
@@ -93,7 +133,12 @@
         "en": "body/leg_name_en.mp3",
         "ar": "body/leg_name_ar.mp3"
       },
-      "confusable_with": ["foot"]
+      "confusable_with": ["foot"],
+      "point": {
+        "en": { "text": "Where's your leg?", "audio": "body/leg_point_en.mp3" },
+        "ar_f": { "text": "أين رِجلُكِ؟", "audio": "body/leg_point_ar_f.mp3" },
+        "ar_m": { "text": "أين رِجلُكَ؟", "audio": "body/leg_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "teeth",
@@ -103,7 +148,12 @@
         "en": "body/teeth_name_en.mp3",
         "ar": "body/teeth_name_ar.mp3"
       },
-      "confusable_with": ["mouth"]
+      "confusable_with": ["mouth"],
+      "point": {
+        "en": { "text": "Where are your teeth?", "audio": "body/teeth_point_en.mp3" },
+        "ar_f": { "text": "أين أسنانُكِ؟", "audio": "body/teeth_point_ar_f.mp3" },
+        "ar_m": { "text": "أين أسنانُكَ؟", "audio": "body/teeth_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "tongue",
@@ -113,7 +163,12 @@
         "en": "body/tongue_name_en.mp3",
         "ar": "body/tongue_name_ar.mp3"
       },
-      "confusable_with": ["mouth"]
+      "confusable_with": ["mouth"],
+      "point": {
+        "en": { "text": "Where's your tongue?", "audio": "body/tongue_point_en.mp3" },
+        "ar_f": { "text": "أين لسانُكِ؟", "audio": "body/tongue_point_ar_f.mp3" },
+        "ar_m": { "text": "أين لسانُكَ؟", "audio": "body/tongue_point_ar_m.mp3" }
+      }
     },
     {
       "item_key": "face",

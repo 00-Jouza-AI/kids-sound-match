@@ -1,4 +1,4 @@
-import type { Lang, LoadedItem, LoadedPack, ResolvedAsset } from '../content/types';
+import type { ArGender, Lang, LoadedItem, LoadedPack, ResolvedAsset } from '../content/types';
 import { speechAvailable } from './speech';
 
 export type ClipCategory = 'sound' | 'name' | 'feedback';
@@ -39,7 +39,13 @@ export const FEEDBACK_SPEECH: Record<string, string> = {
   // Odd one out
   'feedback/odd_question_ar.mp3': 'أين المختلف؟',
   'feedback/odd_question_en.mp3': 'Which one is different?',
+  // Peekaboo, as the blanket comes off
+  'feedback/peekaboo_ar.mp3': 'بَخ!',
+  'feedback/peekaboo_en.mp3': 'Peekaboo!',
 };
+
+/** Peekaboo's "بَخ!" lines, which live with the shared game lines (the Animals pack). */
+export type PeekabooLines = Readonly<Record<Lang, ResolvedAsset | null>>;
 
 /**
  * Picks what to play for each moment: a real recording, else (development only) the device
@@ -89,6 +95,28 @@ export class ClipResolver {
     return this.languages.flatMap((lang) => {
       const asset = lines[lang];
       return asset ? [this.voiced(asset, FEEDBACK_SPEECH[asset.path], lang, 'feedback', `odd:${lang}`)] : [];
+    });
+  }
+
+  /** Peekaboo: "بَخ!" / "Peekaboo!" in each spoken language. */
+  peekaboo(lines: PeekabooLines | undefined = this.pack.feedback.peekaboo): Clip[] {
+    if (!lines) return [];
+    return this.languages.flatMap((lang) => {
+      const asset = lines[lang];
+      return asset ? [this.voiced(asset, FEEDBACK_SPEECH[asset.path], lang, 'feedback', `peekaboo:${lang}`)] : [];
+    });
+  }
+
+  /**
+   * "Where's your nose?" in each spoken language; the Arabic follows the child (أين أنفُكِ؟ for a
+   * girl, أين أنفُكَ؟ for a boy). A language without a line is left out.
+   */
+  pointQuestion(item: LoadedItem, gender: ArGender): Clip[] {
+    const lines = item.point;
+    if (!lines) return [];
+    return this.languages.flatMap((lang) => {
+      const line = lang === 'en' ? lines.en : lines[gender === 'm' ? 'ar_m' : 'ar_f'];
+      return line ? [this.voiced(line.audio, line.text, lang, 'feedback', `point:${item.key}:${lang}`)] : [];
     });
   }
 

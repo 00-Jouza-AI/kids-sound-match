@@ -2752,6 +2752,485 @@ html.kid-locked body {
   }
 }
 
+/* ---------- Kid Mode: Peekaboo ---------- */
+
+.kid.stage-peekaboo {
+  background: radial-gradient(circle at 50% 30%, #fffaf3 0%, #fdeedd 55%, #f9dcc0 100%);
+}
+
+.peekaboo-area {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  padding: 8px 16px 24px;
+  cursor: pointer;
+}
+
+.peekaboo-card.open {
+  box-shadow: 0 0 0 8px rgba(255, 196, 70, 0.55), 0 12px 30px rgba(150, 95, 30, 0.2);
+  transition: box-shadow 0.4s ease;
+}
+
+.peekaboo-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 12%;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(150, 95, 30, 0.16), inset 0 -4px 0 rgba(150, 95, 30, 0.06);
+  animation: appear 0.35s ease-out backwards;
+}
+
+.peekaboo-card > img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.peekaboo-card.open > img {
+  animation: peek-pop 1s ease-out;
+}
+
+@keyframes peek-pop {
+  0% {
+    transform: scale(0.9);
+  }
+  35% {
+    transform: scale(1.12);
+  }
+  60% {
+    transform: scale(0.98);
+  }
+  80% {
+    transform: scale(1.04);
+  }
+}
+
+.blanket {
+  position: absolute;
+  inset: -4%;
+  width: 108%;
+  height: 108%;
+  filter: drop-shadow(0 8px 14px rgba(40, 80, 140, 0.25));
+  transform-origin: 50% 0;
+  animation: blanket-breathe 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Under the blanket something is moving: a gentle wiggle invites the tap. */
+@keyframes blanket-breathe {
+  0%,
+  100% {
+    transform: rotate(0) scaleY(1);
+  }
+  20% {
+    transform: rotate(-1.6deg) scaleY(1.01);
+  }
+  40% {
+    transform: rotate(1.6deg) scaleY(0.99);
+  }
+  55% {
+    transform: rotate(0) scaleY(1);
+  }
+}
+
+.peekaboo-card.open .blanket {
+  animation: blanket-off 0.6s cubic-bezier(0.3, 0.7, 0.4, 1) forwards;
+}
+
+@keyframes blanket-off {
+  to {
+    transform: translate(-30%, -125%) rotate(-24deg) scale(0.7);
+    opacity: 0;
+  }
+}
+
+/* ---------- Kid Mode: Find it in the picture ---------- */
+
+.scene-box {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin: 0 8px 8px;
+  overflow: hidden;
+  border-radius: 22px;
+  box-shadow: 0 8px 22px rgba(150, 95, 30, 0.14);
+}
+
+.scene-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.scene-thing {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  filter: drop-shadow(0 5px 4px rgba(40, 40, 30, 0.22));
+  animation: appear 0.45s ease-out backwards;
+}
+
+.scene-thing img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* Movements go on the picture, so the button's fade-in never plays again when one ends. */
+.scene-thing.celebrate {
+  z-index: 2;
+}
+
+.scene-thing.celebrate img {
+  animation: scene-found 1.1s ease-out forwards;
+}
+
+@keyframes scene-found {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.35) translateY(-8%);
+  }
+  55% {
+    transform: scale(1.18) translateY(0);
+  }
+  75% {
+    transform: scale(1.28) translateY(-4%);
+  }
+  100% {
+    transform: scale(1.22);
+    filter: drop-shadow(0 0 12px rgba(255, 200, 60, 0.95));
+  }
+}
+
+.scene-thing.hint-a img {
+  animation: wiggle-a 1.1s ease-in-out;
+}
+
+.scene-thing.hint-b img {
+  animation: wiggle-b 1.1s ease-in-out;
+}
+
+.scene-thing.bounce-a img {
+  animation: hop-a 0.7s ease-out;
+}
+
+.scene-thing.bounce-b img {
+  animation: hop-b 0.7s ease-out;
+}
+
+/* ---------- Kid Mode: Where's your nose? ---------- */
+
+.kid.stage-point {
+  background: radial-gradient(circle at 50% 28%, #fbfff6 0%, #edf8e2 55%, #d9efc7 100%);
+}
+
+.point-area {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  padding: 4px 16px;
+}
+
+.point-card img {
+  width: 78%;
+  height: 78%;
+}
+
+/* For the parent: skip on one side, the big tick on the other. */
+.point-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 22px calc(18px + env(safe-area-inset-bottom));
+}
+
+.point-skip,
+.point-found {
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.point-skip {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 12px rgba(60, 90, 40, 0.12);
+  color: #7d8c74;
+}
+
+[dir='rtl'] .point-skip svg {
+  transform: scaleX(-1);
+}
+
+.point-found {
+  width: 96px;
+  height: 96px;
+  background: linear-gradient(180deg, #5cc27a, #2e9d55);
+  box-shadow: 0 10px 26px rgba(46, 157, 85, 0.38);
+  color: #fff;
+}
+
+.point-found:active,
+.point-skip:active {
+  transform: scale(0.94);
+}
+
+/* ---------- Girl or boy (Arabic grammar) ---------- */
+
+.gender-pick {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0 6px;
+}
+
+/* ---------- Words I know ---------- */
+
+.words-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.words-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.words-stat strong {
+  color: var(--primary);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.words-stat.says strong {
+  color: var(--accent-strong);
+}
+
+.words-stat span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.word-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px 8px;
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.word-tile.says {
+  background: #fdeee4;
+}
+
+.word-tile img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.word-tile strong {
+  line-height: 1.2;
+}
+
+.word-tile .hint {
+  font-size: 0.75rem;
+}
+
+.word-since {
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.says-btn {
+  margin-top: 4px;
+  padding: 3px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.says-btn.on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+.extra-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.extra-word {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 12px;
+  border-radius: 999px;
+  background: #fdeee4;
+}
+
+[dir='rtl'] .extra-word {
+  padding: 4px 12px 4px 6px;
+}
+
+.extra-word .hint {
+  font-size: 0.72rem;
+}
+
+.chip-x {
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.07);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.extra-form {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.extra-form input,
+.words-search {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+}
+
+.words-search {
+  width: 100%;
+  margin: 6px 0 10px;
+}
+
+.words-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 8px;
+  max-height: 46vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.word-pick {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 4px;
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.word-pick img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.word-pick.on {
+  border-color: var(--accent);
+  background: #fdeee4;
+}
+
+.word-pick-mark {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: 4px;
+  font-size: 0.85rem;
+}
+
+.print-only {
+  display: none;
+}
+
+.flashcard.title-card {
+  gap: 3cqw;
+  font-size: 4.4cqw;
+}
+
+.flashcard.title-card strong {
+  font-size: 6cqw;
+}
+
+/* The child's animal fits its card, whatever the paper. */
+.flashcard.title-card .avatar {
+  width: 14cqw !important;
+  height: 14cqw !important;
+  font-size: 8cqw !important;
+}
+
+.card-date {
+  color: var(--muted);
+  font-size: 2.6cqw;
+  font-weight: 600;
+}
+
+@media print {
+  .print-only {
+    display: block !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

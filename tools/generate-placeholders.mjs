@@ -161,7 +161,13 @@ function yumTone() {
   return normalize(join(chomp(220), silence(0.06), chomp(208), silence(0.06), chomp(196)), 0.45);
 }
 
+/** "Peekaboo!" placeholder: a quick bright leap up. */
+function peekabooTone() {
+  return normalize(join(note(C5, 0.08, bright), note(G5, 0.08, bright), note(C6, 0.3, bright)), 0.45);
+}
+
 function feedbackTone(assetPath) {
+  if (/peekaboo/.test(assetPath)) return peekabooTone();
   if (/yum/.test(assetPath)) return yumTone();
   if (/question/.test(assetPath)) return questionTone();
   if (/incorrect/.test(assetPath)) return incorrectTone();
@@ -197,6 +203,10 @@ for (const packId of packIds) {
     for (const lang of ['en', 'ar']) {
       if (item.name_audio?.[lang]) count += write(`packs/${item.name_audio[lang]}`, wav(nameTone(index, lang)));
     }
+    // "Where's your nose?" lines (body parts): the question tone.
+    for (const line of Object.values(item.point ?? {})) {
+      if (line?.audio) count += write(`packs/${line.audio}`, wav(questionTone()));
+    }
   });
   const fb = manifest.feedback_audio;
   if (fb) {
@@ -207,6 +217,7 @@ for (const packId of packIds) {
       fb.session_end.en,
       fb.session_end.ar,
       ...Object.values(fb.odd_question ?? {}),
+      ...Object.values(fb.peekaboo ?? {}),
     ];
     for (const p of feedbackPaths) count += write(p, wav(feedbackTone(p)));
   }

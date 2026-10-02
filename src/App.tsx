@@ -5,7 +5,8 @@ import { loadContent } from './content/loader';
 import { buildMixedPack } from './content/mixed';
 import type { ChoiceCount, MemoryPairs } from './engine';
 import { buildOddPack } from './content/odd';
-import type { LoadedContent, LoadedFeedback, LoadedPack } from './content/types';
+import { MIN_SCENE_THINGS, SCENES, sceneCandidates, sceneCapacity, type SceneDef } from './content/scenes';
+import type { ArGender, LoadedContent, LoadedFeedback, LoadedPack } from './content/types';
 import { MIN_ITEMS_PER_PACK } from './content/validate';
 import { cloud } from './custom/cloud';
 import { applyOverrides, overrideMap } from './custom/overrides';
@@ -30,6 +31,7 @@ import {
 } from './settings/profiles';
 import { forgetReplays } from './settings/replays';
 import { forgetStickers } from './settings/stickers';
+import { forgetWordMarks } from './settings/words';
 import {
   effectiveMode,
   enabledItemKeys,
@@ -43,6 +45,7 @@ import {
 import { local } from './settings/storage';
 import { telemetry } from './telemetry/telemetry';
 import { KidMode } from './ui/kid/KidMode';
+import { pointItems } from './ui/kid/KidPoint';
 import { clearKidSnapshot, loadKidSnapshot, type KidConfig, type KidKind, type KidSnapshot } from './ui/kid/kidSnapshot';
 import { FirstRun } from './ui/parent/FirstRun';
 import { Flashcards } from './ui/parent/Flashcards';
@@ -53,7 +56,9 @@ import { Personalize } from './ui/parent/Personalize';
 import { ReportScreen } from './ui/parent/ReportScreen';
 import { SettingsScreen } from './ui/parent/SettingsScreen';
 import { StartFlow, type StartStep } from './ui/parent/StartFlow';
+import { Overlay } from './ui/parent/components';
 import { Studio } from './ui/parent/Studio';
+import { WordsScreen } from './ui/parent/WordsScreen';
 
 type Screen =
   | 'loading'
@@ -68,6 +73,7 @@ type Screen =
   | 'personalize'
   | 'studio'
   | 'flashcards'
+  | 'words'
   | 'start'
   | 'kid';
 
@@ -80,6 +86,10 @@ const NUDGE_DISMISSED_KEY = 'ksm.nudgeDismissed.v1';
 const NUDGE_AGAIN_AFTER_GAMES = 3;
 /** "Not now" on the memory suggestion: the pairs, and how many games had been played with them. */
 const MEMORY_NUDGE_DISMISSED_KEY = 'ksm.memoryNudgeDismissed.v1';
+/** Find it in the picture: the scene played last, so the next game shows the other one. */
+const LAST_SCENE_KEY = 'ksm.lastScene.v1';
+/** Where's your nose? needs at least this many body parts it can ask about. */
+const MIN_POINT_ITEMS = 3;
 const PARENTS_GROUP_URL = (import.meta.env.VITE_PARENTS_GROUP_URL ?? '').trim();
 const NO_FEEDBACK: LoadedFeedback = { correct: { en: [], ar: [] }, incorrectTone: null, sessionEnd: { en: null, ar: null } };
 
@@ -168,7 +178,9 @@ export function App() {
       forgetSettings(id);
       forgetReplays(id);
       forgetStickers(id);
+      forgetWordMarks(id);
       local.remove(profileKey(NUDGE_DISMISSED_KEY, id));
+      local.remove(profileKey(LAST_SCENE_KEY, id));
       change({ profiles: rest, activeId: profiles.activeId === id ? rest[0].id : profiles.activeId });
     },
   };
@@ -198,6 +210,9 @@ function Shell({
   const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack } | null>(null);
   const [startStep, setStartStep] = useState<StartStep>('soundCheck');
   const [startKind, setStartKind] = useState<KidKind>('game');
+  // Where's your nose?: asking a parent once whether the child is a girl or a boy (Arabic grammar).
+  const [askGender, setAskGender] = useState(false);
+  const pendingGender = useRef<ArGender | null>(null);
   const [nudge, setNudge] = useState<NextLevel | null>(null);
   const [memoryNudge, setMemoryNudge] = useState<MemoryNext | null>(null);
   const unlockedUntil = useRef(0);
@@ -208,6 +223,24 @@ function Shell({
   const playablePacks = useMemo(() => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK), [allPacks]);
   const content: LoadedContent = { packs: playablePacks, issues: builtin?.issues ?? [] };
   const pack = playablePacks.find((p) => p.id === settings.packId) ?? playablePacks[0];
+  const profile = profiles.state.profiles.find((p) => p.id === profileId);
+  const languages = spokenLanguages(settings.language);
+
+  /** Find it in the picture: the things a scene may show, with this child's pictures and sound setting. */
+  const sceneKeys = (scene: SceneDef): string[] =>
+    scene.packs.flatMap((id) => {
+      const p = allPacks.find((x) => x.id === id);
+      if (!p) return [];
+      const enabled = new Set(enabledItemKeys(p, settings));
+      // "Sound only" can't ask for things that make no sound.
+      return p.items.filter((i) => enabled.has(i.key) && (settings.mode !== 'SOUND_ONLY' || i.sound)).map((i) => i.key);
+    });
+  const playableScenes = SCENES.filter((s) => {
+    const keys = new Set(sceneKeys(s));
+    return sceneCapacity(s, sceneCandidates(s, allPacks, (_, i) => keys.has(i.key))) >= MIN_SCENE_THINGS;
+  });
+  const bodyPack = allPacks.find((p) => p.id === 'body');
+  const canPoint = pointItems(bodyPack, languages, profile?.arGender ?? 'f').length >= MIN_POINT_ITEMS;
 
   const refreshCustom = useCallback(async () => {
     try {
@@ -324,9 +357,31 @@ function Shell({
     else requireParent(() => setScreen(link));
   };
 
+  /** The other scene than last time, when both can be played. */
+  const pickScene = (): SceneDef | undefined => {
+    if (!playableScenes.length) return undefined;
+    const last = local.get(profileKey(LAST_SCENE_KEY, profileId));
+    const fresh = playableScenes.filter((s) => s.id !== last);
+    const from = fresh.length ? fresh : playableScenes;
+    const scene = from[Math.floor(Math.random() * from.length)];
+    local.set(profileKey(LAST_SCENE_KEY, profileId), scene.id);
+    return scene;
+  };
+
   const startKid = async (kind: KidKind) => {
-    // Odd one out plays with every pack of things; the other games with the chosen pack.
-    const gamePack = kind === 'odd' ? oddPack : pack;
+    const scene = kind === 'scene' ? pickScene() : undefined;
+    const arGender = pendingGender.current ?? profile?.arGender ?? 'f';
+    pendingGender.current = null;
+    // Odd one out plays with every pack of things, a scene with its own packs, Where's your nose?
+    // with the body parts; the other games with the chosen pack.
+    const gamePack =
+      kind === 'odd'
+        ? oddPack
+        : kind === 'scene'
+          ? scene?.packs.map((id) => allPacks.find((p) => p.id === id)).find((p) => p !== undefined)
+          : kind === 'point'
+            ? bodyPack
+            : pack;
     if (!gamePack) return;
     // Toddler mode is for the matching game: the others have a right answer even for the youngest.
     const toddlerMode = settings.toddlerMode && kind === 'game' && gamePack.kind !== 'association';
@@ -350,15 +405,25 @@ function Shell({
         kind,
         profileId,
         packId: gamePack.id,
-        itemKeys: kind === 'odd' ? gamePack.items.map((i) => i.key) : enabledItemKeys(gamePack, settings),
+        itemKeys:
+          kind === 'odd'
+            ? gamePack.items.map((i) => i.key)
+            : kind === 'scene' && scene
+              ? sceneKeys(scene)
+              : kind === 'point'
+                ? pointItems(gamePack, languages, arGender).map((i) => i.key)
+                : enabledItemKeys(gamePack, settings),
         // Odd one out always shows at least three: two alike and the different one.
         choiceCount: kind === 'odd' ? (Math.max(3, settings.choiceCount) as ChoiceCount) : settings.choiceCount,
         questionsPerSession: settings.questionsPerSession,
         memoryPairs: settings.memoryPairs,
         oddLevel: level,
         toddlerMode,
-        // Packs without sounds (Food, Colours...) are played by name whatever the setting says.
-        mode: effectiveMode(gamePack, settings.mode),
+        // Packs without sounds (Food, Colours...) are played by name whatever the setting says. A scene
+        // mixes packs, so it keeps the setting (things without a sound are asked for by name).
+        mode: kind === 'scene' ? settings.mode : effectiveMode(gamePack, settings.mode),
+        ...(scene ? { sceneId: scene.id } : {}),
+        ...(kind === 'point' ? { arGender } : {}),
         language: settings.language,
         repeatIntervalSec: settings.repeatIntervalSec,
         hints: settings.hints,
@@ -422,7 +487,7 @@ function Shell({
       ) : null;
       break;
     case 'report':
-      body = <ReportScreen packs={allPacks} profiles={profiles.state} onBack={home} />;
+      body = <ReportScreen packs={allPacks} profiles={profiles.state} onBack={home} onWords={() => setScreen('words')} />;
       break;
     case 'privacy':
       body = <PrivacyScreen onBack={home} />;
@@ -455,6 +520,9 @@ function Shell({
       break;
     case 'flashcards':
       body = <Flashcards packs={playablePacks.filter((p) => !p.parts)} initialPackId={pack?.id} onBack={home} />;
+      break;
+    case 'words':
+      body = <WordsScreen packs={allPacks} profiles={profiles.state} onBack={home} />;
       break;
     case 'start':
       body = pack && (
@@ -509,6 +577,15 @@ function Shell({
           onMemory={() => begin('memory')}
           onOdd={() => begin('odd')}
           canOdd={oddPack !== null}
+          onPeekaboo={() => begin('peekaboo')}
+          onScene={() => begin('scene')}
+          canScene={playableScenes.length > 0}
+          onPoint={() => {
+            // Arabic needs to know: "أين أنفُكِ؟" for a girl, "أين أنفُكَ؟" for a boy.
+            if (languages.includes('ar') && !profile?.arGender) setAskGender(true);
+            else begin('point');
+          }}
+          canPoint={canPoint}
           memoryNudge={memoryNudge}
           onMemoryNudgeAccept={(to) =>
             requireParent(() => {
@@ -538,6 +615,30 @@ function Shell({
   return (
     <>
       {body}
+      {askGender && profile && (
+        <Overlay label={t('genderTitle')} onDismiss={() => setAskGender(false)}>
+          <h2>{t('genderTitle')}</h2>
+          <p>{t('genderBody')}</p>
+          <div className="gender-pick">
+            {(['f', 'm'] as const).map((g) => (
+              <button
+                type="button"
+                key={g}
+                className="btn wide big"
+                onClick={() => {
+                  profiles.edit({ ...profile, arGender: g });
+                  pendingGender.current = g;
+                  setAskGender(false);
+                  begin('point');
+                }}
+              >
+                {g === 'f' ? `👧 ${t('girl')}` : `👦 ${t('boy')}`}
+              </button>
+            ))}
+          </div>
+          <p className="hint">{t('genderPrivacy')}</p>
+        </Overlay>
+      )}
       {gate && (
         <ParentGate
           onSuccess={() => {

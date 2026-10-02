@@ -1,6 +1,6 @@
 import { ConfusionGraph, pickNonConfusable } from '../engine';
 import { feedbackAssetPath, itemAssetPath } from './paths';
-import { LANGS, type ContentIssue, type ManifestItem, type PackManifest } from './types';
+import { LANGS, POINT_VOICES, type ContentIssue, type ManifestItem, type PackManifest } from './types';
 
 export const MIN_ITEMS_PER_PACK = 5;
 const MAX_CHOICES = 4;
@@ -69,6 +69,16 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
       if (typeof p !== 'string' || !p) fail(`Missing ${lang} name audio path`);
       else if (!exists(itemAssetPath(p))) fail(`${lang} name audio not found: ${itemAssetPath(p)}`);
     }
+    // "Where's your nose?": optional lines; a missing recording only leaves that line out.
+    for (const voice of POINT_VOICES) {
+      const line = item.point?.[voice];
+      if (line === undefined) continue;
+      if (typeof line?.text !== 'string' || !line.text.trim() || typeof line.audio !== 'string' || !line.audio) {
+        warn(`"point" needs a text and an audio path for ${voice}`, key);
+      } else if (!exists(itemAssetPath(line.audio))) {
+        warn(`"Where's your…?" line not found: ${itemAssetPath(line.audio)}`, key);
+      }
+    }
     // "Who eats what?": every answer says which prompt items (animals) it goes with.
     if (association && (!Array.isArray(item.prompts) || !item.prompts.length || item.prompts.some((k) => typeof k !== 'string'))) {
       fail('An answer in an association pack needs "prompts": the items it goes with');
@@ -115,6 +125,7 @@ export function validatePack(manifest: PackManifest, exists: (assetPath: string)
       fb.incorrect_tone,
       ...LANGS.map((lang) => fb.session_end?.[lang]),
       ...LANGS.map((lang) => fb.odd_question?.[lang]),
+      ...LANGS.map((lang) => fb.peekaboo?.[lang]),
     ];
     for (const p of feedbackPaths) {
       if (typeof p === 'string' && p && !exists(feedbackAssetPath(p))) warn(`Feedback audio not found: ${feedbackAssetPath(p)}`);

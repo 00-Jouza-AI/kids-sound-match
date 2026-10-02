@@ -52,6 +52,30 @@ describe('recording studio', () => {
     ]);
   });
 
+  it('lists "Where\'s your nose?" for a girl and in English, the boy\'s line only once a child is a boy, and بَخ!', () => {
+    const nose: LoadedItem = {
+      ...item('nose', 'body'),
+      point: {
+        en: { text: "Where's your nose?", audio: asset('packs/body/nose_point_en.mp3') },
+        ar_f: { text: 'أين أنفُكِ؟', audio: asset('packs/body/nose_point_ar_f.mp3') },
+        ar_m: { text: 'أين أنفُكَ؟', audio: asset('packs/body/nose_point_ar_m.mp3') },
+      },
+    };
+    const animals = pack('animals', [item('cat', 'animals', true)], {
+      feedback: {
+        correct: { ar: [], en: [] },
+        incorrectTone: null,
+        sessionEnd: { ar: null, en: null },
+        peekaboo: { ar: asset('feedback/peekaboo_ar.mp3'), en: asset('feedback/peekaboo_en.mp3') },
+      },
+    });
+    const body = pack('body', [nose]);
+    const girls = studioClips([animals, body]).map((c) => c.say);
+    expect(girls).toEqual(expect.arrayContaining(['أين أنفُكِ؟', "Where's your nose?", 'بَخ!', 'Peekaboo!']));
+    expect(girls).not.toContain('أين أنفُكَ؟');
+    expect(studioClips([animals, body], { boys: true }).find((c) => c.say === 'أين أنفُكَ؟')).toMatchObject({ packId: 'body', kind: 'ar' });
+  });
+
   it('saves next to the manifest file, as WAV', () => {
     expect(studioSavePath('packs/animals/cat_name_ar.mp3')).toBe('packs/animals/cat_name_ar.wav');
     expect(studioSavePath('feedback/correct_en_1.mp3')).toBe('feedback/correct_en_1.wav');

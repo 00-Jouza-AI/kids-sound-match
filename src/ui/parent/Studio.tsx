@@ -4,6 +4,7 @@ import type { LoadedPack } from '../../content/types';
 import { decodeToMono, MAX_RECORDING_SEC, type MonoAudio } from '../../custom/audioTools';
 import { recordingProblem, startRecording, type ActiveRecording } from '../../custom/recorder';
 import { useI18n } from '../../i18n/I18n';
+import { loadProfiles } from '../../settings/profiles';
 import { choosePictures } from '../kid/layout';
 import { Row, Screen, Segmented, Toggle } from './components';
 import { Trimmer } from './SoundEditor';
@@ -25,7 +26,8 @@ const QUIET_MS = 750;
  */
 export function Studio({ packs, onBack }: { packs: readonly LoadedPack[]; onBack: () => void }) {
   const { t, lang } = useI18n();
-  const clips = useMemo(() => studioClips(packs), [packs]);
+  // The boys' Arabic "Where's your…?" lines are only needed once a child is a boy.
+  const clips = useMemo(() => studioClips(packs, { boys: loadProfiles().profiles.some((p) => p.arGender === 'm') }), [packs]);
   const [packId, setPackId] = useState('all');
   const [kind, setKind] = useState<StudioClip['kind']>('ar');
   const [showDone, setShowDone] = useState(false);

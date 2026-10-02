@@ -5,11 +5,11 @@ import type { MemoryNext } from '../../report/levels';
 import type { NextLevel } from '../../report/practice';
 import type { ProfileState } from '../../settings/profiles';
 import { effectiveMode, enabledItemKeys, type Settings } from '../../settings/settings';
-import { ExploreIcon, MemoryIcon, OddIcon } from '../kid/icons';
+import { ExploreIcon, MemoryIcon, OddIcon, PeekabooIcon, PointIcon, SceneIcon } from '../kid/icons';
 import { ChevronIcon } from './components';
 import { ProfileRow } from './ProfileRow';
 
-export type HomeLink = 'report' | 'settings' | 'myPacks' | 'flashcards' | 'studio' | 'parentsGroup' | 'privacy' | 'about';
+export type HomeLink = 'report' | 'words' | 'settings' | 'myPacks' | 'flashcards' | 'studio' | 'parentsGroup' | 'privacy' | 'about';
 
 /** Spec 5.2: title, settings summary, a large START button, and the parent links. */
 export function Home({
@@ -23,10 +23,15 @@ export function Home({
   nudge,
   memoryNudge,
   canOdd,
+  canScene,
+  canPoint,
   onStart,
   onExplore,
   onMemory,
   onOdd,
+  onPeekaboo,
+  onScene,
+  onPoint,
   onOpen,
   onNudgeAccept,
   onNudgeDismiss,
@@ -45,10 +50,17 @@ export function Home({
   /** "Ready for more memory cards?" */
   memoryNudge: MemoryNext | null;
   canOdd: boolean;
+  /** Find it in the picture: at least one scene has enough things to find. */
+  canScene: boolean;
+  /** Where's your nose?: the body-part questions exist in the game's language. */
+  canPoint: boolean;
   onStart: () => void;
   onExplore: () => void;
   onMemory: () => void;
   onOdd: () => void;
+  onPeekaboo: () => void;
+  onScene: () => void;
+  onPoint: () => void;
   onOpen: (link: HomeLink) => void;
   onNudgeAccept: (to: ChoiceCount) => void;
   onNudgeDismiss: (nudge: NextLevel) => void;
@@ -75,6 +87,7 @@ export function Home({
     : [];
   const links: { id: HomeLink; label: string; icon: string }[] = [
     { id: 'report', label: t('report'), icon: '📊' },
+    { id: 'words', label: t('wordsTitle'), icon: '🗣️' },
     { id: 'settings', label: t('settings'), icon: '⚙️' },
     { id: 'myPacks', label: t('myPacks'), icon: '🎨' },
     { id: 'flashcards', label: t('flashcards'), icon: '🖨️' },
@@ -103,11 +116,27 @@ export function Home({
       <button type="button" className="start-btn" onClick={onStart} disabled={!canStart}>
         {t('start')}
       </button>
+      {/* The youngest players' games first. */}
       <div className="games-row">
+        <button type="button" className="game-tile" onClick={onPeekaboo} disabled={!canExplore}>
+          <PeekabooIcon />
+          <strong>{t('peekaboo')}</strong>
+          <small>{t('peekabooSub')}</small>
+        </button>
         <button type="button" className="game-tile" onClick={onExplore} disabled={!canExplore}>
           <ExploreIcon />
           <strong>{t('explore')}</strong>
           <small>{t('exploreSub')}</small>
+        </button>
+        <button type="button" className="game-tile" onClick={onScene} disabled={!canScene}>
+          <SceneIcon />
+          <strong>{t('sceneGame')}</strong>
+          <small>{t('sceneSub')}</small>
+        </button>
+        <button type="button" className="game-tile" onClick={onPoint} disabled={!canPoint}>
+          <PointIcon />
+          <strong>{t('pointGame')}</strong>
+          <small>{t('pointSub')}</small>
         </button>
         <button type="button" className="game-tile" onClick={onMemory} disabled={!canExplore}>
           <MemoryIcon />

@@ -308,3 +308,32 @@ describe('all packs', () => {
     expect(cow.nameAudio.ar).toEqual({ path: 'packs/animals/cow_name_ar.mp3', url: '/assets/packs/animals/cow_name_ar.wav', real: true });
   });
 });
+
+describe('Peekaboo and "Where\'s your nose?" content', () => {
+  const packIds = fs.readdirSync(path.join(ASSETS, 'packs')).filter((d) => fs.existsSync(path.join(ASSETS, 'packs', d, 'manifest.json')));
+  const index: AssetIndex = { packs: packIds, files: [...realFiles], placeholders: [...placeholderFiles] };
+  const fetchJson = async (url: string) =>
+    url.endsWith('packs/index.json') ? index : JSON.parse(fs.readFileSync(path.join(ASSETS, url.replace(/^\.?\/assets\//, '')), 'utf8'));
+
+  it('asks about 11 body parts, for a girl, a boy and in English', async () => {
+    const content = await loadContent({ baseUrl: '/', allowPlaceholders: true, fetchJson });
+    const body = content.packs.find((p) => p.id === 'body')!;
+    const asked = body.items.filter((i) => i.point);
+    expect(asked.map((i) => i.key)).toEqual(['eye', 'nose', 'mouth', 'ear', 'hand', 'finger', 'arm', 'foot', 'leg', 'teeth', 'tongue']);
+    const nose = body.items.find((i) => i.key === 'nose')!;
+    expect(nose.point!.ar_f).toMatchObject({ text: 'أين أنفُكِ؟', audio: { path: 'packs/body/nose_point_ar_f.mp3', real: false } });
+    expect(nose.point!.ar_m!.text).toBe('أين أنفُكَ؟');
+    expect(nose.point!.en!.text).toBe("Where's your nose?");
+    const animals = content.packs.find((p) => p.id === 'animals')!;
+    expect(animals.feedback.peekaboo?.ar?.path).toBe('feedback/peekaboo_ar.mp3');
+  });
+
+  it('leaves a line out, never the body part, when its recording is missing (a release build)', async () => {
+    const release = await loadContent({ baseUrl: '/', allowPlaceholders: false, fetchJson });
+    for (const p of release.packs) for (const i of p.items) expect(i.point).toBeUndefined();
+    const body = JSON.parse(fs.readFileSync(path.join(ASSETS, 'packs', 'body', 'manifest.json'), 'utf8')) as PackManifest;
+    const { issues } = validatePack(body, (p) => realFiles.has(p) || !p.includes('_point_'));
+    expect(issues.filter((i) => i.message.includes("Where's your"))).toHaveLength(33);
+    expect(issues.filter((i) => i.message.includes("Where's your")).every((i) => i.level === 'warning')).toBe(true);
+  });
+});

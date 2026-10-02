@@ -5,7 +5,7 @@ matching one, in Arabic or English. No ads, no tracking; results stay on the dev
 `App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
 for every change agreed since.
 
-Packs: Animals (54), Things at home, Vehicles, Musical instruments, Food, Body parts, Family, Colours,
+Packs: Animals (54), First words, Things at home, Vehicles, Musical instruments, Food, Body parts, Family, Colours,
 Shapes, Feelings, Counting 1 to 5, **Who eats what?** (see an animal, tap its food), **Where does it
 live?** (tap its home), a **Mixed** game, and the parent's own packs. Parents can also put their own
 voice and photos into the built-in packs. Brothers and sisters each get a profile (an animal on a
@@ -73,16 +73,25 @@ Anything a recording replaces is moved to `dev-assets/replaced`, never deleted. 
 the new clips. The studio only exists on the development server and only accepts this computer.
 
 **Find real sounds and photos** (the studio's second tab) lists sound effects and baby-animal photos
-found on Pixabay for everything still on a placeholder. Listen or look, press **Use this**, trim the
+found on Pixabay. Every sound and baby photo has already been chosen this way (see docs/DECISIONS.md);
+use the tab to swap one you don't like. Listen or look, press **Use this**, trim the
 sound or crop the photo, and save; the file goes into `public/assets` and its source into
 `public/assets/licenses/sources.csv`. The candidate list lives in `dev-assets/studio-candidates.json`.
 
 ## Games
 
-Besides the matching game (START) and Explore, Home has **Memory** (pairs face down; 3 pairs, more
-when the child is ready) and **Odd one out** (easy across packs, harder inside a pack, chosen from the
-child's results). Every finished game earns a sticker for the child's **sticker album**, opened from
-the end screen. **Print flashcards** (for parents) prints any pack on A4 for play away from the screen.
+Besides the matching game (START), Home has, youngest first:
+
+- **Peekaboo**: a blanket hides a picture while its sound plays; one tap pulls it off ("بَخ!" and the name)
+- **Explore**: tap any picture to hear it
+- **Find it in the picture**: a farm or a doll's house; "Where's the cow?" and the child finds it in the scene
+- **Where's your nose?**: the app asks, the child points at her own nose, the parent taps the tick
+- **Memory** (pairs face down; 3 pairs, more when the child is ready) and **Odd one out** (easy across
+  packs, harder inside a pack, chosen from the child's results)
+
+Every finished game earns a sticker for the child's **sticker album**, opened from the end screen.
+For parents: **Words I know** (the words each child understands and says, shareable and printable),
+and **Print flashcards** (any pack on A4 for play away from the screen).
 
 ## My packs (your own pictures and voice)
 

@@ -1,6 +1,7 @@
 import { feedbackAssetPath, itemAssetPath, placeholderPathFor } from './paths';
 import {
   LANGS,
+  POINT_VOICES,
   type ContentIssue,
   type Lang,
   type LoadedAssociation,
@@ -10,6 +11,8 @@ import {
   type LoadedPack,
   type ManifestItem,
   type PackManifest,
+  type PointLine,
+  type PointVoice,
   type ResolvedAsset,
 } from './types';
 import { itemPictures, MIN_ITEMS_PER_PACK, validatePack } from './validate';
@@ -102,6 +105,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
         const paths = itemPictures(item).map(itemAssetPath);
         const pictures = paths.map(usable).filter(isAsset);
         const photos = pictures.filter((a) => a.real);
+        const point = pointLines(item, (p) => resolve(itemAssetPath(p)));
         return {
           key: item.item_key,
           name: item.name,
@@ -116,6 +120,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
           confusableWith: (item.confusable_with ?? []).filter((k) => validation.validKeys.has(k)),
           picturePath: itemAssetPath(item.image ?? item.images![0]),
           arFeminine: arabicFeminine(item),
+          ...(point ? { point } : {}),
         };
       });
 
@@ -128,6 +133,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       incorrectTone: feedbackAsset(fb?.incorrect_tone),
       sessionEnd: perLang((lang) => feedbackAsset(fb?.session_end?.[lang])),
       ...(fb?.odd_question ? { oddQuestion: perLang((lang) => feedbackAsset(fb.odd_question?.[lang])) } : {}),
+      ...(fb?.peekaboo ? { peekaboo: perLang((lang) => feedbackAsset(fb.peekaboo?.[lang])) } : {}),
     };
 
     const assoc = manifest.association;
@@ -178,6 +184,18 @@ const AUDIO_FORMATS = ['.wav', '.mp3', '.m4a', '.ogg', '.opus', '.webm'];
 /** Arabic nouns ending in ة are feminine; a manifest can say so for the others (أفعى). */
 function arabicFeminine(item: ManifestItem): boolean {
   return typeof item.ar_feminine === 'boolean' ? item.ar_feminine : /ةs*$/.test(item.name?.ar ?? '');
+}
+
+/** "Where's your nose?": the lines whose recording (or development stand-in) exists. */
+function pointLines(item: ManifestItem, resolve: (path: string) => ResolvedAsset | null): Partial<Record<PointVoice, PointLine>> | null {
+  const out: Partial<Record<PointVoice, PointLine>> = {};
+  for (const voice of POINT_VOICES) {
+    const line = item.point?.[voice];
+    if (!line || typeof line.text !== 'string' || typeof line.audio !== 'string') continue;
+    const audio = resolve(line.audio);
+    if (audio) out[voice] = { text: line.text, audio };
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 /**

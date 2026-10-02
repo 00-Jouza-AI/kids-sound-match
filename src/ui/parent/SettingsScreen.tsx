@@ -354,6 +354,22 @@ function ChildEditor({
           />
         ))}
       </div>
+      <Row label={t('childArGender')} hint={t('childArGenderHint')}>
+        <div className="segmented" role="radiogroup" aria-label={t('childArGender')}>
+          {(['f', 'm'] as const).map((g) => (
+            <button
+              type="button"
+              key={g}
+              role="radio"
+              aria-checked={draft.arGender === g}
+              className={draft.arGender === g ? 'on' : undefined}
+              onClick={() => setDraft({ ...draft, arGender: g })}
+            >
+              {g === 'f' ? t('girl') : t('boy')}
+            </button>
+          ))}
+        </div>
+      </Row>
       <div className="pin-footer">
         {canDelete && (
           <button type="button" className="btn danger-outline" onClick={() => setConfirm(true)}>

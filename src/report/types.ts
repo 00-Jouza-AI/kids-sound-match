@@ -17,13 +17,13 @@ export interface SessionEntity {
   profileId?: string;
   /** Missing: the matching game (any pack, including Who eats what?). */
   game?: GameKind;
-  /** Odd one out: 'easy' or 'hard'. Memory: the number of pairs. */
+  /** Odd one out: 'easy' or 'hard'. Memory: the number of pairs. Find it in the picture: the scene. */
   variant?: string;
   /** Memory: turns taken (two cards each) to find every pair. */
   turns?: number;
 }
 
-export type GameKind = 'match' | 'memory' | 'odd';
+export type GameKind = 'match' | 'memory' | 'odd' | 'peekaboo' | 'scene' | 'point';
 
 /** The matching game feeds the per-picture Report and practice; Memory and Odd one out don't. */
 export function isMatchGame(s: Pick<SessionEntity, 'game'>): boolean {

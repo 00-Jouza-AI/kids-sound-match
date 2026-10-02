@@ -1,11 +1,17 @@
-import type { LoadedItem } from '../content/types';
+import type { ArGender, LoadedItem } from '../content/types';
 import type { GameMode } from '../settings/settings';
 import type { AudioEngine } from './audioEngine';
-import type { Clip, ClipResolver } from './clips';
+import type { Clip, ClipResolver, PeekabooLines } from './clips';
 
 interface Token {
   cancelled: boolean;
 }
+
+/** Peekaboo: the hidden picture's sound comes again after this long. */
+const PEEKABOO_REPEAT_MS = 4000;
+/** "Where's your nose?" is asked this many times, this far apart, then waits quietly. */
+const POINT_ASKS = 3;
+const POINT_REPEAT_MS = 6000;
 
 export interface GameAudioOptions {
   mode: GameMode;
@@ -86,6 +92,37 @@ export class GameAudio {
     const token = this.begin();
     await this.play(this.clips.sound(item), token);
     await this.playAll(this.clips.names(item), token);
+  }
+
+  /**
+   * Peekaboo, while the picture is under the blanket: its sound, again every few seconds until the
+   * blanket comes off. Things without a sound stay quiet (the blanket wiggles instead).
+   */
+  async peekabooHidden(item: LoadedItem): Promise<void> {
+    const token = this.begin();
+    const sound = this.options.mode === 'NAME_ONLY' ? null : this.clips.sound(item);
+    if (!sound) return;
+    while (!token.cancelled) {
+      await this.play(sound, token);
+      await this.wait(PEEKABOO_REPEAT_MS, token);
+    }
+  }
+
+  /** The blanket comes off: "بَخ!", the name, then its sound once more. Resolves when done or stopped. */
+  async peekabooReveal(item: LoadedItem, lines?: PeekabooLines): Promise<void> {
+    const token = this.begin();
+    await this.playAll(this.clips.peekaboo(lines), token);
+    await this.playAll(this.clips.names(item), token);
+    if (this.options.mode !== 'NAME_ONLY') await this.play(this.clips.sound(item), token);
+  }
+
+  /** "Where's your nose?", said again a couple of times while the child looks for it. */
+  async pointAsk(item: LoadedItem, gender: ArGender): Promise<void> {
+    const token = this.begin();
+    for (let i = 0; i < POINT_ASKS && !token.cancelled; i++) {
+      if (i > 0) await this.wait(POINT_REPEAT_MS, token);
+      await this.playAll(this.clips.pointQuestion(item, gender), token);
+    }
   }
 
   async sessionEnd(): Promise<void> {

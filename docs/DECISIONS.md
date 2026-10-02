@@ -107,7 +107,6 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
   (واحد، اثنان، ثلاثة، أربعة، خمسة) and homes (مزرعة، بيت، بحر، نهر، غابة، صحراء، ثلج، عش، خلية).
 - **6 feeling sounds**: laugh, sob, "hmph", gasp, yawn, "wow".
 - **3 lines**: `home_question_ar.mp3` أين يعيش؟, `home_question_ar_f.mp3` أين تعيش؟, `home_question_en.mp3` "Where does it live?".
-- Pictures still to draw: the 6 feelings and the 9 homes (colours, shapes and counting are final).
 - The studio (`Home → Recording studio` on this PC) is the quickest way to record all of these.
 
 ## Added on 2 October 2026
@@ -123,6 +122,34 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
 | Sticker album | After each finished game the child gets a sticker of a picture they found and don't have yet; it pops up on the end screen and flies into a book. The book (next to play again) opens the album: a page per pack, found stickers in colour, the rest as faint shapes; tapping one plays it. Per child, on this phone. (The V1 spec avoided rewards; you chose to add this one.) |
 | Print flashcards | Home → Print flashcards: any pack, 4, 6 or 9 cards per A4 page with dashed cut lines, the picture with its Arabic and English names (names can be switched off). On a phone the print screen can save a PDF |
 | Real sounds | The studio's "Find real sounds and photos" lists Pixabay candidates (free for apps, no credit needed) for every sound still on a tone: you listen, choose, trim and save; each file's source goes in `public/assets/licenses/sources.csv`. Nothing is downloaded until you choose it |
+
+## Added on 2 October 2026 (second round)
+
+Chosen for a 1.5-year-old (the main player): games she can play now, and a word list for her parents.
+
+| Feature | Decision |
+|---|---|
+| First words | A new pack, second in the list: ball كرة, teddy دبدوب, balloon بالون, bubbles فقاعات, book كتاب, shoe حذاء, socks جوارب, hat قبعة, cup كوب, spoon ملعقة, bottle رضّاعة, bed سرير, chair كرسي, bath حمّام. Names only. 14 Fluent pictures (MIT), downloaded with your approval. Ball and balloon are never asked together |
+| Peekaboo | For the youngest: a blue spotted blanket hides a picture of the chosen pack while its sound plays (every 4 s); one tap anywhere pulls it off: "بَخ!" / "Peekaboo!", the name, the sound again. The next tap brings the blanket back over the next picture. 10 pictures a game (the questions setting), a sticker at the end, nothing to get wrong. Things without a sound stay quiet under a wiggling blanket |
+| Find it in the picture | Two scenes, drawn for the app and fitted to any screen: a farm (sky, tree, barn door, fence, field, pond) and a doll's house (bedroom, bathroom, kitchen, living room, with First words, Things at home and Family). "Where's the cow?" (its sound, then its name). It shows 2 more things than the picture setting (4-6), one area at a time so they spread out, each where it belongs (the duck in the pond), never two look-alikes (sheep and goat; clock and alarm clock). Tapping something else makes it hop and say what it is, then the question comes again; after 8 s or two other taps, the right one wiggles. The scenes take turns. "Sound only" leaves out things without a sound |
+| Where's your nose? | "Find it at home" became body parts only: a big picture and "أين أنفُكِ؟" (asked up to 3 times, 6 s apart); she points at her own nose and you tap the big green tick (or skip). Tapping the picture asks again. 11 parts: eyes, nose, mouth, ears, hands, finger, arm, feet, leg, teeth, tongue (not face or heart) |
+| Girl or boy | Each child's profile can say girl or boy, used only for Arabic grammar (أنفُكِ / أنفُكَ). Asked once, the first time Where's your nose? is played in Arabic; changeable in Settings → Children → Edit child. Kept on this phone, never backed up |
+| Words I know | Home → Words I know (and a card in the Report), per child. A word counts as understood after 3 first-try rights on at least 2 different days; a miss takes one right away (so lucky guesses with 2 pictures don't add up); a hint without a wrong tap counts neither way; once known it stays. Counted from the matching game (not Toddler mode), Find it in the picture and Where's your nose? (your tick); not from Memory, Odd one out, Peekaboo or the association packs. Parents mark the words she says ("Says it?") and add words outside the app ("ماء", "bye-bye"). Share as a picture (her animal, the counts, up to 24 words) or print 9 to an A4 page with a title card. On this phone only |
+| Real sounds, chosen for you | You asked me to fill the gaps myself: 82 Pixabay sound effects chosen from the studio's candidates (shorter single calls first), each cut to its loudest 3 s (vehicles 3.5 s, instruments 4 s) and saved as 22 kHz WAV through the studio, plus a seal (sea lions in Santa Cruz) and a language-neutral "mmm" for yum instead of the English "yummy". Every sound in the app is now real; all sources are in `public/assets/licenses/sources.csv`. Swap any you dislike in the studio (the old file is kept in `dev-assets/replaced`) |
+| Baby photos, chosen for you | 10 Pixabay photos, one clear baby each, cropped square (720 px): calf, lamb, kid, foal, puppy, kitten, lion cub, a new baby camel (the earlier options were a crowded herd or black-and-white) and duckling, plus a real chick so the whole pack is photos |
+| Soft "try again" tone | The spec's muted marimba note (0.35 s), made for the app instead of a Pixabay pop |
+| The 8 sounds from your Drive | Confirmed on Pixabay: "Free for use under the Pixabay Content License" (cat, dog, frog, monkey, bear, sheep, tiger, duck); listed in sources.csv |
+| "Name only" games | Now start with every picture, the quiet animals included; the "real sounds first" default only applies when sounds are played |
+| Full screen | Some in-app browsers never answer a full-screen request; the game now starts anyway after 1.5 s |
+
+### More clips for the voice session (sixth round)
+
+- `feedback/peekaboo_ar.mp3` **بَخ!**, `feedback/peekaboo_en.mp3` **Peekaboo!**
+- `packs/body/<part>_point_ar_f.mp3` for a girl: أين عيناكِ؟، أين أنفُكِ؟، أين فمُكِ؟، أين أُذُناكِ؟، أين يداكِ؟، أين إصبعُكِ؟، أين ذراعُكِ؟، أين قدماكِ؟، أين رِجلُكِ؟، أين أسنانُكِ؟، أين لسانُكِ؟ (11)
+- `packs/body/<part>_point_en.mp3`: Where are your eyes? / nose / mouth / ears / hands / finger / arm / feet / leg / teeth / tongue (11)
+- `packs/body/<part>_point_ar_m.mp3` for a boy (أين أنفُكَ؟...): only needed if a boy plays; the studio lists them once a child is a boy
+- First words names: 14 in Arabic and 14 in English
+- The studio lists all of these, and "Your voice and photos" lets you record them on your phone
 
 ## Fixes applied by default
 
@@ -154,7 +181,7 @@ panda (باندا). Plus 20 animal sound effects (`<key>_sound.mp3`) for the fir
 - `session_end_ar.mp3`: **انتهينا! برافو!** instead of أحسنت! لقد أنهيت اللعبة
 - `goat_name_ar.mp3`: **عنزة** (ʿanza) instead of ماعز
 - Worth a listen during the 8-of-10 adult test: camel (unfamiliar groan), owl vs pigeon, mouse vs bird. Add confusable pairs if they fail.
-- The 8 downloaded sounds look like Pixabay files; confirm the licence covers commercial use before release.
+- The 8 downloaded sounds are confirmed Pixabay files (Pixabay Content License), listed in `public/assets/licenses/sources.csv`.
 
 ## Notes for later
 

@@ -8,6 +8,7 @@ import { customStore } from '../../custom/store';
 import { blobUrl } from '../../custom/toLoaded';
 import type { AssetOverride } from '../../custom/types';
 import { useI18n } from '../../i18n/I18n';
+import { loadProfiles } from '../../settings/profiles';
 import { choosePictures } from '../kid/layout';
 import { ChevronIcon, Screen } from './components';
 import { PictureCropper } from './PictureCropper';
@@ -346,6 +347,13 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
         lines: (['ar', 'en'] as const).flatMap((lang) => line(odd[lang], lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
       });
     }
+    const peekaboo = feedback.peekaboo;
+    if (peekaboo) {
+      sections.push({
+        title: t('peekaboo'),
+        lines: (['ar', 'en'] as const).flatMap((lang) => line(peekaboo[lang], lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
+      });
+    }
     sections.push({
       title: t('linesEnd'),
       lines: (['ar', 'en'] as const).flatMap((lang) =>
@@ -367,5 +375,19 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
       ],
     });
   }
+  // "Where's your nose?": each body part, for a girl (and a boy, once a child is one) and in English.
+  const boys = loadProfiles().profiles.some((p) => p.arGender === 'm');
+  const pointLines = packs.flatMap((p) =>
+    p.items.flatMap((i): Line[] => {
+      const point = i.point;
+      if (!point) return [];
+      const one = (voice: 'ar_f' | 'ar_m' | 'en', label: string): Line[] => {
+        const l = point[voice];
+        return l ? [{ path: l.audio.path, original: l.audio, label: `${i.name[lang]} · ${label}`, say: l.text, lang: voice === 'en' ? 'en' : 'ar', category: 'feedback' }] : [];
+      };
+      return [...one('ar_f', t('lineForGirl')), ...(boys ? one('ar_m', t('lineForBoy')) : []), ...one('en', t('langEnglish'))];
+    }),
+  );
+  if (pointLines.length) sections.push({ title: t('pointGame'), lines: pointLines });
   return sections.filter((s) => s.lines.length);
 }

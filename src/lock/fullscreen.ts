@@ -14,13 +14,17 @@ export function isFullscreen(): boolean {
   return Boolean(doc.fullscreenElement ?? doc.webkitFullscreenElement);
 }
 
+/** Some in-app browsers never answer a fullscreen request; the game starts anyway after this long. */
+const FULLSCREEN_WAIT_MS = 1500;
+
 /** Must be called from a tap handler. Resolves to whether the page is now fullscreen. */
 export async function enterFullscreen(): Promise<boolean> {
   if (isFullscreen()) return true;
   const el = document.documentElement as WebkitElement;
   try {
-    if (typeof el.requestFullscreen === 'function') await el.requestFullscreen({ navigationUI: 'hide' });
-    else await el.webkitRequestFullscreen?.();
+    const request =
+      typeof el.requestFullscreen === 'function' ? el.requestFullscreen({ navigationUI: 'hide' }) : el.webkitRequestFullscreen?.();
+    await Promise.race([request, new Promise((resolve) => window.setTimeout(resolve, FULLSCREEN_WAIT_MS))]);
   } catch {
     return false;
   }

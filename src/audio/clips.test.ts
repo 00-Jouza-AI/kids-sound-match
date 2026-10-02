@@ -44,3 +44,28 @@ describe('"Who eats what?" clips', () => {
     expect(both.reward()).toMatchObject({ kind: 'file', url: '/yum.mp3' });
   });
 });
+
+describe('Peekaboo and "Where\'s your nose?" lines', () => {
+  const nose: LoadedItem = {
+    ...animal('nose', false),
+    point: {
+      en: { text: "Where's your nose?", audio: asset('nose_point_en.mp3') },
+      ar_f: { text: 'أين أنفُكِ؟', audio: asset('nose_point_ar_f.mp3') },
+      ar_m: { text: 'أين أنفُكَ؟', audio: asset('nose_point_ar_m.mp3') },
+    },
+  };
+  const body: LoadedPack = { ...whoEats, id: 'body', kind: 'match', association: undefined };
+
+  it('asks a girl أين أنفُكِ؟ and a boy أين أنفُكَ؟, then English for "Both"', () => {
+    expect(urls(new ClipResolver(body, ['ar']).pointQuestion(nose, 'f'))).toEqual(['/nose_point_ar_f.mp3']);
+    expect(urls(new ClipResolver(body, ['ar']).pointQuestion(nose, 'm'))).toEqual(['/nose_point_ar_m.mp3']);
+    expect(urls(new ClipResolver(body, ['ar', 'en']).pointQuestion(nose, 'f'))).toEqual(['/nose_point_ar_f.mp3', '/nose_point_en.mp3']);
+    expect(new ClipResolver(body, ['en']).pointQuestion(animal('cat', false), 'f')).toEqual([]);
+  });
+
+  it('says بَخ! / Peekaboo! from the shared lines, whichever pack is played', () => {
+    const lines = { ar: asset('feedback/peekaboo_ar.mp3'), en: asset('feedback/peekaboo_en.mp3') };
+    expect(urls(new ClipResolver(body, ['ar', 'en']).peekaboo(lines))).toEqual(['/feedback/peekaboo_ar.mp3', '/feedback/peekaboo_en.mp3']);
+    expect(new ClipResolver(body, ['ar']).peekaboo()).toEqual([]);
+  });
+});

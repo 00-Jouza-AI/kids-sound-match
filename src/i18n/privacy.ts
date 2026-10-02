@@ -33,6 +33,11 @@ const EN = [
     body: 'For the Report, the app saves which item was asked, whether your child found it on the first try, and how many taps it took. This is stored only in this browser on this device and is never sent anywhere, not even with cloud backup. You can delete it at any time under Report → Clear all history.',
   },
   {
+    id: 'words',
+    heading: 'Words I know, and girl or boy',
+    body: 'The words you mark as said, the words you add yourself, and whether a child is a girl or a boy (used only so the Arabic “Where’s your nose?” is grammatical) are saved on this device only. They are never backed up or sent anywhere, and removing a child deletes them.',
+  },
+  {
     id: 'own',
     heading: 'Your own pictures and recordings',
     body: 'Packs you make in My packs (photos, icons, your recordings and the names you type), and your own voice and photos for our packs, are saved on this device. Recording uses the microphone only while you press Record.',
@@ -79,6 +84,11 @@ const AR: typeof EN = [
     id: 'results',
     heading: 'نتائج طفلك تبقى على هذا الجهاز',
     body: 'من أجل التقرير، يحفظ التطبيق العنصر المطلوب، وهل وجده طفلك من أول محاولة، وعدد اللمسات. تُحفظ هذه البيانات في هذا المتصفح على هذا الجهاز فقط ولا تُرسل إلى أي مكان، حتى مع النسخ الاحتياطي السحابي. يمكنك حذفها في أي وقت من التقرير ← مسح كل السجل.',
+  },
+  {
+    id: 'words',
+    heading: 'كلماتي، وبنت أم ولد',
+    body: 'الكلمات التي تحدّدها كمنطوقة، والكلمات التي تضيفها بنفسك، وهل الطفل بنت أم ولد (لتكون جملة «أين أنفك؟» صحيحة لغوياً فقط) تُحفظ على هذا الجهاز وحده. لا تُنسخ احتياطياً ولا تُرسل إلى أي مكان، وحذف الطفل يحذفها.',
   },
   {
     id: 'own',

@@ -1,3 +1,4 @@
+import type { ArGender } from '../content/types';
 import { newId } from '../custom/types';
 import { local } from './storage';
 
@@ -10,6 +11,8 @@ export interface Profile {
   id: string;
   animal: string;
   color: string;
+  /** Girl or boy, only for Arabic grammar ("Where's your nose?": أنفُكِ / أنفُكَ). Unset until a parent says. */
+  arGender?: ArGender;
 }
 
 export interface ProfileState {
@@ -41,7 +44,12 @@ export function sanitizeProfiles(raw: unknown): ProfileState {
       return Boolean(ok);
     })
     .slice(0, MAX_PROFILES)
-    .map((p) => ({ id: p.id, animal: p.animal, color: p.color }));
+    .map((p) => ({
+      id: p.id,
+      animal: p.animal,
+      color: p.color,
+      ...(p.arGender === 'f' || p.arGender === 'm' ? { arGender: p.arGender } : {}),
+    }));
   if (!profiles.length) return defaultProfiles();
   const activeId = profiles.some((p) => p.id === r.activeId) ? (r.activeId as string) : profiles[0].id;
   return { profiles, activeId };

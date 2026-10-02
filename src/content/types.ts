@@ -27,7 +27,19 @@ export interface ManifestItem {
   prompts?: string[];
   /** Arabic grammatical gender, when the name doesn't show it (أفعى). Otherwise a final ة means feminine. */
   ar_feminine?: boolean;
+  /**
+   * "Where's your nose?": the question in English and in Arabic for a girl and a boy (أين أنفُكِ؟ /
+   * أين أنفُكَ؟), with the words for the stand-in voice. Body parts only.
+   */
+  point?: Partial<Record<PointVoice, { text: string; audio: string }>>;
 }
+
+/** Who a "Where's your…?" line is said to: English, or Arabic for a girl or a boy. */
+export type PointVoice = 'en' | 'ar_f' | 'ar_m';
+export const POINT_VOICES: readonly PointVoice[] = ['en', 'ar_f', 'ar_m'];
+
+/** Arabic grammar for a child ("your" is كِ for a girl, كَ for a boy). Kept only on this phone. */
+export type ArGender = 'f' | 'm';
 
 /** A preset for the parent's animal picker. */
 export interface ManifestGroup {
@@ -42,6 +54,8 @@ export interface ManifestFeedback {
   session_end: Record<Lang, string>;
   /** Odd one out: "Which one is different?". */
   odd_question?: Record<Lang, string>;
+  /** Peekaboo: "بَخ!" / "Peekaboo!", said as the blanket comes off. */
+  peekaboo?: Record<Lang, string>;
 }
 
 /**
@@ -120,6 +134,13 @@ export interface LoadedItem {
   readonly arFeminine?: boolean;
   /** The pack's own drawings, kept when a parent's photo replaces them (see choosePictures). */
   readonly drawings?: readonly ResolvedAsset[];
+  /** "Where's your nose?" lines that can be played (a recording, or a stand-in in development). */
+  readonly point?: Readonly<Partial<Record<PointVoice, PointLine>>>;
+}
+
+export interface PointLine {
+  readonly text: string;
+  readonly audio: ResolvedAsset;
 }
 
 export interface LoadedFeedback {
@@ -128,6 +149,8 @@ export interface LoadedFeedback {
   readonly sessionEnd: Readonly<Record<Lang, ResolvedAsset | null>>;
   /** Odd one out: "Which one is different?". Missing in packs without it. */
   readonly oddQuestion?: Readonly<Record<Lang, ResolvedAsset | null>>;
+  /** Peekaboo: "بَخ!" / "Peekaboo!". Missing in packs without it. */
+  readonly peekaboo?: Readonly<Record<Lang, ResolvedAsset | null>>;
 }
 
 export interface LoadedAssociation {

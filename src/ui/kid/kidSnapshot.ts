@@ -1,10 +1,11 @@
+import type { ArGender } from '../../content/types';
 import type { ChoiceCount, SessionSnapshot } from '../../engine';
 import { FIRST_PROFILE_ID } from '../../settings/profiles';
 import type { GameLanguage, GameMode } from '../../settings/settings';
 import { session as tabStorage } from '../../settings/storage';
 
-/** The matching game, Explore, the memory game, or Odd one out. */
-export type KidKind = 'game' | 'explore' | 'memory' | 'odd';
+/** The matching game, Explore, Memory, Odd one out, Peekaboo, Find it in the picture, or Where's your nose? */
+export type KidKind = 'game' | 'explore' | 'memory' | 'odd' | 'peekaboo' | 'scene' | 'point';
 
 /** The settings a game was started with. Changing Settings mid-game doesn't affect it. */
 export interface KidConfig {
@@ -28,6 +29,10 @@ export interface KidConfig {
   memoryPairs?: number;
   /** Odd one out: easy (three animals and a car) or hard (three farm animals and a fish). */
   oddLevel?: 'easy' | 'hard';
+  /** Find it in the picture: the farm or the house. */
+  sceneId?: string;
+  /** Where's your nose?: the child's Arabic grammar (أنفُكِ / أنفُكَ). */
+  arGender?: ArGender;
 }
 
 /**
