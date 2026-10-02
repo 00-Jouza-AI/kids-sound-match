@@ -81,7 +81,7 @@
     {
       "item_key": "chick",
       "name": { "en": "Chick", "ar": "كتكوت" },
-      "image": "animals/chick.svg",
+      "image": "animal-babies/chick.jpg",
       "name_audio": {
         "en": "animals/chick_name_en.mp3",
         "ar": "animals/chick_name_ar.mp3"

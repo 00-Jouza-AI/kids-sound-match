@@ -174,6 +174,8 @@ export function usableInMode(item: LoadedItem, mode: GameMode): boolean {
 /** Default selection: the animals that have a real sound, so testing uses real sounds only. */
 export function defaultSelection(pack: LoadedPack, mode: GameMode = 'SOUND_AND_NAME'): string[] {
   const usable = pack.items.filter((i) => usableInMode(i, mode));
+  // Real sounds over development tones, when sounds are played; "Name only" plays no sounds.
+  if (mode === 'NAME_ONLY') return usable.map((i) => i.key);
   const withRealSound = usable.filter((i) => i.sound?.real).map((i) => i.key);
   return withRealSound.length >= MIN_ITEMS_PER_PACK ? withRealSound : usable.map((i) => i.key);
 }

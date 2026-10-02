@@ -128,13 +128,15 @@ describe('loader', () => {
     expect(animals.items).toHaveLength(54);
     const cat = animals.items.find((i) => i.key === 'cat')!;
     expect(cat.sound).toEqual({ path: 'packs/animals/cat_sound.mp3', url: '/assets/packs/animals/cat_sound.mp3', real: true });
-    // Every picture is a real drawing now; the voice is still a stand-in.
+    // Every picture and sound is real now; the voice is still a stand-in.
     expect(cat.images).toEqual([{ path: 'packs/animals/cat.svg', url: '/assets/packs/animals/cat.svg', real: true }]);
     expect(cat.nameAudio.ar.real).toBe(false);
     const cow = animals.items.find((i) => i.key === 'cow')!;
     expect(cow.images[0].real).toBe(true);
-    expect(cow.sound?.url).toBe('/placeholders/packs/animals/cow_sound.wav');
-    expect(animals.feedback.incorrectTone?.url).toBe('/placeholders/feedback/incorrect_tone.wav');
+    // A Pixabay sound approved in the studio is saved as WAV and stands in for the manifest's MP3.
+    expect(cow.sound).toEqual({ path: 'packs/animals/cow_sound.mp3', url: '/assets/packs/animals/cow_sound.wav', real: true });
+    expect(animals.feedback.incorrectTone?.url).toBe('/assets/feedback/incorrect_tone.wav');
+    expect(animals.feedback.correct.ar[0].url).toBe('/placeholders/feedback/correct_ar_1.wav');
     expect(animals.groups.map((g) => g.id)).toEqual(['first', 'farm', 'wild', 'birds', 'sea', 'bugs']);
   });
 
@@ -200,7 +202,7 @@ describe('all packs', () => {
     const content = await load();
     expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
     expect(content.packs.map((p) => p.id)).toEqual([
-      'animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family',
+      'animals', 'first-words', 'home', 'vehicles', 'instruments', 'food', 'body', 'family',
       'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
     ]);
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
@@ -210,7 +212,7 @@ describe('all packs', () => {
     expect(carrot.prompts!.map((p) => p.key)).toEqual(['rabbit', 'donkey', 'horse']);
     expect(carrot.nameAudio.ar.path).toBe('packs/food/carrot_name_ar.mp3'); // the same recording as in Food
     expect(whoEats.association!.question.ar?.url).toBe('/placeholders/feedback/eat_question_ar.wav');
-    expect(whoEats.association!.reward?.url).toBe('/placeholders/feedback/yum.wav');
+    expect(whoEats.association!.reward?.url).toBe('/assets/feedback/yum.wav');
     const animals = content.packs[0];
     const gender = (key: string) => animals.items.find((i) => i.key === key)!.arFeminine;
     expect([gender('cow'), gender('horse'), gender('turtle'), gender('snake')]).toEqual([true, false, true, true]);
@@ -229,16 +231,16 @@ describe('all packs', () => {
     const content = await load();
     const mixed = buildMixedPack(content.packs, content.packs[0].feedback)!;
     // Counting stays out of the mix.
-    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'colors', 'shapes', 'feelings']);
+    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'first-words', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'colors', 'shapes', 'feelings']);
     expect(new Set(mixed.items.map((i) => i.key)).size).toBe(mixed.items.length);
     expect(mixed.items.find((i) => i.key === 'bell')!.confusableWith).toContain('doorbell');
 
     const settings = defaultSettings('ar');
-    // Sound modes: the 8 animals with real sounds, plus every home, vehicle, instrument and feeling sound.
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 6);
+    // Sound modes: the 44 animals that make a sound, plus every home, vehicle, instrument and feeling sound.
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(44 + 15 + 14 + 11 + 6);
     settings.mode = 'NAME_ONLY';
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(8 + 15 + 14 + 11 + 25 + 13 + 9 + 6 + 6 + 6);
-    settings.mixedExcluded = ['animals', 'home', 'vehicles', 'instruments', 'body', 'family', 'colors', 'shapes', 'feelings'];
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(54 + 14 + 15 + 14 + 11 + 25 + 13 + 9 + 6 + 6 + 6);
+    settings.mixedExcluded = ['animals', 'first-words', 'home', 'vehicles', 'instruments', 'body', 'family', 'colors', 'shapes', 'feelings'];
     expect(enabledItemKeys(mixed, settings)).toEqual(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));
     expect(sourcePacks(mixed).get('drum')).toBe('instruments');
     // Colours, shapes and feelings only appear with their own kind; the other built-in packs mix.
@@ -264,7 +266,7 @@ describe('all packs', () => {
     expect(babies.association!.celebration).toBe('baby');
     const chick = babies.items.find((i) => i.key === 'chick')!;
     expect(chick.prompts!.map((p) => p.key)).toEqual(['hen']);
-    expect(chick.images[0].path).toBe('packs/animals/chick.svg'); // the same drawing as in Animals
+    expect(chick.images[0].path).toBe('packs/animal-babies/chick.jpg'); // a photo, like every other baby
     expect(babies.items.find((i) => i.key === 'calf')!.name.ar).toBe('عِجل');
   });
 
