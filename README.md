@@ -1,6 +1,20 @@
 # Kids Sound Match (web)
 
-The web version of Kids Sound Match V1. A child hears a sound or a word, sees 2–4 pictures and taps the
+## Open the app
+
+**https://kids-sound-match.vercel.app**
+
+- Open it on a phone or computer. On a phone, choose "Add to Home screen" / "Install app" to use it like an
+  app (it then works offline too).
+- It updates by itself: every push to this repo's `main` branch is built and published by Vercel within a
+  minute. Builds and logs: https://vercel.com/mohammadjouzas-projects/kids-sound-match
+- This is the **test version**: the phone reads the names aloud until the real voice recordings are added.
+- **It won't open?** Some internet connections block every `*.vercel.app` address (the page never loads).
+  Try mobile data instead of Wi-Fi, or give the project a domain of your own in Vercel → Settings → Domains.
+- **Leaving a game:** hold the small circle in the top corner (3 seconds, or the time chosen in Settings →
+  Leaving a game), then enter your PIN or your 4 pictures.
+
+The web version of Kids Sound Match V1. A child hears a sound or a word, sees 2–10 pictures and taps the
 matching one, in Arabic or English. No ads, no tracking; results stay on the device. It follows
 `App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
 for every change agreed since.
@@ -118,7 +132,7 @@ Supabase and appear on the parent's other devices. The child's results are never
 ## Online with Vercel
 
 The GitHub repo (`00-Jouza-AI/kids-sound-match`) is connected to Vercel: every push to `main` builds and
-publishes the app. `vercel.json` makes Vercel build the **test version** (`npm run build:test`), which uses
+publishes the app at **https://kids-sound-match.vercel.app**. `vercel.json` makes Vercel build the **test version** (`npm run build:test`), which uses
 the phone's voice until the real recordings exist; the release build would show nothing yet.
 
 - Cloud backup online: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel → Project → Settings →
