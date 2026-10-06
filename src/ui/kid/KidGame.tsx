@@ -22,10 +22,8 @@ import { IdleScene, SessionEndScene } from './scenes';
 
 /** Taps are ignored briefly after a question appears, so a finger still tapping can't skip it. */
 const INPUT_GUARD_MS = 500;
-/** A right answer: about a second of confetti and its name, then straight on to the next question. */
+/** A right answer: a second of confetti, no words, then straight on to the next question. */
 const CELEBRATION_MS = 1000;
-/** A longer name may finish, up to this long per spoken language (both names in "Both"). */
-const CELEBRATION_MAX_MS = 1800;
 /** The end-of-game celebration (and its praise) before the play-again screen. */
 const SESSION_END_MS = 1800;
 const SESSION_END_MAX_MS = 4000;
@@ -262,13 +260,10 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, picke
     }
   };
 
-  const celebrate = async (celebrated: LoadedItem, toddler: boolean) => {
-    const began = performance.now();
-    // Its name (Toddler mode too), then the next question; the praise comes at the end of the game.
-    const sounds = audio.named(celebrated, !toddler && pack.kind === 'association');
-    await Promise.race([sounds, sleep(CELEBRATION_MAX_MS * spokenLanguages(config.language).length)]);
-    const elapsed = performance.now() - began;
-    if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
+  /** Confetti only (Toddler mode too): the question stops, and the next one comes after a second. */
+  const celebrate = async () => {
+    audio.stop();
+    await sleep(CELEBRATION_MS);
     if (alive.current) advance();
   };
 
@@ -287,7 +282,7 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, picke
       return;
     }
     clearHint();
-    void celebrate(item(outcome === 'toddler' ? key : targetKey), outcome === 'toddler');
+    void celebrate();
   };
 
   const replay = () => {

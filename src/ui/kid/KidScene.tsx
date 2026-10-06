@@ -29,9 +29,8 @@ import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Sti
 
 /** Taps are ignored briefly after a question starts, so a finger still tapping can't answer it. */
 const INPUT_GUARD_MS = 500;
-/** Found it: about a second of confetti and its name, then the next question. */
+/** Found it: a second of confetti, no words, then the next question. */
 const CELEBRATION_MS = 1000;
-const CELEBRATION_MAX_MS = 1800;
 const SESSION_END_MS = 1800;
 const SESSION_END_MAX_MS = 4000;
 /** Gentle hint: the right thing wiggles after this long without finding it, and again after as long. */
@@ -262,11 +261,8 @@ export function KidScene({
     setHint(null);
     setFound(key);
     answers.current.push({ key, packId: tapped.packId, taps: current.current.taps, hinted: current.current.hinted });
-    const began = performance.now();
-    const cap = CELEBRATION_MAX_MS * spokenLanguages(config.language).length;
-    void Promise.race([audio.named(tapped.item), sleep(cap)]).then(async () => {
-      const elapsed = performance.now() - began;
-      if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
+    audio.stop();
+    void sleep(CELEBRATION_MS).then(() => {
       if (!alive.current) return;
       if (indexRef.current + 1 >= roundRef.current.order.length) {
         finish();

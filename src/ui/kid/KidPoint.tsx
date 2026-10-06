@@ -17,9 +17,8 @@ import { IdleScene, SessionEndScene } from './scenes';
 import { EndScreen, type PickerOptions } from './EndScreen';
 import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 
-/** Found it: about a second of confetti and its name, then the next one. */
+/** Found it: a second of confetti, no words, then the next one. */
 const CELEBRATION_MS = 1000;
-const CELEBRATION_MAX_MS = 1800;
 const SESSION_END_MS = 1800;
 const SESSION_END_MAX_MS = 4000;
 /** A body part can't be marked found the moment it appears (an excited double tap). */
@@ -188,12 +187,8 @@ export function KidPoint({
     busy.current = true;
     setFound(true);
     foundKeys.current.push(it.key);
-    const began = performance.now();
-    void Promise.race([audio.named(it), sleep(CELEBRATION_MAX_MS * spokenLanguages(config.language).length)]).then(async () => {
-      const elapsed = performance.now() - began;
-      if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
-      next();
-    });
+    audio.stop();
+    void sleep(CELEBRATION_MS).then(next);
   };
 
   const onSkip = () => {
