@@ -115,6 +115,17 @@ Packs stay on the phone unless a parent signs in with Google in My packs; then t
 Supabase and appear on the parent's other devices. The child's results are never uploaded. Setup
 (once): [docs/CLOUD-SETUP.md](docs/CLOUD-SETUP.md) and [supabase/schema.sql](supabase/schema.sql).
 
+## Online with Vercel
+
+The GitHub repo (`00-Jouza-AI/kids-sound-match`) is connected to Vercel: every push to `main` builds and
+publishes the app. `vercel.json` makes Vercel build the **test version** (`npm run build:test`), which uses
+the phone's voice until the real recordings exist; the release build would show nothing yet.
+
+- Cloud backup online: add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel → Project → Settings →
+  Environment Variables, and add the Vercel address to Supabase → Authentication → URL Configuration.
+- Some internet connections block every `*.vercel.app` address. If the site won't open, give the project a
+  domain of your own in Vercel → Project → Settings → Domains.
+
 ## Put it on your phone as a real app (Cloudflare Pages)
 
 Over home Wi-Fi a phone can't install the app, keep the screen on or work offline; over HTTPS it can.
