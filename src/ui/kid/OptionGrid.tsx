@@ -1,4 +1,6 @@
 import { useMemo, useRef, type CSSProperties } from 'react';
+import type { LocalizedText } from '../../content/types';
+import { CardNames } from './CardNames';
 import { fitSquares, layoutRows, useBoxSize } from './layout';
 
 interface Props {
@@ -8,10 +10,12 @@ interface Props {
   celebratedKey: string | null;
   /** Gentle hint: this picture wiggles. The pulse number restarts the wiggle each time. */
   hint: { key: string; pulse: number } | null;
+  /** The names to show on each picture; none when the names are switched off. */
+  names?: Readonly<Record<string, LocalizedText>>;
   onTap: (key: string) => void;
 }
 
-export function OptionGrid({ options, pictures, faded, celebratedKey, hint, onTap }: Props) {
+export function OptionGrid({ options, pictures, faded, celebratedKey, hint, names, onTap }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const box = useBoxSize(ref);
   const rows = layoutRows(options.length, box.w > box.h ? 'landscape' : 'portrait');
@@ -33,7 +37,7 @@ export function OptionGrid({ options, pictures, faded, celebratedKey, hint, onTa
                 <button
                   type="button"
                   key={key}
-                  className={`option${state}`}
+                  className={`option${names?.[key] ? ' named' : ''}${state}`}
                   style={{ width: size, height: size }}
                   data-key={key}
                   tabIndex={-1}
@@ -41,6 +45,7 @@ export function OptionGrid({ options, pictures, faded, celebratedKey, hint, onTa
                   onPointerDown={() => onTap(key)}
                 >
                   <img src={pictures[key]} alt="" draggable={false} />
+                  {names?.[key] && <CardNames name={names[key]} />}
                   {celebratedKey === key && <Burst size={size} />}
                 </button>
               );

@@ -42,6 +42,16 @@ describe('layouts', () => {
     expect(layoutRows(4, 'landscape')).toEqual([[0, 1], [2, 3]]);
   });
 
+  it('lays out 5 to 10 pictures 2 across upright and in two rows sideways', () => {
+    expect(layoutRows(5, 'portrait')).toEqual([[0, 1], [2, 3], [4]]);
+    expect(layoutRows(10, 'portrait')).toHaveLength(5);
+    expect(layoutRows(7, 'landscape')).toEqual([[0, 1, 2, 3], [4, 5, 6]]);
+    expect(layoutRows(10, 'landscape')).toEqual([[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]]);
+    for (const n of [5, 6, 7, 8, 10]) {
+      for (const o of ['portrait', 'landscape'] as const) expect(layoutRows(n, o).flat()).toEqual([...Array(n).keys()]);
+    }
+  });
+
   it('lays out Explore 2 across upright and 3 across sideways', () => {
     expect(exploreRows(6, 'portrait')).toEqual([[0, 1], [2, 3], [4, 5]]);
     expect(exploreRows(5, 'landscape')).toEqual([[0, 1, 2], [3, 4]]);

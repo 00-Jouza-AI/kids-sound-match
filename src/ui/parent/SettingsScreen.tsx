@@ -5,7 +5,9 @@ import { MIN_ITEMS_PER_PACK } from '../../content/validate';
 import { isCustomPackId } from '../../custom/types';
 import { MEMORY_PAIRS, type ChoiceCount } from '../../engine';
 import { useI18n } from '../../i18n/I18n';
+import { HOLD_SECONDS, loadLockPrefs, loadPictureCode, saveLockPrefs, type LockPrefs } from '../../lock/lockPrefs';
 import { ParentGate } from '../../lock/ParentGate';
+import { PictureSetup } from '../../lock/PicturePad';
 import { PinSetup } from '../../lock/PinSetup';
 import { MAX_PROFILES, PROFILE_ANIMALS, PROFILE_COLORS, type Profile } from '../../settings/profiles';
 import {
@@ -20,7 +22,7 @@ import {
 } from '../../settings/settings';
 import { NO_REPLAY_LIMIT, REPLAY_LIMITS } from '../../settings/replays';
 import { telemetry } from '../../telemetry/telemetry';
-import { choosePictures } from '../kid/layout';
+import { choosePictures, layoutRows } from '../kid/layout';
 import { Overlay, Row, Screen, Segmented, Toggle } from './components';
 import { Avatar, ProfileRow } from './ProfileRow';
 
@@ -44,6 +46,13 @@ export function SettingsScreen({
   const [toast, setToast] = useState<string | null>(null);
   const [nudge, setNudge] = useState(false);
   const [editingChild, setEditingChild] = useState<Profile | null>(null);
+  // Leaving a game: how long to hold the corner, and the PIN or 4 pictures. For the whole phone.
+  const [lock, setLock] = useState<LockPrefs>(loadLockPrefs);
+  const [pictureSetup, setPictureSetup] = useState(false);
+  const changeLock = (next: LockPrefs) => {
+    saveLockPrefs(next);
+    setLock(next);
+  };
   const association = pack.kind === 'association';
   const byName = !association && !soundModesAvailable(pack);
   const children = profiles.state.profiles;
@@ -185,6 +194,9 @@ export function SettingsScreen({
         <Row label={t('settingsAdaptive')} hint={t('settingsAdaptiveHint')}>
           <Toggle label={t('settingsAdaptive')} checked={settings.adaptive} onChange={(adaptive) => update({ adaptive })} />
         </Row>
+        <Row label={t('settingsCardNames')} hint={t('settingsCardNamesHint')}>
+          <Toggle label={t('settingsCardNames')} checked={settings.cardNames} onChange={(cardNames) => update({ cardNames })} />
+        </Row>
         <Row label={t('settingsMemory')} hint={t('settingsMemoryHint')}>
           <Segmented
             label={t('settingsMemory')}
@@ -238,6 +250,44 @@ export function SettingsScreen({
         </Row>
       </section>
 
+      <section className="card">
+        <h2>{t('exitTitle')}</h2>
+        <Row label={t('exitHold')} hint={t('exitHoldHint')}>
+          <Segmented
+            label={t('exitHold')}
+            value={lock.holdSec}
+            options={HOLD_SECONDS.map((n) => ({ value: n, label: t('secondsShort', { n }) }))}
+            onChange={(holdSec) => changeLock({ ...lock, holdSec })}
+          />
+        </Row>
+        <Row label={t('exitLock')} hint={t('exitLockHint')}>
+          <Segmented
+            label={t('exitLock')}
+            value={lock.exitLock}
+            options={[
+              { value: 'pin', label: t('exitLockPin') },
+              { value: 'pictures', label: t('exitLockPictures') },
+            ]}
+            onChange={(exitLock) => (exitLock === 'pictures' && !loadPictureCode() ? setPictureSetup(true) : changeLock({ ...lock, exitLock }))}
+          />
+        </Row>
+        {lock.exitLock === 'pictures' && (
+          <button type="button" className="btn" onClick={() => setPictureSetup(true)}>
+            {t('pictureChange')}
+          </button>
+        )}
+      </section>
+
+      {pictureSetup && (
+        <PictureSetup
+          onDone={() => {
+            changeLock({ ...lock, exitLock: 'pictures' });
+            setPictureSetup(false);
+            showToast(t('pictureSaved'));
+          }}
+          onCancel={() => setPictureSetup(false)}
+        />
+      )}
       {pinStep === 'verify' && (
         <ParentGate
           title={t('gateEnterCurrentPin')}
@@ -531,20 +581,22 @@ function PackThumb({ pack }: { pack: LoadedPack }) {
 }
 
 /** A tiny picture of how 2, 3 or 4 pictures sit on a phone held upright. */
+/** A phone held upright with the pictures as the game lays them out (2 stacked ... 10 in pairs). */
 function LayoutPreview({ count }: { count: number }) {
-  const cells: [number, number][] =
-    count === 2
-      ? [[11, 6], [11, 26]]
-      : count === 3
-        ? [[4, 10], [18, 10], [11, 24]]
-        : [[4, 10], [18, 10], [4, 24], [18, 24]];
-  const size = count === 2 ? 14 : 11;
+  const rows = layoutRows(count, 'portrait');
+  const cols = Math.max(...rows.map((r) => r.length));
+  const gap = 2;
+  const size = Math.min((28 - gap * (cols - 1)) / cols, (36 - gap * (rows.length - 1)) / rows.length, 14);
+  const top = 23 - (rows.length * size + (rows.length - 1) * gap) / 2;
   return (
     <svg className="layout-preview" viewBox="0 0 36 46" aria-hidden="true">
       <rect x="1" y="1" width="34" height="44" rx="6" />
-      {cells.map(([x, y], i) => (
-        <rect key={i} className="cell" x={count === 2 ? x : x + 1} y={y} width={size} height={size} rx="2.5" />
-      ))}
+      {rows.flatMap((row, r) => {
+        const left = 18 - (row.length * size + (row.length - 1) * gap) / 2;
+        return row.map((i, c) => (
+          <rect key={i} className="cell" x={left + c * (size + gap)} y={top + r * (size + gap)} width={size} height={size} rx="2" />
+        ));
+      })}
     </svg>
   );
 }

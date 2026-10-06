@@ -71,20 +71,14 @@ export class GameAudio {
     if (!token.cancelled) void this.prompt(target, about, odd);
   }
 
-  /** Right tap: the name, then praise. Association games add a "yum" in between. Resolves when done or stopped. */
-  async correct(item: LoadedItem, eaten = false): Promise<void> {
+  /**
+   * A right answer, quickly: just its name (and the "yum" in association games), so the next
+   * question comes after about a second. The praise is saved for the end of the game.
+   */
+  async named(item: LoadedItem, eaten = false): Promise<void> {
     const token = this.begin();
     await this.playAll(this.clips.names(item), token);
     if (eaten) await this.play(this.clips.reward(), token);
-    await this.play(this.clips.correct(this.options.random), token);
-  }
-
-  /** Toddler mode: the tapped animal's own sound and name, then praise. */
-  async toddler(item: LoadedItem): Promise<void> {
-    const token = this.begin();
-    await this.play(this.clips.sound(item), token);
-    await this.playAll(this.clips.names(item), token);
-    await this.play(this.clips.correct(this.options.random), token);
   }
 
   /** Explore mode: the tapped animal's sound and name, nothing else. */
@@ -125,8 +119,10 @@ export class GameAudio {
     }
   }
 
+  /** The end of a game: the praise saved up from the answers ("رائع!"), then "انتهينا! برافو!". */
   async sessionEnd(): Promise<void> {
     const token = this.begin();
+    await this.play(this.clips.correct(this.options.random), token);
     await this.playAll(this.clips.sessionEnd(), token);
   }
 

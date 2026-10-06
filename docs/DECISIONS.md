@@ -151,6 +151,17 @@ Chosen for a 1.5-year-old (the main player): games she can play now, and a word 
 - First words names: 14 in Arabic and 14 in English
 - The studio lists all of these, and "Your voice and photos" lets you record them on your phone
 
+## Added on 6 October 2026
+
+| Feature | Decision |
+|---|---|
+| Hold time | Settings → Leaving a game: hold the corner circle 3, 5, 7 or 10 seconds (3 by default); the ring fills over that time. For the whole phone, like the PIN |
+| Picture lock | Settings → Leaving a game → "Then ask for": PIN or 4 pictures. With pictures, leaving a game shows 9 big pictures (cat, dog, frog, apple, banana, car, ball, rocket, star); you tap your 4 in order. No delete key: after the 4th tap it checks and clears itself, so a wrong try just starts again. 3 wrong tries start the PIN's 30-second wait (they share the count). "Use the PIN" is always there. The code is stored salted and hashed like the PIN. Settings, the Report and My packs still ask for the PIN |
+| Faster right answers | A right answer gets confetti and its name, then the next question after about a second (a longer name may finish, up to 1.8 s per spoken language). Toddler mode says the tapped picture's name only. The praise ("رائع!") is said once at the end of the game, before "انتهينا! برافو!", and the play-again screen comes after about 2 s instead of up to 6. Same in Find it in the picture and Where's your nose?; a Memory pair says its name |
+| End screen | A much bigger play-again button in the middle, the sticker album bottom left, and a small "choose" button bottom right: pick the game, the pack and one of its groups (Farm, Wild, Birds, Fruit...), then Play. No lock (nothing else can be changed there); groups with fewer than 5 pictures are greyed out; the choice is saved for that child and counts as one of the day's play-agains. Only offered while play-agains are left |
+| Pictures per question | 2, 3, 4, 5, 6, 7, 8 or 10 (as asked; 9 was left out). 5 to 10 are laid out 2 across when the phone is upright and in two rows when it's sideways. A small pack shows as many different pictures as it can. Odd one out stays at 3 or 4. "Ready for more?" still only suggests up to 4 |
+| Names on the pictures | Every card shows its English name in the top left corner and its Arabic name in the bottom right, sized to the card (on by default; Settings → Names on the pictures). Matching game, Explore, Memory (face up), Peekaboo (once the blanket is off) and Where's your nose?. Not in the scenes, where things are small |
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.

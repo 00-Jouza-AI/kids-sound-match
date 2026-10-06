@@ -385,3 +385,19 @@ describe('association questions ("Who eats what?")', () => {
     }
   });
 });
+
+describe('more pictures per question', () => {
+  const many: EngineItem[] = Array.from({ length: 14 }, (_, i) => ({ key: `k${i}`, confusableWith: [] }));
+
+  it('shows up to 10 different pictures, and fewer when the pack is smaller', () => {
+    for (const n of [5, 6, 7, 8, 10] as ChoiceCount[]) {
+      const q = generateQuestion({ items: many, choiceCount: n, previousTargetKey: null, rng: seededRng(n), targetKey: 'k0' });
+      expect(q.options).toHaveLength(n);
+      expect(new Set(q.options).size).toBe(n);
+      expect(q.options).toContain('k0');
+    }
+    const small = many.slice(0, 6);
+    const q = generateQuestion({ items: small, choiceCount: 10, previousTargetKey: null, rng: seededRng(1), targetKey: 'k0' });
+    expect(q.options).toHaveLength(6);
+  });
+});

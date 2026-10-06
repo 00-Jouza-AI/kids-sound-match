@@ -57,3 +57,25 @@ describe('forgot-PIN challenge', () => {
     }
   });
 });
+
+describe('picture lock', () => {
+  it('keeps 4 of the 9 pictures like the PIN: salted and hashed, checked in order', async () => {
+    const { createPictureCode, verifyPictureCode, pictureCodeString, LOCK_PICTURES } = await import('./lockPrefs');
+    expect(LOCK_PICTURES).toHaveLength(9);
+    expect(new Set(LOCK_PICTURES.map((p) => p.id)).size).toBe(9);
+    expect(pictureCodeString([0, 4, 8, 2])).toBe('1593');
+    const record = await createPictureCode([0, 4, 8, 2]);
+    expect(JSON.stringify(record)).not.toContain('1593');
+    expect(await verifyPictureCode([0, 4, 8, 2], record)).toBe(true);
+    expect(await verifyPictureCode([2, 8, 4, 0], record)).toBe(false);
+    await expect(createPictureCode([0, 1, 2])).rejects.toThrow();
+    await expect(createPictureCode([0, 1, 2, 9])).rejects.toThrow();
+  });
+
+  it('holds the corner 3, 5, 7 or 10 seconds, and repairs whatever was stored', async () => {
+    const { sanitizeLockPrefs } = await import('./lockPrefs');
+    expect(sanitizeLockPrefs(null)).toEqual({ holdSec: 3, exitLock: 'pin' });
+    expect(sanitizeLockPrefs({ holdSec: 7, exitLock: 'pictures' })).toEqual({ holdSec: 7, exitLock: 'pictures' });
+    expect(sanitizeLockPrefs({ holdSec: 4, exitLock: 'emoji' })).toEqual({ holdSec: 3, exitLock: 'pin' });
+  });
+});

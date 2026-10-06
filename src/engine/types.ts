@@ -10,4 +10,5 @@ export interface EngineItem {
   readonly group?: string;
 }
 
-export type ChoiceCount = 2 | 3 | 4;
+/** Pictures in a question. Small packs show fewer when there aren't enough different ones. */
+export type ChoiceCount = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 10;

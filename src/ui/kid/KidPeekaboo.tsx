@@ -8,20 +8,21 @@ import { useI18n } from '../../i18n/I18n';
 import { reportStore } from '../../report/db';
 import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
-import { PlayIcon } from './icons';
+import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
-import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
+import { EndScreen, type PickerOptions } from './EndScreen';
+import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 
 /** Taps are ignored this long after the blanket goes back on, so one excited tap can't skip a turn. */
 const COVER_GUARD_MS = 700;
 /** The picture stays out at least this long before the next tap brings the blanket back. */
 const SHOW_AT_LEAST_MS = 1500;
-const SESSION_END_MS = 3500;
-const MAX_LINE_MS = 6000;
+const SESSION_END_MS = 1800;
+const MAX_LINE_MS = 4000;
 
 type Stage = 'paused' | 'playing' | 'ending' | 'idle';
 
@@ -38,6 +39,7 @@ export function KidPeekaboo({
   config,
   snapshot,
   lines,
+  picker,
   onExit,
 }: {
   pack: LoadedPack;
@@ -46,6 +48,7 @@ export function KidPeekaboo({
   snapshot: KidSnapshot | null;
   /** "بَخ!" / "Peekaboo!", from the shared game lines. */
   lines: PeekabooLines | undefined;
+  picker?: PickerOptions;
   onExit: () => void;
 }) {
   const { t } = useI18n();
@@ -253,8 +256,13 @@ export function KidPeekaboo({
       {stage === 'playing' && (
         <div className="peekaboo-area" ref={ref} onPointerDown={onTap}>
           {size > 0 && key && (
-            <div className={open ? 'peekaboo-card open' : 'peekaboo-card'} key={index} style={{ width: size, height: size }}>
+            <div
+              className={`peekaboo-card${open ? ' open' : ''}${config.cardNames ? ' named' : ''}`}
+              key={index}
+              style={{ width: size, height: size }}
+            >
               <img src={pictures[key]} alt="" draggable={false} />
+              {open && config.cardNames && <CardNames name={items.find((i) => i.key === key)!.name} />}
               {open && <Burst size={size * 0.7} />}
               <Blanket />
             </div>
@@ -265,18 +273,7 @@ export function KidPeekaboo({
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && (
-        <div className="kid-center play-again-layer">
-          {canReplay && (
-            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-              <PlayIcon />
-            </button>
-          )}
-          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
-            <AlbumIcon />
-          </button>
-        </div>
-      )}
+      {stage === 'idle' && <EndScreen canReplay={canReplay} onPlayAgain={playAgain} onAlbum={() => setAlbumOpen(true)} picker={picker} />}
       {stage === 'idle' && albumOpen && (
         <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}

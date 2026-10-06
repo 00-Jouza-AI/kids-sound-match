@@ -12,7 +12,12 @@ export function layoutRows(count: number, orientation: Orientation): number[][] 
   if (count <= 1) return [[0]];
   if (count === 2) return orientation === 'portrait' ? [[0], [1]] : [[0, 1]];
   if (count === 3) return orientation === 'portrait' ? [[0, 1], [2]] : [[0, 1, 2]];
-  return [[0, 1], [2, 3]];
+  if (count === 4) return [[0, 1], [2, 3]];
+  // 5 to 10 pictures: 2 across when upright (5 is 2 + 2 + 1), two rows when sideways (7 is 4 + 3).
+  const perRow = orientation === 'portrait' ? 2 : Math.ceil(count / 2);
+  const rows: number[][] = [];
+  for (let i = 0; i < count; i += perRow) rows.push(Array.from({ length: Math.min(perRow, count - i) }, (_, j) => i + j));
+  return rows;
 }
 
 /** Explore mode: up to 6 animals, 2 across when upright and 3 across when sideways. */

@@ -174,8 +174,8 @@ export class GameSession {
 
   private makeQuestion(): Question {
     if (this.config.odd) {
-      // Always at least 3 pictures: two alike and the different one.
-      const question = oddQuestion(this.config.odd, Math.max(3, this.config.choiceCount), this.rng, this.lastTarget);
+      // 3 or 4 pictures: two or three alike and the different one, whatever the picture setting.
+      const question = oddQuestion(this.config.odd, Math.min(4, Math.max(3, this.config.choiceCount)), this.rng, this.lastTarget);
       this.lastTarget = question.targetKey;
       return question;
     }

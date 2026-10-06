@@ -17,20 +17,23 @@ import { reportStore } from '../../report/db';
 import type { NewQuestionResult } from '../../report/types';
 import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
-import { PlayIcon, SpeakerIcon } from './icons';
+import { SpeakerIcon } from './icons';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { SceneArt, spotPlaces } from './sceneArt';
 import { IdleScene, SessionEndScene } from './scenes';
-import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
+import { EndScreen, type PickerOptions } from './EndScreen';
+import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 
 /** Taps are ignored briefly after a question starts, so a finger still tapping can't answer it. */
 const INPUT_GUARD_MS = 500;
-const MIN_CELEBRATION_MS = 1200;
-const MAX_CELEBRATION_MS = 6000;
-const SESSION_END_MS = 3500;
+/** Found it: about a second of confetti and its name, then the next question. */
+const CELEBRATION_MS = 1000;
+const CELEBRATION_MAX_MS = 1800;
+const SESSION_END_MS = 1800;
+const SESSION_END_MAX_MS = 4000;
 /** Gentle hint: the right thing wiggles after this long without finding it, and again after as long. */
 const HINT_AFTER_MS = 8000;
 
@@ -60,12 +63,14 @@ export function KidScene({
   packs,
   config,
   snapshot,
+  picker,
   onExit,
 }: {
   pack: LoadedPack;
   packs: readonly LoadedPack[];
   config: KidConfig;
   snapshot: KidSnapshot | null;
+  picker?: PickerOptions;
   onExit: () => void;
 }) {
   const { t } = useI18n();
@@ -227,7 +232,7 @@ export function KidScene({
     persist('idle');
     setStage('ending');
     const began = performance.now();
-    void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
+    void Promise.race([audio.sessionEnd(), sleep(SESSION_END_MAX_MS)]).then(() => {
       later(() => {
         setCanReplay(replaysLeft(config.replaysPerDay, config.profileId) > 0);
         setStage('idle');
@@ -258,9 +263,10 @@ export function KidScene({
     setFound(key);
     answers.current.push({ key, packId: tapped.packId, taps: current.current.taps, hinted: current.current.hinted });
     const began = performance.now();
-    void Promise.race([audio.correct(tapped.item), sleep(MAX_CELEBRATION_MS)]).then(async () => {
+    const cap = CELEBRATION_MAX_MS * spokenLanguages(config.language).length;
+    void Promise.race([audio.named(tapped.item), sleep(cap)]).then(async () => {
       const elapsed = performance.now() - began;
-      if (elapsed < MIN_CELEBRATION_MS) await sleep(MIN_CELEBRATION_MS - elapsed);
+      if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
       if (!alive.current) return;
       if (indexRef.current + 1 >= roundRef.current.order.length) {
         finish();
@@ -400,18 +406,7 @@ export function KidScene({
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && (
-        <div className="kid-center play-again-layer">
-          {canReplay && (
-            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-              <PlayIcon />
-            </button>
-          )}
-          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
-            <AlbumIcon />
-          </button>
-        </div>
-      )}
+      {stage === 'idle' && <EndScreen canReplay={canReplay} onPlayAgain={playAgain} onAlbum={() => setAlbumOpen(true)} picker={picker} />}
       {stage === 'idle' && albumOpen && (
         <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}

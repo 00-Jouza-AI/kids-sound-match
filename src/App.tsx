@@ -29,7 +29,7 @@ import {
   type Profile,
   type ProfileState,
 } from './settings/profiles';
-import { forgetReplays } from './settings/replays';
+import { countReplay, forgetReplays } from './settings/replays';
 import { forgetStickers } from './settings/stickers';
 import { forgetWordMarks } from './settings/words';
 import {
@@ -207,7 +207,9 @@ function Shell({
   const [custom, setCustom] = useState<CustomData>(NO_CUSTOM);
   const [screen, setScreen] = useState<Screen>('loading');
   const [gate, setGate] = useState<{ run: () => void } | null>(null);
-  const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack } | null>(null);
+  // `run` changes with every game started, so Kid Mode starts afresh even for the same game.
+  const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack; run: number } | null>(null);
+  const runs = useRef(0);
   const [startStep, setStartStep] = useState<StartStep>('soundCheck');
   const [startKind, setStartKind] = useState<KidKind>('game');
   // Where's your nose?: asking a parent once whether the child is a girl or a boy (Arabic grammar).
@@ -227,13 +229,13 @@ function Shell({
   const languages = spokenLanguages(settings.language);
 
   /** Find it in the picture: the things a scene may show, with this child's pictures and sound setting. */
-  const sceneKeys = (scene: SceneDef): string[] =>
+  const sceneKeys = (scene: SceneDef, s: Settings = settings): string[] =>
     scene.packs.flatMap((id) => {
       const p = allPacks.find((x) => x.id === id);
       if (!p) return [];
-      const enabled = new Set(enabledItemKeys(p, settings));
+      const enabled = new Set(enabledItemKeys(p, s));
       // "Sound only" can't ask for things that make no sound.
-      return p.items.filter((i) => enabled.has(i.key) && (settings.mode !== 'SOUND_ONLY' || i.sound)).map((i) => i.key);
+      return p.items.filter((i) => enabled.has(i.key) && (s.mode !== 'SOUND_ONLY' || i.sound)).map((i) => i.key);
     });
   const playableScenes = SCENES.filter((s) => {
     const keys = new Set(sceneKeys(s));
@@ -265,7 +267,7 @@ function Shell({
     const snap = loadKidSnapshot();
     const snapPack = snap && packs.find((p) => p.id === snap.config.packId);
     if (snap && snapPack) {
-      setKid({ config: snap.config, snapshot: snap, pack: snapPack });
+      setKid({ config: snap.config, snapshot: snap, pack: snapPack, run: ++runs.current });
       setScreen('kid');
       return;
     }
@@ -368,8 +370,10 @@ function Shell({
     return scene;
   };
 
-  const startKid = async (kind: KidKind) => {
+  /** Starts a game. `s` is the settings to use: the quick picker passes the ones it just saved. */
+  const startKid = async (kind: KidKind, s: Settings = settings) => {
     const scene = kind === 'scene' ? pickScene() : undefined;
+    const spoken = spokenLanguages(s.language);
     const arGender = pendingGender.current ?? profile?.arGender ?? 'f';
     pendingGender.current = null;
     // Odd one out plays with every pack of things, a scene with its own packs, Where's your nose?
@@ -381,16 +385,16 @@ function Shell({
           ? scene?.packs.map((id) => allPacks.find((p) => p.id === id)).find((p) => p !== undefined)
           : kind === 'point'
             ? bodyPack
-            : pack;
+            : (playablePacks.find((p) => p.id === s.packId) ?? playablePacks[0]);
     if (!gamePack) return;
     // Toddler mode is for the matching game: the others have a right answer even for the youngest.
-    const toddlerMode = settings.toddlerMode && kind === 'game' && gamePack.kind !== 'association';
+    const toddlerMode = s.toddlerMode && kind === 'game' && gamePack.kind !== 'association';
     let weights: Record<string, number> = {};
     let level: OddLevel = 'easy';
     try {
       const sessions = forProfile(await reportStore.sessions(), profileId);
       // Adaptive practice: weights come from the Report on this device when the game starts.
-      if (kind === 'game' && settings.adaptive && !toddlerMode) {
+      if (kind === 'game' && s.adaptive && !toddlerMode) {
         const packIds = gamePack.parts ? gamePack.parts.map((p) => p.id) : [gamePack.id];
         weights = practiceWeights(sessions, await reportStore.questions(), packIds);
       }
@@ -401,6 +405,7 @@ function Shell({
     unlockedUntil.current = 0;
     setKid({
       pack: gamePack,
+      run: ++runs.current,
       config: {
         kind,
         profileId,
@@ -409,31 +414,52 @@ function Shell({
           kind === 'odd'
             ? gamePack.items.map((i) => i.key)
             : kind === 'scene' && scene
-              ? sceneKeys(scene)
+              ? sceneKeys(scene, s)
               : kind === 'point'
-                ? pointItems(gamePack, languages, arGender).map((i) => i.key)
-                : enabledItemKeys(gamePack, settings),
-        // Odd one out always shows at least three: two alike and the different one.
-        choiceCount: kind === 'odd' ? (Math.max(3, settings.choiceCount) as ChoiceCount) : settings.choiceCount,
-        questionsPerSession: settings.questionsPerSession,
-        memoryPairs: settings.memoryPairs,
+                ? pointItems(gamePack, spoken, arGender).map((i) => i.key)
+                : enabledItemKeys(gamePack, s),
+        // Odd one out shows 3 or 4: two or three alike and the different one.
+        choiceCount: kind === 'odd' ? (Math.min(4, Math.max(3, s.choiceCount)) as ChoiceCount) : s.choiceCount,
+        questionsPerSession: s.questionsPerSession,
+        memoryPairs: s.memoryPairs,
         oddLevel: level,
         toddlerMode,
         // Packs without sounds (Food, Colours...) are played by name whatever the setting says. A scene
         // mixes packs, so it keeps the setting (things without a sound are asked for by name).
-        mode: kind === 'scene' ? settings.mode : effectiveMode(gamePack, settings.mode),
+        mode: kind === 'scene' ? s.mode : effectiveMode(gamePack, s.mode),
         ...(scene ? { sceneId: scene.id } : {}),
         ...(kind === 'point' ? { arGender } : {}),
-        language: settings.language,
-        repeatIntervalSec: settings.repeatIntervalSec,
-        hints: settings.hints,
-        replaysPerDay: settings.replaysPerDay,
+        language: s.language,
+        repeatIntervalSec: s.repeatIntervalSec,
+        hints: s.hints,
+        replaysPerDay: s.replaysPerDay,
+        cardNames: s.cardNames,
         weights,
       },
       snapshot: null,
     });
     setScreen('kid');
   };
+
+  /**
+   * The end screen's quick picker: save the pack and group it chose, then start that game straight
+   * away. Counted against today's play-again limit, like the play-again button.
+   */
+  const restartKid = (kind: KidKind, patch: Partial<Settings>) => {
+    countReplay(profileId);
+    if (Object.keys(patch).length) update(patch);
+    void startKid(kind, { ...settings, ...patch });
+  };
+  // What the picker offers: Where's your nose? only once the child's Arabic grammar is known.
+  const pickerKinds: KidKind[] = [
+    'game',
+    'peekaboo',
+    'explore',
+    ...(playableScenes.length ? (['scene'] as const) : []),
+    ...(canPoint && !(languages.includes('ar') && !profile?.arGender) ? (['point'] as const) : []),
+    'memory',
+    ...(oddPack ? (['odd'] as const) : []),
+  ];
 
   /** Runs inside a tap: fullscreen must be requested from a user gesture. */
   const launch = (kind: KidKind) => {
@@ -547,11 +573,13 @@ function Shell({
     case 'kid':
       body = kid && (
         <KidMode
+          key={kid.run}
           pack={kid.pack}
           packs={allPacks}
           config={kid.config}
           snapshot={kid.snapshot}
           telemetryEnabled={settings.telemetryEnabled}
+          picker={{ packs: playablePacks, settings, kind: kid.config.kind, available: pickerKinds, onPlay: restartKid }}
           onExit={() => {
             setKid(null);
             unlockedUntil.current = Date.now() + PARENT_UNLOCK_MS;

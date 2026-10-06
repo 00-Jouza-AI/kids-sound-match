@@ -33,6 +33,8 @@ export interface KidConfig {
   sceneId?: string;
   /** Where's your nose?: the child's Arabic grammar (أنفُكِ / أنفُكَ). */
   arGender?: ArGender;
+  /** Names on the pictures (English top left, Arabic bottom right). Missing in older snapshots: off. */
+  cardNames?: boolean;
 }
 
 /**

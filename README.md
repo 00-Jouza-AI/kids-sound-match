@@ -24,7 +24,8 @@ npm run dev
   Over plain Wi-Fi http, the phone won't keep the screen awake or work offline; everything else works.
 
 The first run asks you to set a 4-digit parent PIN. To leave Kid Mode, press and hold the small circle
-in the top corner for 3 seconds, then enter the PIN.
+in the top corner for 3 seconds (5, 7 or 10 in Settings → Leaving a game), then enter the PIN, or your
+4 pictures if you chose the picture lock there.
 
 ## Scripts
 

@@ -4,7 +4,9 @@ import { useI18n } from '../../i18n/I18n';
 import { enterFullscreen, exitFullscreen, isFullscreen } from '../../lock/fullscreen';
 import { GateButton } from '../../lock/GateButton';
 import { engageKidLock } from '../../lock/kidLock';
+import { loadLockPrefs } from '../../lock/lockPrefs';
 import { ParentGate } from '../../lock/ParentGate';
+import { PictureGate } from '../../lock/PicturePad';
 import { PlayIcon } from './icons';
 
 /**
@@ -28,6 +30,9 @@ export function KidFrame({
 }) {
   const { t } = useI18n();
   const [gateOpen, setGateOpen] = useState(false);
+  // How long to hold the corner, and whether leaving asks for the PIN or the 4 pictures (Settings).
+  const [prefs] = useState(loadLockPrefs);
+  const [usePin, setUsePin] = useState(false);
   const wantFullscreen = useRef(isFullscreen());
 
   useEffect(() => engageKidLock(), []);
@@ -52,6 +57,7 @@ export function KidFrame({
         {left ?? <span />}
         <GateButton
           label={t('parentExit')}
+          holdMs={prefs.holdSec * 1000}
           onUnlock={() => {
             setGateOpen(true);
             onGateOpen();
@@ -59,18 +65,32 @@ export function KidFrame({
         />
       </div>
       {children}
-      {gateOpen && (
-        <ParentGate
-          onSuccess={() => {
-            void exitFullscreen();
-            onExit();
-          }}
-          onCancel={() => {
-            setGateOpen(false);
-            onGateCancel();
-          }}
-        />
-      )}
+      {gateOpen &&
+        (prefs.exitLock === 'pictures' && !usePin ? (
+          <PictureGate
+            onSuccess={() => {
+              void exitFullscreen();
+              onExit();
+            }}
+            onCancel={() => {
+              setGateOpen(false);
+              onGateCancel();
+            }}
+            onUsePin={() => setUsePin(true)}
+          />
+        ) : (
+          <ParentGate
+            onSuccess={() => {
+              void exitFullscreen();
+              onExit();
+            }}
+            onCancel={() => {
+              setGateOpen(false);
+              setUsePin(false);
+              onGateCancel();
+            }}
+          />
+        ))}
     </div>
   );
 }

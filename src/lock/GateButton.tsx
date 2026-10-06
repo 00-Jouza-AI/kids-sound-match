@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 
 export const HOLD_MS = 3000;
 
 /**
- * Spec 6.2: a small, low-contrast circle in a top corner. Only a continuous 3-second press opens
- * the parent gate; taps and shorter holds do nothing. A ring fills while holding.
+ * Spec 6.2: a small, low-contrast circle in a top corner. Only a continuous press (3 seconds, or
+ * the 5, 7 or 10 chosen in Settings) opens the parent gate; taps and shorter holds do nothing. A
+ * ring fills while holding.
  */
-export function GateButton({ label, onUnlock }: { label: string; onUnlock: () => void }) {
+export function GateButton({ label, holdMs = HOLD_MS, onUnlock }: { label: string; holdMs?: number; onUnlock: () => void }) {
   const [holding, setHolding] = useState(false);
   const timer = useRef<number | null>(null);
   const pointer = useRef<number | null>(null);
@@ -33,7 +34,7 @@ export function GateButton({ label, onUnlock }: { label: string; onUnlock: () =>
     timer.current = window.setTimeout(() => {
       cancel();
       onUnlock();
-    }, HOLD_MS);
+    }, holdMs);
   };
 
   const end = (e: PointerEvent<HTMLButtonElement>) => {
@@ -44,6 +45,7 @@ export function GateButton({ label, onUnlock }: { label: string; onUnlock: () =>
     <button
       type="button"
       className={holding ? 'gate holding' : 'gate'}
+      style={{ '--hold': `${holdMs}ms` } as CSSProperties}
       aria-label={label}
       onPointerDown={start}
       onPointerUp={end}

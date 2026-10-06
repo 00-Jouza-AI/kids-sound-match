@@ -8,17 +8,18 @@ import { useI18n } from '../../i18n/I18n';
 import { reportStore } from '../../report/db';
 import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
-import { PlayIcon } from './icons';
+import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, fitSquares, useBoxSize, type Orientation } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
-import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
+import { EndScreen, type PickerOptions } from './EndScreen';
+import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 
 /** Two different cards stay face up this long before turning back. */
 const MISS_SHOW_MS = 1300;
-const SESSION_END_MS = 3500;
+const SESSION_END_MS = 1800;
 
 type Stage = 'paused' | 'playing' | 'ending' | 'idle';
 
@@ -45,12 +46,14 @@ export function KidMemory({
   packs,
   config,
   snapshot,
+  picker,
   onExit,
 }: {
   pack: LoadedPack;
   packs: readonly LoadedPack[];
   config: KidConfig;
   snapshot: KidSnapshot | null;
+  picker?: PickerOptions;
   onExit: () => void;
 }) {
   const { t } = useI18n();
@@ -131,7 +134,7 @@ export function KidMemory({
     setNewSticker(sticker && items.has(sticker.key) ? stickerPicture(items.get(sticker.key)!) : null);
     saveKidSnapshot({ v: 1, config, startedAt: startedAt.current, stage: 'idle', session: null });
     setStage('ending');
-    await Promise.race([audio.sessionEnd(), new Promise((r) => window.setTimeout(r, 6000))]);
+    await Promise.race([audio.sessionEnd(), new Promise((r) => window.setTimeout(r, 4000))]);
     window.setTimeout(() => {
       if (!alive.current) return;
       setCanReplay(replaysLeft(config.replaysPerDay, config.profileId) > 0);
@@ -154,7 +157,7 @@ export function KidMemory({
     }
     if (event === 'match' || event === 'done') {
       setLastMatch(card.key);
-      const praise = audio.correct(item);
+      const praise = audio.named(item);
       if (event === 'done') {
         void praise.then(() => {
           if (alive.current) void finish(next);
@@ -229,8 +232,9 @@ export function KidMemory({
                     >
                       <span className="card-inner">
                         <span className="face back" />
-                        <span className="face front">
+                        <span className={config.cardNames ? 'face front named' : 'face front'}>
                           <img src={pictures[card.key]} alt="" draggable={false} />
+                          {config.cardNames && up && <CardNames name={items.get(card.key)!.name} />}
                           {found && lastMatch === card.key && <Burst size={size} />}
                         </span>
                       </span>
@@ -253,18 +257,7 @@ export function KidMemory({
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && (
-        <div className="kid-center play-again-layer">
-          {canReplay && (
-            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-              <PlayIcon />
-            </button>
-          )}
-          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
-            <AlbumIcon />
-          </button>
-        </div>
-      )}
+      {stage === 'idle' && <EndScreen canReplay={canReplay} onPlayAgain={playAgain} onAlbum={() => setAlbumOpen(true)} picker={picker} />}
       {stage === 'idle' && albumOpen && (
         <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}

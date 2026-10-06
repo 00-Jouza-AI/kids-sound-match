@@ -45,7 +45,7 @@ describe('settings', () => {
 
   it('repairs damaged or old stored values field by field', () => {
     const s = sanitizeSettings(
-      { choiceCount: 7, mode: 'SOUND_ONLY', language: 'fr', toddlerMode: 'yes', enabledItems: { animals: ['cat', 3] } },
+      { choiceCount: 9, mode: 'SOUND_ONLY', language: 'fr', toddlerMode: 'yes', enabledItems: { animals: ['cat', 3] } },
       'en',
     );
     expect(s.choiceCount).toBe(3);

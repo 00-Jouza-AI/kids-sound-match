@@ -8,17 +8,20 @@ import { useI18n } from '../../i18n/I18n';
 import { reportStore } from '../../report/db';
 import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
-import { PlayIcon } from './icons';
+import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
-import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
+import { EndScreen, type PickerOptions } from './EndScreen';
+import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 
-const MIN_CELEBRATION_MS = 1200;
-const MAX_CELEBRATION_MS = 6000;
-const SESSION_END_MS = 3500;
+/** Found it: about a second of confetti and its name, then the next one. */
+const CELEBRATION_MS = 1000;
+const CELEBRATION_MAX_MS = 1800;
+const SESSION_END_MS = 1800;
+const SESSION_END_MAX_MS = 4000;
 /** A body part can't be marked found the moment it appears (an excited double tap). */
 const INPUT_GUARD_MS = 600;
 
@@ -43,12 +46,14 @@ export function KidPoint({
   packs,
   config,
   snapshot,
+  picker,
   onExit,
 }: {
   pack: LoadedPack;
   packs: readonly LoadedPack[];
   config: KidConfig;
   snapshot: KidSnapshot | null;
+  picker?: PickerOptions;
   onExit: () => void;
 }) {
   const { t } = useI18n();
@@ -152,7 +157,7 @@ export function KidPoint({
     persist('idle');
     setStage('ending');
     const began = performance.now();
-    void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
+    void Promise.race([audio.sessionEnd(), sleep(SESSION_END_MAX_MS)]).then(() => {
       window.setTimeout(
         () => {
           if (!alive.current) return;
@@ -184,9 +189,9 @@ export function KidPoint({
     setFound(true);
     foundKeys.current.push(it.key);
     const began = performance.now();
-    void Promise.race([audio.correct(it), sleep(MAX_CELEBRATION_MS)]).then(async () => {
+    void Promise.race([audio.named(it), sleep(CELEBRATION_MAX_MS * spokenLanguages(config.language).length)]).then(async () => {
       const elapsed = performance.now() - began;
-      if (elapsed < MIN_CELEBRATION_MS) await sleep(MIN_CELEBRATION_MS - elapsed);
+      if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
       next();
     });
   };
@@ -267,7 +272,7 @@ export function KidPoint({
               <button
                 type="button"
                 key={index}
-                className={found ? 'option point-card celebrate' : 'option point-card'}
+                className={`option point-card${config.cardNames ? ' named' : ''}${found ? ' celebrate' : ''}`}
                 style={{ width: size, height: size }}
                 tabIndex={-1}
                 aria-hidden="true"
@@ -276,6 +281,7 @@ export function KidPoint({
                 }}
               >
                 <img src={pictures[key]} alt="" draggable={false} />
+                {config.cardNames && <CardNames name={items.find((i) => i.key === key)!.name} />}
                 {found && <Burst size={size} />}
               </button>
             )}
@@ -298,18 +304,7 @@ export function KidPoint({
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && (
-        <div className="kid-center play-again-layer">
-          {canReplay && (
-            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-              <PlayIcon />
-            </button>
-          )}
-          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
-            <AlbumIcon />
-          </button>
-        </div>
-      )}
+      {stage === 'idle' && <EndScreen canReplay={canReplay} onPlayAgain={playAgain} onAlbum={() => setAlbumOpen(true)} picker={picker} />}
       {stage === 'idle' && albumOpen && (
         <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}

@@ -36,9 +36,11 @@ export interface Settings {
   mixedExcluded: string[];
   /** Memory game: pairs of cards. Starts at 3; Home suggests more when the child is ready. */
   memoryPairs: MemoryPairs;
+  /** The names on the pictures in the games: English top left, Arabic bottom right. */
+  cardNames: boolean;
 }
 
-export const CHOICE_COUNTS = [2, 3, 4] as const;
+export const CHOICE_COUNTS = [2, 3, 4, 5, 6, 7, 8, 10] as const;
 export const REPEAT_INTERVALS = [1, 2, 3] as const;
 export const QUESTIONS_PER_SESSION = [5, 10, 15] as const;
 export const MODES = ['SOUND_AND_NAME', 'SOUND_ONLY', 'NAME_ONLY'] as const;
@@ -84,6 +86,7 @@ export function defaultSettings(device: Lang): Settings {
     enabledItems: {},
     mixedExcluded: [],
     memoryPairs: 3,
+    cardNames: true,
   };
 }
 
@@ -120,6 +123,7 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
     enabledItems,
     mixedExcluded: Array.isArray(r.mixedExcluded) ? r.mixedExcluded.filter((k): k is string => typeof k === 'string') : [],
     memoryPairs: pick(r.memoryPairs, MEMORY_PAIRS, d.memoryPairs),
+    cardNames: bool(r.cardNames, d.cardNames),
   };
 }
 

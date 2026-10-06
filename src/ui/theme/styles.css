@@ -534,7 +534,7 @@ h2 {
 
 .choice-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 
@@ -1114,7 +1114,7 @@ html.kid-locked body {
 }
 
 .gate.holding .ring circle {
-  animation: gate-fill 3s linear forwards;
+  animation: gate-fill var(--hold, 3s) linear forwards;
 }
 
 .gate-dot {
@@ -3229,6 +3229,270 @@ html.kid-locked body {
   .print-only {
     display: block !important;
   }
+}
+
+/* ---------- Names on the pictures: English top left, Arabic bottom right ---------- */
+
+.option.named,
+.memory-card .face.front.named,
+.peekaboo-card.named {
+  container-type: size;
+}
+
+.option.named img,
+.memory-card .face.front.named img {
+  width: 60%;
+  height: 60%;
+}
+
+.peekaboo-card.named > img {
+  width: 62%;
+  height: 62%;
+}
+
+/* Sized to the card: big on one big card, still readable with 10 small ones. */
+.card-name {
+  position: absolute;
+  max-width: 90%;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 13cqmin;
+  font-weight: 800;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.card-name.en {
+  top: 5%;
+  left: 6%;
+}
+
+.card-name.ar {
+  right: 6%;
+  bottom: 5%;
+}
+
+/* ---------- The picture lock: 4 of 9 pictures ---------- */
+
+.picture-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.picture-pad h2 {
+  margin: 0 0 4px;
+}
+
+.picture-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: min(100%, 330px);
+  margin: 4px auto;
+}
+
+.picture-key {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 12%;
+  border: 2px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+.picture-key:active {
+  transform: scale(0.92);
+  background: var(--primary-soft);
+}
+
+.picture-key:disabled {
+  opacity: 0.45;
+}
+
+.picture-key img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.picture-dots img.dot.chosen {
+  width: 38px;
+  height: 38px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+}
+
+/* ---------- The end screen: a big play-again button ---------- */
+
+.end-screen {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+}
+
+.end-play {
+  display: grid;
+  place-items: center;
+  width: min(58vmin, 300px);
+  height: min(58vmin, 300px);
+  padding-inline-start: 4%;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f6995c, var(--accent));
+  box-shadow: 0 18px 46px rgba(242, 137, 74, 0.45);
+  color: #fff;
+  cursor: pointer;
+  animation: breathe 2.2s ease-in-out infinite;
+}
+
+.end-play svg {
+  width: 50%;
+  height: 50%;
+}
+
+.album-btn.end-album {
+  position: absolute;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  left: 18px;
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+}
+
+/* For a parent: small, in the corner, but harmless if a child taps it. */
+.end-pick {
+  position: absolute;
+  right: 18px;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+/* ---------- The quick picker: another pack, group or game ---------- */
+
+.quick-picker {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--ink);
+  touch-action: pan-y;
+}
+
+.qp-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.qp-top h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.qp-games,
+.qp-packs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.qp-game,
+.qp-pack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.qp-game.on,
+.qp-pack.on {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.qp-game-icon {
+  color: var(--primary-strong);
+}
+
+.qp-game-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.qp-pack img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.qp-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qp-play {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: auto;
+  padding: 16px;
+  border: 0;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #f6995c, var(--accent));
+  box-shadow: 0 10px 26px rgba(242, 137, 74, 0.35);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.qp-play svg {
+  width: 34px;
+  height: 34px;
 }
 
 @media (prefers-reduced-motion: reduce) {

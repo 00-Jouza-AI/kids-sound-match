@@ -5,6 +5,7 @@ import { GameAudio } from '../../audio/gameAudio';
 import type { LoadedItem, LoadedPack } from '../../content/types';
 import { useI18n } from '../../i18n/I18n';
 import { spokenLanguages } from '../../settings/settings';
+import { CardNames } from './CardNames';
 import { ArrowIcon } from './icons';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
@@ -111,7 +112,7 @@ export function KidExplore({
         />
       ) : (
         <>
-          <ExploreGrid key={page} items={pageItems} pictures={pictures} bounce={bounce} onTap={tap} />
+          <ExploreGrid key={page} items={pageItems} pictures={pictures} bounce={bounce} names={config.cardNames === true} onTap={tap} />
           {pageCount > 1 && (
             <div className="explore-nav" dir="ltr">
               <button
@@ -153,11 +154,13 @@ function ExploreGrid({
   items,
   pictures,
   bounce,
+  names,
   onTap,
 }: {
   items: readonly LoadedItem[];
   pictures: Readonly<Record<string, string>>;
   bounce: { key: string; n: number } | null;
+  names: boolean;
   onTap: (key: string) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -176,7 +179,7 @@ function ExploreGrid({
                 <button
                   type="button"
                   key={it.key}
-                  className={`option explore${moving}`}
+                  className={`option explore${names ? ' named' : ''}${moving}`}
                   style={{ width: size, height: size }}
                   data-key={it.key}
                   tabIndex={-1}
@@ -184,6 +187,7 @@ function ExploreGrid({
                   onPointerDown={() => onTap(it.key)}
                 >
                   <img src={pictures[it.key]} alt="" draggable={false} />
+                  {names && <CardNames name={it.name} />}
                 </button>
               );
             })}

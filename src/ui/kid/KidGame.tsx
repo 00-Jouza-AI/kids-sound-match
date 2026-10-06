@@ -11,8 +11,9 @@ import { reportStore } from '../../report/db';
 import { countReplay, replaysLeft } from '../../settings/replays';
 import { spokenLanguages } from '../../settings/settings';
 import { telemetry } from '../../telemetry/telemetry';
-import { PlayIcon, SpeakerIcon } from './icons';
-import { AlbumIcon, awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
+import { SpeakerIcon } from './icons';
+import { EndScreen, type PickerOptions } from './EndScreen';
+import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
 import { choosePictures, useBoxSize } from './layout';
@@ -21,10 +22,13 @@ import { IdleScene, SessionEndScene } from './scenes';
 
 /** Taps are ignored briefly after a question appears, so a finger still tapping can't skip it. */
 const INPUT_GUARD_MS = 500;
-/** Spec 6.5: ~1.2 s of celebration; longer if the name and praise take longer, so nothing is cut off. */
-const MIN_CELEBRATION_MS = 1200;
-const MAX_CELEBRATION_MS = 6000;
-const SESSION_END_MS = 3500;
+/** A right answer: about a second of confetti and its name, then straight on to the next question. */
+const CELEBRATION_MS = 1000;
+/** A longer name may finish, up to this long per spoken language (both names in "Both"). */
+const CELEBRATION_MAX_MS = 1800;
+/** The end-of-game celebration (and its praise) before the play-again screen. */
+const SESSION_END_MS = 1800;
+const SESSION_END_MAX_MS = 4000;
 /** Gentle hint: the right picture wiggles after this long without a tap, and again after as long. */
 const HINT_AFTER_MS = 8000;
 
@@ -37,6 +41,8 @@ interface Props {
   config: KidConfig;
   snapshot: KidSnapshot | null;
   telemetryEnabled: boolean;
+  /** The end screen's quick picker (another pack, group or game). */
+  picker?: PickerOptions;
   onExit: () => void;
 }
 
@@ -53,7 +59,7 @@ function randomSeed(): number {
  * No text, no score, no timer, no negative feedback. In "Who eats what?" the animal sits above
  * the pictures and eats the right one.
  */
-export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExit }: Props) {
+export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, picker, onExit }: Props) {
   const { t } = useI18n();
   // Odd one out: "Which one is different?" instead of a sound or a name.
   const odd = config.kind === 'odd';
@@ -238,7 +244,7 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExi
     setNewSticker(sticker && items.has(sticker.key) ? stickerPicture(item(sticker.key)) : null);
     setStage('ending');
     const began = performance.now();
-    void Promise.race([audio.sessionEnd(), sleep(MAX_CELEBRATION_MS)]).then(() => {
+    void Promise.race([audio.sessionEnd(), sleep(SESSION_END_MAX_MS)]).then(() => {
       later(() => {
         setCanReplay(replaysLeft(config.replaysPerDay, config.profileId) > 0);
         setStage('idle');
@@ -258,10 +264,11 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExi
 
   const celebrate = async (celebrated: LoadedItem, toddler: boolean) => {
     const began = performance.now();
-    const sounds = toddler ? audio.toddler(celebrated) : audio.correct(celebrated, pack.kind === 'association');
-    await Promise.race([sounds, sleep(MAX_CELEBRATION_MS)]);
+    // Its name (Toddler mode too), then the next question; the praise comes at the end of the game.
+    const sounds = audio.named(celebrated, !toddler && pack.kind === 'association');
+    await Promise.race([sounds, sleep(CELEBRATION_MAX_MS * spokenLanguages(config.language).length)]);
     const elapsed = performance.now() - began;
-    if (elapsed < MIN_CELEBRATION_MS) await sleep(MIN_CELEBRATION_MS - elapsed);
+    if (elapsed < CELEBRATION_MS) await sleep(CELEBRATION_MS - elapsed);
     if (alive.current) advance();
   };
 
@@ -352,6 +359,7 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExi
       faded={view.faded}
       celebratedKey={view.celebratedKey}
       hint={hint}
+      names={config.cardNames ? Object.fromEntries(view.question.options.map((k) => [k, item(k).name])) : undefined}
       onTap={onTap}
     />
   );
@@ -401,18 +409,7 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, onExi
       {stage === 'ending' && <SessionEndScene />}
       {stage === 'ending' && newSticker && <StickerReveal picture={newSticker} />}
       {stage === 'idle' && <IdleScene />}
-      {stage === 'idle' && (
-        <div className="kid-center play-again-layer">
-          {canReplay && (
-            <button type="button" className="resume play-again" aria-label={t('playAgain')} onClick={playAgain}>
-              <PlayIcon />
-            </button>
-          )}
-          <button type="button" className="album-btn" aria-label={t('stickerAlbum')} onClick={() => setAlbumOpen(true)}>
-            <AlbumIcon />
-          </button>
-        </div>
-      )}
+      {stage === 'idle' && <EndScreen canReplay={canReplay} onPlayAgain={playAgain} onAlbum={() => setAlbumOpen(true)} picker={picker} />}
       {stage === 'idle' && albumOpen && (
         <StickerAlbum profileId={config.profileId} packs={packs} audio={audio} onClose={() => setAlbumOpen(false)} />
       )}
