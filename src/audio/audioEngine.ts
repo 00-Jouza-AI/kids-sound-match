@@ -1,6 +1,6 @@
-import type { Clip, ClipCategory } from './clips';
+import type { Clip, ClipCategory, FileClip } from './clips';
 import { analyzeClip } from './leveling';
-import { cancelSpeech, speak, unlockSpeech } from './speech';
+import { cancelSpeech, speak, speechAvailable, unlockSpeech } from './speech';
 
 interface Prepared {
   buffer: AudioBuffer;
@@ -58,12 +58,19 @@ export class AudioEngine {
   }
 
   preload(clips: readonly (Clip | null)[]): void {
-    for (const clip of clips) if (clip?.kind === 'file') void this.prepare(clip.url, clip.category);
+    for (const clip of clips) {
+      const f = clip?.kind === 'speech' ? (speechAvailable(clip.lang) ? null : clip.fallback) : clip;
+      if (f) void this.prepare(f.url, f.category);
+    }
   }
 
   /** Plays one clip. Resolves when it ends or is stopped; never rejects. */
   play(clip: Clip, isCancelled: () => boolean): Promise<void> {
-    if (clip.kind === 'speech') return this.track(clip.label, () => speak(clip.text, clip.lang, isCancelled));
+    if (clip.kind === 'speech') {
+      // No voice for this language on the phone: the placeholder beeps instead of silence.
+      if (!speechAvailable(clip.lang)) return this.playFile(clip.fallback, isCancelled);
+      return this.track(clip.label, () => speak(clip.text, clip.lang, isCancelled));
+    }
     return this.playFile(clip, isCancelled);
   }
 
@@ -118,7 +125,7 @@ export class AudioEngine {
     }
   }
 
-  private async playFile(clip: Extract<Clip, { kind: 'file' }>, isCancelled: () => boolean): Promise<void> {
+  private async playFile(clip: FileClip, isCancelled: () => boolean): Promise<void> {
     const prepared = await this.prepare(clip.url, clip.category);
     if (!prepared || isCancelled()) return;
     const ctx = this.context();

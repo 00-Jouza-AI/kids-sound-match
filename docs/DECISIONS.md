@@ -155,12 +155,29 @@ Chosen for a 1.5-year-old (the main player): games she can play now, and a word 
 
 | Feature | Decision |
 |---|---|
-| Hold time | Settings → Leaving a game: hold the corner circle 3, 5, 7 or 10 seconds (3 by default); the ring fills over that time. For the whole phone, like the PIN |
-| Picture lock | Settings → Leaving a game → "Then ask for": PIN or 4 pictures. With pictures, leaving a game shows 9 big pictures (cat, dog, frog, apple, banana, car, ball, rocket, star); you tap your 4 in order. No delete key: after the 4th tap it checks and clears itself, so a wrong try just starts again. 3 wrong tries start the PIN's 30-second wait (they share the count). "Use the PIN" is always there. The code is stored salted and hashed like the PIN. Settings, the Report and My packs still ask for the PIN |
+| Hold time | Settings → Leaving a game: hold the corner circle 3, 5, 7 or 10 seconds (1 and 2 added on 11 October; 3 by default); the ring fills over that time. For the whole phone, like the PIN |
+| Picture lock | Settings → Leaving a game → "Then ask for": PIN or 4 pictures. With pictures, leaving a game shows 9 big pictures (cat, dog, frog, apple, banana, car, ball, rocket, star); you tap your 4 in order. No delete key: after the 4th tap it checks and clears itself, so a wrong try just starts again. 3 wrong tries start the PIN's 30-second wait (they share the count). "Use the PIN" is always there. The code is stored salted and hashed like the PIN. Settings, the Report and My packs still ask for the PIN (changed on 11 October: they open without it) |
 | Faster right answers | A right answer gets a second of confetti, no words (changed on 7 October: no name either), then the next question. Toddler mode too. The praise ("رائع!") is said once at the end of the game, before "انتهينا! برافو!", and the play-again screen comes after about 2 s instead of up to 6. Same in Find it in the picture and Where's your nose?; a Memory pair says its name |
 | End screen | A much bigger play-again button in the middle, the sticker album bottom left, and a small "choose" button bottom right: pick the game, the pack and one of its groups (Farm, Wild, Birds, Fruit...), then Play. No lock (nothing else can be changed there); groups with fewer than 5 pictures are greyed out; the choice is saved for that child and counts as one of the day's play-agains. Only offered while play-agains are left |
 | Pictures per question | 2, 3, 4, 5, 6, 7, 8 or 10 (as asked; 9 was left out). 5 to 10 are laid out 2 across when the phone is upright and in two rows when it's sideways. A small pack shows as many different pictures as it can. Odd one out stays at 3 or 4. "Ready for more?" still only suggests up to 4 |
 | Names on the pictures | Every card shows its English name in the top left corner and its Arabic name in the bottom right, sized to the card (on by default; Settings → Names on the pictures). Matching game, Explore, Memory (face up), Peekaboo (once the blanket is off) and Where's your nose?. Not in the scenes, where things are small |
+
+## Added on 11 October 2026
+
+| Feature | Decision |
+|---|---|
+| Home without the PIN | Settings, the Report, My packs, Words I know, the studio and the "Ready for more?" buttons open straight from Home. Leaving a game (hold the corner, then the PIN or the 4 pictures) is the only lock: a child only reaches Home by getting past it. Changing the PIN still asks for the current one |
+| Hold time | 1, 2, 3, 5, 7 or 10 seconds (3 by default) |
+| Settings order | Pictures per question first, then the pack (group), then that pack's pictures, then everything else |
+| Voices on this phone | A Settings card (test builds only, where the phone reads the names): for Arabic and English, the voice that will speak, a choice among the phone's own voices ("Automatic" picks Jordanian, Saudi, Emirati, then Egyptian Arabic) and a Test button. With no Arabic voice it says so and gives the install steps for this phone's system (Android, iPhone/iPad, Windows or Mac). Online voices are still never used. The choice is for the whole phone |
+| Voices that load late | Phones often list their voices a second after the page opens. Whether to speak or play the placeholder is now decided when each word is played, not when the game starts, so the first questions no longer beep on a phone that has the voice |
+| New packs | **Clothes** (9: T-shirt, dress, trousers, shorts, coat, scarf, gloves, glasses, boot), **Toys and play** (10: kite, puzzle, doll, robot, crayon, slide, scooter, skateboard, dice, yo-yo), **Weather and nature** (13: sun, moon, star, cloud, rain, thunder, wind, snow, rainbow, waves, fire, tree, flower), **Jobs and helpers** (10: doctor, police officer, firefighter, cook, farmer, pilot, builder, teacher, astronaut, mechanic). Fluent Emoji pictures. Weather has 5 real Pixabay sounds (rain, thunder, wind, waves, fire), so its sound game plays those 5 and "Name only" plays all 13; the other three are played by name. All four join the Mixed game; Clothes and Toys also join Odd one out. Never asked together: trousers/shorts, scooter/skateboard, and cloud/rain/thunder |
+| Feelings pictures | Redrawn for the app, one colour per feeling and one big sign each: a wide smile (yellow), tears (blue), angry eyebrows and steam (red), wide eyes and a wobbly mouth (purple), closed eyes and Zzz (green), a round "O" mouth (pink). The old Fluent faces are in `dev-assets/replaced/feelings` |
+
+### More clips for the voice session (seventh round)
+
+- Names of the 42 new pictures, in Arabic and English: Clothes (قميص، فستان، بنطال، شورت، معطف، وشاح، قفازات، نظارة، جزمة), Toys (طائرة ورقية، أحجية، دمية، روبوت، قلم تلوين، زحليقة، سكوتر، لوح تزلج، نرد، يويو), Weather (شمس، قمر، نجمة، غيمة، مطر، رعد، ريح، ثلج، قوس قزح، أمواج، نار، شجرة، وردة), Jobs (طبيب، شرطي، إطفائي، طبّاخ، مزارع، طيّار، عامل بناء، معلّم، رائد فضاء، ميكانيكي)
+- The studio lists them all
 
 ## Fixes applied by default
 

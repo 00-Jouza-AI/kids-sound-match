@@ -1,0 +1,169 @@
+{
+  "pack_id": "toys",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 2.4,
+  "name": {
+    "en": "Toys and play",
+    "ar": "الألعاب"
+  },
+  "items": [
+    {
+      "item_key": "kite",
+      "name": {
+        "en": "Kite",
+        "ar": "طائرة ورقية"
+      },
+      "image": "toys/kite.svg",
+      "name_audio": {
+        "en": "toys/kite_name_en.mp3",
+        "ar": "toys/kite_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "puzzle",
+      "name": {
+        "en": "Puzzle",
+        "ar": "أحجية"
+      },
+      "image": "toys/puzzle.svg",
+      "name_audio": {
+        "en": "toys/puzzle_name_en.mp3",
+        "ar": "toys/puzzle_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "doll",
+      "name": {
+        "en": "Doll",
+        "ar": "دمية"
+      },
+      "image": "toys/doll.svg",
+      "name_audio": {
+        "en": "toys/doll_name_en.mp3",
+        "ar": "toys/doll_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "robot",
+      "name": {
+        "en": "Robot",
+        "ar": "روبوت"
+      },
+      "image": "toys/robot.svg",
+      "name_audio": {
+        "en": "toys/robot_name_en.mp3",
+        "ar": "toys/robot_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "crayon",
+      "name": {
+        "en": "Crayon",
+        "ar": "قلم تلوين"
+      },
+      "image": "toys/crayon.svg",
+      "name_audio": {
+        "en": "toys/crayon_name_en.mp3",
+        "ar": "toys/crayon_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "slide",
+      "name": {
+        "en": "Slide",
+        "ar": "زحليقة"
+      },
+      "image": "toys/slide.svg",
+      "name_audio": {
+        "en": "toys/slide_name_en.mp3",
+        "ar": "toys/slide_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "scooter",
+      "name": {
+        "en": "Scooter",
+        "ar": "سكوتر"
+      },
+      "image": "toys/scooter.svg",
+      "name_audio": {
+        "en": "toys/scooter_name_en.mp3",
+        "ar": "toys/scooter_name_ar.mp3"
+      },
+      "confusable_with": [
+        "skateboard"
+      ]
+    },
+    {
+      "item_key": "skateboard",
+      "name": {
+        "en": "Skateboard",
+        "ar": "لوح تزلج"
+      },
+      "image": "toys/skateboard.svg",
+      "name_audio": {
+        "en": "toys/skateboard_name_en.mp3",
+        "ar": "toys/skateboard_name_ar.mp3"
+      },
+      "confusable_with": [
+        "scooter"
+      ]
+    },
+    {
+      "item_key": "dice",
+      "name": {
+        "en": "Dice",
+        "ar": "نرد"
+      },
+      "image": "toys/dice.svg",
+      "name_audio": {
+        "en": "toys/dice_name_en.mp3",
+        "ar": "toys/dice_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "yoyo",
+      "name": {
+        "en": "Yo-yo",
+        "ar": "يويو"
+      },
+      "image": "toys/yoyo.svg",
+      "name_audio": {
+        "en": "toys/yoyo_name_en.mp3",
+        "ar": "toys/yoyo_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

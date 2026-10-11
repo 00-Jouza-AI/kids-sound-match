@@ -53,6 +53,11 @@ const EN = [
     body: 'Your parent PIN is stored on this device as a salted hash, never as the number itself.',
   },
   {
+    id: 'voice',
+    heading: 'Reading words aloud',
+    body: 'Until the voice recordings are ready, the test version reads words with a voice stored on your device. Online voices are never used, so the words are not sent anywhere.',
+  },
+  {
     id: 'telemetry',
     heading: 'Optional anonymous statistics (off unless you turn it on)',
     body: 'If you turn on "Help us improve" in Settings, the app sends anonymous results for the built-in packs, such as "cat, 3 pictures, Arabic, not found on the first try", with no names, IDs or dates, mixed together so they can\'t be linked to a single game. Your own packs are never included. Like any internet request, an upload shows your network (IP) address to our server; the server is set up not to store it. Turning the option off deletes anything not yet sent.',
@@ -104,6 +109,11 @@ const AR: typeof EN = [
     id: 'pin',
     heading: 'الرمز السري',
     body: 'يُحفظ رمز الأهل على هذا الجهاز بشكل مُشفّر (تجزئة مع ملح)، ولا يُحفظ الرقم نفسه أبداً.',
+  },
+  {
+    id: 'voice',
+    heading: 'قراءة الكلمات بصوت عالٍ',
+    body: 'إلى أن تجهز التسجيلات الصوتية، تقرأ النسخة التجريبية الكلمات بصوت محفوظ على جهازك. لا نستخدم الأصوات عبر الإنترنت أبداً، فلا تُرسل الكلمات إلى أي مكان.',
   },
   {
     id: 'telemetry',

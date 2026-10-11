@@ -1,0 +1,156 @@
+{
+  "pack_id": "clothes",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 2.2,
+  "name": {
+    "en": "Clothes",
+    "ar": "الملابس"
+  },
+  "items": [
+    {
+      "item_key": "tshirt",
+      "name": {
+        "en": "T-shirt",
+        "ar": "قميص"
+      },
+      "image": "clothes/tshirt.svg",
+      "name_audio": {
+        "en": "clothes/tshirt_name_en.mp3",
+        "ar": "clothes/tshirt_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "dress",
+      "name": {
+        "en": "Dress",
+        "ar": "فستان"
+      },
+      "image": "clothes/dress.svg",
+      "name_audio": {
+        "en": "clothes/dress_name_en.mp3",
+        "ar": "clothes/dress_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "trousers",
+      "name": {
+        "en": "Trousers",
+        "ar": "بنطال"
+      },
+      "image": "clothes/trousers.svg",
+      "name_audio": {
+        "en": "clothes/trousers_name_en.mp3",
+        "ar": "clothes/trousers_name_ar.mp3"
+      },
+      "confusable_with": [
+        "shorts"
+      ]
+    },
+    {
+      "item_key": "shorts",
+      "name": {
+        "en": "Shorts",
+        "ar": "شورت"
+      },
+      "image": "clothes/shorts.svg",
+      "name_audio": {
+        "en": "clothes/shorts_name_en.mp3",
+        "ar": "clothes/shorts_name_ar.mp3"
+      },
+      "confusable_with": [
+        "trousers"
+      ]
+    },
+    {
+      "item_key": "coat",
+      "name": {
+        "en": "Coat",
+        "ar": "معطف"
+      },
+      "image": "clothes/coat.svg",
+      "name_audio": {
+        "en": "clothes/coat_name_en.mp3",
+        "ar": "clothes/coat_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "scarf",
+      "name": {
+        "en": "Scarf",
+        "ar": "وشاح"
+      },
+      "image": "clothes/scarf.svg",
+      "name_audio": {
+        "en": "clothes/scarf_name_en.mp3",
+        "ar": "clothes/scarf_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "gloves",
+      "name": {
+        "en": "Gloves",
+        "ar": "قفازات"
+      },
+      "image": "clothes/gloves.svg",
+      "name_audio": {
+        "en": "clothes/gloves_name_en.mp3",
+        "ar": "clothes/gloves_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "glasses",
+      "name": {
+        "en": "Glasses",
+        "ar": "نظارة"
+      },
+      "image": "clothes/glasses.svg",
+      "name_audio": {
+        "en": "clothes/glasses_name_en.mp3",
+        "ar": "clothes/glasses_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "boot",
+      "name": {
+        "en": "Boot",
+        "ar": "جزمة"
+      },
+      "image": "clothes/boot.svg",
+      "name_audio": {
+        "en": "clothes/boot_name_en.mp3",
+        "ar": "clothes/boot_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

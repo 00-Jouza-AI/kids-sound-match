@@ -3,10 +3,10 @@ import { local } from '../settings/storage';
 import { createPinRecord, verifyPin, type PinRecord } from './pin';
 
 /** How long the corner circle must be held to leave a game. */
-export const HOLD_SECONDS = [3, 5, 7, 10] as const;
+export const HOLD_SECONDS = [1, 2, 3, 5, 7, 10] as const;
 export type HoldSeconds = (typeof HOLD_SECONDS)[number];
 
-/** What leaving a game asks for: the number PIN, or 4 pictures tapped in order. Settings and the Report always use the PIN. */
+/** What leaving a game asks for: the number PIN, or 4 pictures tapped in order. */
 export type ExitLock = 'pin' | 'pictures';
 
 /** For the whole phone, like the PIN (not per child). */

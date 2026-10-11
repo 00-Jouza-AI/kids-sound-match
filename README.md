@@ -11,16 +11,21 @@
 - This is the **test version**: the phone reads the names aloud until the real voice recordings are added.
 - **It won't open?** Some internet connections block every `*.vercel.app` address (the page never loads).
   Try mobile data instead of Wi-Fi, or give the project a domain of your own in Vercel → Settings → Domains.
-- **Leaving a game:** hold the small circle in the top corner (3 seconds, or the time chosen in Settings →
-  Leaving a game), then enter your PIN or your 4 pictures.
+- **Leaving a game:** hold the small circle in the top corner (3 seconds, or 1, 2, 5, 7 or 10 chosen in
+  Settings → Leaving a game), then enter your PIN or your 4 pictures. That is the only lock: on the home
+  screen, Settings, the Report and My packs open straight away.
+- **Arabic voice silent or beeping?** The phone needs an Arabic voice of its own. Settings → **Voices on
+  this phone** shows which voice reads each language, lets you choose and test it, and says how to add
+  Arabic on Android, iPhone, Windows or Mac.
 
 The web version of Kids Sound Match V1. A child hears a sound or a word, sees 2–10 pictures and taps the
 matching one, in Arabic or English. No ads, no tracking; results stay on the device. It follows
 `App v01.md` (the Android spec), adapted for the browser. See [docs/DECISIONS.md](docs/DECISIONS.md)
 for every change agreed since.
 
-Packs: Animals (54), First words, Things at home, Vehicles, Musical instruments, Food, Body parts, Family, Colours,
-Shapes, Feelings, Counting 1 to 5, **Who eats what?** (see an animal, tap its food), **Where does it
+Packs: Animals (54), First words, Things at home, Clothes, Toys and play, Vehicles, Weather and nature
+(with real rain, thunder, wind, waves and fire sounds), Musical instruments, Food, Body parts, Family, Jobs and
+helpers, Colours, Shapes, Feelings, Counting 1 to 5, **Who eats what?** (see an animal, tap its food), **Where does it
 live?** (tap its home), a **Mixed** game, and the parent's own packs. Parents can also put their own
 voice and photos into the built-in packs. Brothers and sisters each get a profile (an animal on a
 colour) with their own settings and Report, and the Report can be shared as a picture.
@@ -38,8 +43,8 @@ npm run dev
   Over plain Wi-Fi http, the phone won't keep the screen awake or work offline; everything else works.
 
 The first run asks you to set a 4-digit parent PIN. To leave Kid Mode, press and hold the small circle
-in the top corner for 3 seconds (5, 7 or 10 in Settings → Leaving a game), then enter the PIN, or your
-4 pictures if you chose the picture lock there.
+in the top corner for 3 seconds (1, 2, 5, 7 or 10 in Settings → Leaving a game), then enter the PIN, or
+your 4 pictures if you chose the picture lock there. The home screen itself has no lock.
 
 ## Scripts
 
@@ -59,7 +64,7 @@ Drop files into `public/assets/` using the names in the manifest; a real file al
 placeholder, no code changes needed.
 
 - Pictures: every built-in picture is a real drawing now: Microsoft Fluent Emoji (MIT licence, see
-  `public/assets/licenses/`), plus colours, shapes, counting, dates, beehive, vacuum cleaner and oud
+  `public/assets/licenses/`), plus colours, shapes, counting, feelings, dates, beehive, vacuum cleaner and oud
   drawn for this app. To change one, replace `public/assets/packs/animals/cat.svg` (any of
   svg/webp/png/jpg works if the manifest says so)
 - Several pictures of one item: use `"images": ["counting/count_3_dots.svg", ...]` in the manifest;
@@ -78,8 +83,7 @@ Until real files exist, development builds use emoji pictures, tones, and the de
 
 ### Recording studio (the fastest way to add real voices)
 
-Run `npm run dev`, open http://localhost:5173 on this PC, then Home → **Recording studio** (behind the
-PIN). It lists every name, sound and line that still uses the stand-in voice. Pick a pack and Arabic /
+Run `npm run dev`, open http://localhost:5173 on this PC, then Home → **Recording studio**. It lists every name, sound and line that still uses the stand-in voice. Pick a pack and Arabic /
 English / Sounds, press **Space** to record (it stops by itself after the word), check the trim, and
 press **Enter**: the clip is saved straight into `public/assets` with the right name and the next one
 comes up. **P** plays, **R** records again, **← →** move between clips. Sounds can be loaded from a file
@@ -110,7 +114,7 @@ and **Print flashcards** (any pack on A4 for play away from the screen).
 
 ## My packs (your own pictures and voice)
 
-Home → **My packs** (behind the PIN): create packs like "Family" or "Toys". Each item has a picture
+Home → **My packs**: create packs like "Family" or "Toys". Each item has a picture
 (take a photo, choose one and crop it square, or pick an icon), its name typed in Arabic and/or
 English, the name **recorded** in either or both languages (record, then drag two handles to cut
 it to the exact word), and optionally a sound. A pack is playable once it has 5 finished items;

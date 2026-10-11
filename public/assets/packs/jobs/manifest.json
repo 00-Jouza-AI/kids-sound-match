@@ -1,0 +1,165 @@
+{
+  "pack_id": "jobs",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 7.5,
+  "name": {
+    "en": "Jobs and helpers",
+    "ar": "المهن"
+  },
+  "items": [
+    {
+      "item_key": "doctor",
+      "name": {
+        "en": "Doctor",
+        "ar": "طبيب"
+      },
+      "image": "jobs/doctor.svg",
+      "name_audio": {
+        "en": "jobs/doctor_name_en.mp3",
+        "ar": "jobs/doctor_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "police",
+      "name": {
+        "en": "Police officer",
+        "ar": "شرطي"
+      },
+      "image": "jobs/police.svg",
+      "name_audio": {
+        "en": "jobs/police_name_en.mp3",
+        "ar": "jobs/police_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "firefighter",
+      "name": {
+        "en": "Firefighter",
+        "ar": "إطفائي"
+      },
+      "image": "jobs/firefighter.svg",
+      "name_audio": {
+        "en": "jobs/firefighter_name_en.mp3",
+        "ar": "jobs/firefighter_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "cook",
+      "name": {
+        "en": "Cook",
+        "ar": "طبّاخ"
+      },
+      "image": "jobs/cook.svg",
+      "name_audio": {
+        "en": "jobs/cook_name_en.mp3",
+        "ar": "jobs/cook_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "farmer",
+      "name": {
+        "en": "Farmer",
+        "ar": "مزارع"
+      },
+      "image": "jobs/farmer.svg",
+      "name_audio": {
+        "en": "jobs/farmer_name_en.mp3",
+        "ar": "jobs/farmer_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "pilot",
+      "name": {
+        "en": "Pilot",
+        "ar": "طيّار"
+      },
+      "image": "jobs/pilot.svg",
+      "name_audio": {
+        "en": "jobs/pilot_name_en.mp3",
+        "ar": "jobs/pilot_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "builder",
+      "name": {
+        "en": "Builder",
+        "ar": "عامل بناء"
+      },
+      "image": "jobs/builder.svg",
+      "name_audio": {
+        "en": "jobs/builder_name_en.mp3",
+        "ar": "jobs/builder_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "teacher",
+      "name": {
+        "en": "Teacher",
+        "ar": "معلّم"
+      },
+      "image": "jobs/teacher.svg",
+      "name_audio": {
+        "en": "jobs/teacher_name_en.mp3",
+        "ar": "jobs/teacher_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "astronaut",
+      "name": {
+        "en": "Astronaut",
+        "ar": "رائد فضاء"
+      },
+      "image": "jobs/astronaut.svg",
+      "name_audio": {
+        "en": "jobs/astronaut_name_en.mp3",
+        "ar": "jobs/astronaut_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "mechanic",
+      "name": {
+        "en": "Mechanic",
+        "ar": "ميكانيكي"
+      },
+      "image": "jobs/mechanic.svg",
+      "name_audio": {
+        "en": "jobs/mechanic_name_en.mp3",
+        "ar": "jobs/mechanic_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

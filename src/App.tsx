@@ -15,7 +15,6 @@ import { customToLoaded } from './custom/toLoaded';
 import type { AssetOverride, CustomItem, CustomPack } from './custom/types';
 import { I18nProvider, useI18n } from './i18n/I18n';
 import { enterFullscreen } from './lock/fullscreen';
-import { ParentGate } from './lock/ParentGate';
 import { loadPinRecord } from './lock/pin';
 import { reportStore } from './report/db';
 import { memoryReady, oddLevel, type MemoryNext, type OddLevel } from './report/levels';
@@ -77,8 +76,6 @@ type Screen =
   | 'start'
   | 'kid';
 
-/** After a correct PIN, the parent area stays open briefly so Settings -> Report doesn't ask twice. */
-const PARENT_UNLOCK_MS = 2 * 60 * 1000;
 const LOCK_NOTE_KEY = 'ksm.lockNoteShown.v1';
 /** "Not now" on the Ready-for-more card: the level, and how many games had been played at it. */
 const NUDGE_DISMISSED_KEY = 'ksm.nudgeDismissed.v1';
@@ -206,7 +203,6 @@ function Shell({
   const [builtin, setBuiltin] = useState<LoadedContent | null>(null);
   const [custom, setCustom] = useState<CustomData>(NO_CUSTOM);
   const [screen, setScreen] = useState<Screen>('loading');
-  const [gate, setGate] = useState<{ run: () => void } | null>(null);
   // `run` changes with every game started, so Kid Mode starts afresh even for the same game.
   const [kid, setKid] = useState<{ config: KidConfig; snapshot: KidSnapshot | null; pack: LoadedPack; run: number } | null>(null);
   const runs = useRef(0);
@@ -217,7 +213,6 @@ function Shell({
   const pendingGender = useRef<ArGender | null>(null);
   const [nudge, setNudge] = useState<NextLevel | null>(null);
   const [memoryNudge, setMemoryNudge] = useState<MemoryNext | null>(null);
-  const unlockedUntil = useRef(0);
   const soundChecked = useRef(false);
 
   const { customViews, allPacks, oddPack } = useMemo(() => composePacks(builtin?.packs ?? [], custom), [builtin, custom]);
@@ -252,12 +247,6 @@ function Shell({
     }
   }, []);
 
-  /** Settings, Report, My packs, outside links and difficulty changes sit behind the parent gate (spec 6.2). */
-  const requireParent = (run: () => void) => {
-    if (Date.now() < unlockedUntil.current) run();
-    else setGate({ run });
-  };
-
   const afterLoad = (packs: readonly LoadedPack[]) => {
     if (!loadPinRecord()) {
       setScreen('firstRun');
@@ -273,8 +262,8 @@ function Shell({
     }
     if (snap) clearKidSnapshot();
     setScreen('home');
-    // Back from Google's sign-in page: reopen My packs (after the PIN, as always).
-    if (cloud.takeReturnToMyPacks()) requireParent(() => setScreen('myPacks'));
+    // Back from Google's sign-in page: reopen My packs.
+    if (cloud.takeReturnToMyPacks()) setScreen('myPacks');
   };
 
   useEffect(() => {
@@ -353,10 +342,13 @@ function Shell({
     };
   }, [screen, settings.choiceCount, settings.memoryPairs, profileId]);
 
+  /**
+   * Home opens the parent's screens without the PIN (the parent asked for it): a child only reaches
+   * Home by leaving a game, and leaving a game is what's locked.
+   */
   const open = (link: HomeLink) => {
-    if (link === 'about') setScreen('about');
-    else if (link === 'parentsGroup') requireParent(() => window.open(PARENTS_GROUP_URL, '_blank', 'noopener,noreferrer'));
-    else requireParent(() => setScreen(link));
+    if (link === 'parentsGroup') window.open(PARENTS_GROUP_URL, '_blank', 'noopener,noreferrer');
+    else setScreen(link);
   };
 
   /** The other scene than last time, when both can be played. */
@@ -402,7 +394,6 @@ function Shell({
     } catch {
       // No history available: every animal equally often, and an easy Odd one out.
     }
-    unlockedUntil.current = 0;
     setKid({
       pack: gamePack,
       run: ++runs.current,
@@ -582,7 +573,6 @@ function Shell({
           picker={{ packs: playablePacks, settings, kind: kid.config.kind, available: pickerKinds, onPlay: restartKid }}
           onExit={() => {
             setKid(null);
-            unlockedUntil.current = Date.now() + PARENT_UNLOCK_MS;
             setScreen('home');
           }}
         />
@@ -615,23 +605,19 @@ function Shell({
           }}
           canPoint={canPoint}
           memoryNudge={memoryNudge}
-          onMemoryNudgeAccept={(to) =>
-            requireParent(() => {
-              update({ memoryPairs: to as MemoryPairs });
-              setMemoryNudge(null);
-            })
-          }
+          onMemoryNudgeAccept={(to) => {
+            update({ memoryPairs: to as MemoryPairs });
+            setMemoryNudge(null);
+          }}
           onMemoryNudgeDismiss={(next) => {
             local.setJson(profileKey(MEMORY_NUDGE_DISMISSED_KEY, profileId), { level: next.from, games: next.gamesAtLevel });
             setMemoryNudge(null);
           }}
           onOpen={open}
-          onNudgeAccept={(to) =>
-            requireParent(() => {
-              update({ choiceCount: to });
-              setNudge(null);
-            })
-          }
+          onNudgeAccept={(to) => {
+            update({ choiceCount: to });
+            setNudge(null);
+          }}
           onNudgeDismiss={(next) => {
             local.setJson(profileKey(NUDGE_DISMISSED_KEY, profileId), { level: next.from, games: next.gamesAtLevel });
             setNudge(null);
@@ -666,16 +652,6 @@ function Shell({
           </div>
           <p className="hint">{t('genderPrivacy')}</p>
         </Overlay>
-      )}
-      {gate && (
-        <ParentGate
-          onSuccess={() => {
-            unlockedUntil.current = Date.now() + PARENT_UNLOCK_MS;
-            setGate(null);
-            gate.run();
-          }}
-          onCancel={() => setGate(null)}
-        />
       )}
     </>
   );

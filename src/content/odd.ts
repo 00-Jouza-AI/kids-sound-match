@@ -6,7 +6,7 @@ export const ODD_PACK_ID = 'odd-one-out';
 export const ODD_PACK_NAME = { en: 'Odd one out', ar: 'أين المختلف؟' } as const;
 
 /** An easy game compares these packs of things (three animals and a car). */
-const EASY_PACKS = ['animals', 'vehicles', 'food', 'instruments', 'home', 'body'];
+const EASY_PACKS = ['animals', 'vehicles', 'food', 'instruments', 'home', 'body', 'clothes', 'toys'];
 /** A harder game stays inside one pack and compares its groups (three farm animals and a fish). */
 const HARD_GROUPS: Readonly<Record<string, readonly string[]>> = {
   animals: ['farm', 'wild', 'birds', 'sea', 'bugs'],

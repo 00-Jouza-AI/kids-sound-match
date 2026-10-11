@@ -202,8 +202,8 @@ describe('all packs', () => {
     const content = await load();
     expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
     expect(content.packs.map((p) => p.id)).toEqual([
-      'animals', 'first-words', 'home', 'vehicles', 'instruments', 'food', 'body', 'family',
-      'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
+      'animals', 'first-words', 'home', 'clothes', 'toys', 'vehicles', 'weather', 'instruments', 'food', 'body',
+      'family', 'jobs', 'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
     ]);
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
     expect(whoEats.kind).toBe('association');
@@ -231,16 +231,23 @@ describe('all packs', () => {
     const content = await load();
     const mixed = buildMixedPack(content.packs, content.packs[0].feedback)!;
     // Counting stays out of the mix.
-    expect(mixed.parts!.map((p) => p.id)).toEqual(['animals', 'first-words', 'home', 'vehicles', 'instruments', 'food', 'body', 'family', 'colors', 'shapes', 'feelings']);
+    expect(mixed.parts!.map((p) => p.id)).toEqual([
+      'animals', 'first-words', 'home', 'clothes', 'toys', 'vehicles', 'weather', 'instruments', 'food', 'body', 'family', 'jobs',
+      'colors', 'shapes', 'feelings',
+    ]);
     expect(new Set(mixed.items.map((i) => i.key)).size).toBe(mixed.items.length);
     expect(mixed.items.find((i) => i.key === 'bell')!.confusableWith).toContain('doorbell');
 
     const settings = defaultSettings('ar');
-    // Sound modes: the 44 animals that make a sound, plus every home, vehicle, instrument and feeling sound.
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(44 + 15 + 14 + 11 + 6);
+    // Sound modes: the 44 animals that make a sound, plus every home, vehicle, weather, instrument and feeling sound.
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(44 + 15 + 14 + 5 + 11 + 6);
     settings.mode = 'NAME_ONLY';
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(54 + 14 + 15 + 14 + 11 + 25 + 13 + 9 + 6 + 6 + 6);
-    settings.mixedExcluded = ['animals', 'first-words', 'home', 'vehicles', 'instruments', 'body', 'family', 'colors', 'shapes', 'feelings'];
+    // ...and by name: clothes 9, toys 10, weather 13 and jobs 10 join in.
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(54 + 14 + 15 + 9 + 10 + 14 + 13 + 11 + 25 + 13 + 9 + 10 + 6 + 6 + 6);
+    settings.mixedExcluded = [
+      'animals', 'first-words', 'home', 'clothes', 'toys', 'vehicles', 'weather', 'instruments', 'body', 'family', 'jobs',
+      'colors', 'shapes', 'feelings',
+    ];
     expect(enabledItemKeys(mixed, settings)).toEqual(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));
     expect(sourcePacks(mixed).get('drum')).toBe('instruments');
     // Colours, shapes and feelings only appear with their own kind; the other built-in packs mix.
@@ -273,9 +280,9 @@ describe('all packs', () => {
   it('make Odd one out from the packs of things: packs when easy, groups inside a pack when harder', async () => {
     const content = await load();
     const odd = buildOddPack(content.packs, content.packs[0].feedback)!;
-    expect(odd.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'vehicles', 'instruments', 'food', 'body']);
+    expect(odd.parts!.map((p) => p.id)).toEqual(['animals', 'home', 'clothes', 'toys', 'vehicles', 'instruments', 'food', 'body']);
     expect(odd.odd!.easy.families).toHaveLength(1);
-    expect(odd.odd!.easy.families[0]).toHaveLength(6);
+    expect(odd.odd!.easy.families[0]).toHaveLength(8);
     // Harder: animals (farm, wild, birds, sea, bugs) and food (fruit, vegetables), never mixed.
     expect(odd.odd!.hard.families.map((f) => f.length)).toEqual([5, 2]);
     const food = new Set(content.packs.find((p) => p.id === 'food')!.items.map((i) => i.key));

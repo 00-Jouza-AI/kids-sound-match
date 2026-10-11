@@ -1,0 +1,218 @@
+{
+  "pack_id": "weather",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 3.5,
+  "name": {
+    "en": "Weather and nature",
+    "ar": "الطقس والطبيعة"
+  },
+  "items": [
+    {
+      "item_key": "sun",
+      "name": {
+        "en": "Sun",
+        "ar": "شمس"
+      },
+      "image": "weather/sun.svg",
+      "name_audio": {
+        "en": "weather/sun_name_en.mp3",
+        "ar": "weather/sun_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "moon",
+      "name": {
+        "en": "Moon",
+        "ar": "قمر"
+      },
+      "image": "weather/moon.svg",
+      "name_audio": {
+        "en": "weather/moon_name_en.mp3",
+        "ar": "weather/moon_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "star",
+      "name": {
+        "en": "Star",
+        "ar": "نجمة"
+      },
+      "image": "weather/star.svg",
+      "name_audio": {
+        "en": "weather/star_name_en.mp3",
+        "ar": "weather/star_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "cloud",
+      "name": {
+        "en": "Cloud",
+        "ar": "غيمة"
+      },
+      "image": "weather/cloud.svg",
+      "name_audio": {
+        "en": "weather/cloud_name_en.mp3",
+        "ar": "weather/cloud_name_ar.mp3"
+      },
+      "confusable_with": [
+        "rain",
+        "thunder"
+      ]
+    },
+    {
+      "item_key": "rain",
+      "name": {
+        "en": "Rain",
+        "ar": "مطر"
+      },
+      "image": "weather/rain.svg",
+      "sound": "weather/rain_sound.mp3",
+      "name_audio": {
+        "en": "weather/rain_name_en.mp3",
+        "ar": "weather/rain_name_ar.mp3"
+      },
+      "confusable_with": [
+        "cloud",
+        "thunder"
+      ]
+    },
+    {
+      "item_key": "thunder",
+      "name": {
+        "en": "Thunder",
+        "ar": "رعد"
+      },
+      "image": "weather/thunder.svg",
+      "sound": "weather/thunder_sound.mp3",
+      "name_audio": {
+        "en": "weather/thunder_name_en.mp3",
+        "ar": "weather/thunder_name_ar.mp3"
+      },
+      "confusable_with": [
+        "cloud",
+        "rain"
+      ]
+    },
+    {
+      "item_key": "wind",
+      "name": {
+        "en": "Wind",
+        "ar": "ريح"
+      },
+      "image": "weather/wind.svg",
+      "sound": "weather/wind_sound.mp3",
+      "name_audio": {
+        "en": "weather/wind_name_en.mp3",
+        "ar": "weather/wind_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "snowflake",
+      "name": {
+        "en": "Snow",
+        "ar": "ثلج"
+      },
+      "image": "weather/snowflake.svg",
+      "name_audio": {
+        "en": "weather/snowflake_name_en.mp3",
+        "ar": "weather/snowflake_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "rainbow",
+      "name": {
+        "en": "Rainbow",
+        "ar": "قوس قزح"
+      },
+      "image": "weather/rainbow.svg",
+      "name_audio": {
+        "en": "weather/rainbow_name_en.mp3",
+        "ar": "weather/rainbow_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "waves",
+      "name": {
+        "en": "Waves",
+        "ar": "أمواج"
+      },
+      "image": "weather/waves.svg",
+      "sound": "weather/waves_sound.mp3",
+      "name_audio": {
+        "en": "weather/waves_name_en.mp3",
+        "ar": "weather/waves_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "fire",
+      "name": {
+        "en": "Fire",
+        "ar": "نار"
+      },
+      "image": "weather/fire.svg",
+      "sound": "weather/fire_sound.mp3",
+      "name_audio": {
+        "en": "weather/fire_name_en.mp3",
+        "ar": "weather/fire_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "tree",
+      "name": {
+        "en": "Tree",
+        "ar": "شجرة"
+      },
+      "image": "weather/tree.svg",
+      "name_audio": {
+        "en": "weather/tree_name_en.mp3",
+        "ar": "weather/tree_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "flower",
+      "name": {
+        "en": "Flower",
+        "ar": "وردة"
+      },
+      "image": "weather/flower.svg",
+      "name_audio": {
+        "en": "weather/flower_name_en.mp3",
+        "ar": "weather/flower_name_ar.mp3"
+      },
+      "confusable_with": []
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

@@ -1,11 +1,11 @@
 import type { ArGender, Lang, LoadedItem, LoadedPack, ResolvedAsset } from '../content/types';
-import { speechAvailable } from './speech';
+import { speechSupported } from './speech';
 
 export type ClipCategory = 'sound' | 'name' | 'feedback';
 
-export type Clip =
-  | { kind: 'file'; url: string; category: ClipCategory; label: string }
-  | { kind: 'speech'; text: string; lang: Lang; label: string };
+export type FileClip = { kind: 'file'; url: string; category: ClipCategory; label: string };
+/** `fallback` plays when the phone has no voice for the language when the clip is played. */
+export type Clip = FileClip | { kind: 'speech'; text: string; lang: Lang; label: string; fallback: FileClip };
 
 /**
  * What the stand-in voice says for each feedback clip until the recordings exist. Mirrors the
@@ -175,11 +175,12 @@ export class ClipResolver {
 /** A recording, or (development only) the device voice reading `text` while the recording is a placeholder. */
 export function voicedClip(asset: ResolvedAsset, text: string | undefined, lang: Lang, category: ClipCategory, label: string): Clip {
   // Placeholders only resolve in development/test builds, so release builds never reach speech.
-  if (!asset.real && text && speechAvailable(lang)) return { kind: 'speech', text, lang, label };
+  // Whether the phone has a voice is decided when the clip plays: phones list their voices late.
+  if (!asset.real && text && speechSupported()) return { kind: 'speech', text, lang, label, fallback: file(asset, category, label) };
   return file(asset, category, label);
 }
 
-function file(asset: ResolvedAsset, category: ClipCategory, label: string): Clip {
+function file(asset: ResolvedAsset, category: ClipCategory, label: string): FileClip {
   return { kind: 'file', url: asset.url, category, label };
 }
 

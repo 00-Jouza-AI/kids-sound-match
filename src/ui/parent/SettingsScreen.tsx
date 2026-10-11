@@ -25,6 +25,7 @@ import { telemetry } from '../../telemetry/telemetry';
 import { choosePictures, layoutRows } from '../kid/layout';
 import { Overlay, Row, Screen, Segmented, Toggle } from './components';
 import { Avatar, ProfileRow } from './ProfileRow';
+import { VoicesCard } from './VoicesCard';
 
 export function SettingsScreen({
   content,
@@ -71,20 +72,24 @@ export function SettingsScreen({
 
   return (
     <Screen title={t('settings')} onBack={onBack}>
-      <section className="card">
-        <h2>{t('children')}</h2>
-        <ProfileRow profiles={children} activeId={child.id} onSelect={profiles.select} label={t('children')} />
-        <div className="nudge-actions">
-          <button type="button" className="btn" onClick={() => setEditingChild(child)}>
-            ✎ {t('editChild')}
-          </button>
-          {children.length < MAX_PROFILES && (
-            <button type="button" className="btn ghost" onClick={profiles.add}>
-              + {t('addChild')}
+      <section className="card featured">
+        <h2>{t('settingsPictures')}</h2>
+        <div className="choice-cards" role="radiogroup" aria-label={t('settingsPictures')}>
+          {CHOICE_COUNTS.map((n) => (
+            <button
+              type="button"
+              key={n}
+              role="radio"
+              aria-checked={settings.choiceCount === n}
+              className={settings.choiceCount === n ? 'choice-card on' : 'choice-card'}
+              onClick={() => update({ choiceCount: n as ChoiceCount })}
+            >
+              <LayoutPreview count={n} />
+              <span className="choice-num">{n}</span>
             </button>
-          )}
+          ))}
         </div>
-        <p className="hint">{children.length > 1 ? t('childrenHintMany') : t('childrenHintOne')}</p>
+        <p className="hint">{t('settingsPicturesHint')}</p>
       </section>
 
       {content.packs.length > 1 && (
@@ -109,31 +114,27 @@ export function SettingsScreen({
         </section>
       )}
 
-      <section className="card featured">
-        <h2>{t('settingsPictures')}</h2>
-        <div className="choice-cards" role="radiogroup" aria-label={t('settingsPictures')}>
-          {CHOICE_COUNTS.map((n) => (
-            <button
-              type="button"
-              key={n}
-              role="radio"
-              aria-checked={settings.choiceCount === n}
-              className={settings.choiceCount === n ? 'choice-card on' : 'choice-card'}
-              onClick={() => update({ choiceCount: n as ChoiceCount })}
-            >
-              <LayoutPreview count={n} />
-              <span className="choice-num">{n}</span>
-            </button>
-          ))}
-        </div>
-        <p className="hint">{t('settingsPicturesHint')}</p>
-      </section>
-
       {pack.parts ? (
         <MixCard pack={pack} settings={settings} update={update} nudge={nudge} onRefuse={refuse} />
       ) : (
         <ItemsCard pack={pack} settings={settings} update={update} nudge={nudge} onRefuse={refuse} />
       )}
+
+      <section className="card">
+        <h2>{t('children')}</h2>
+        <ProfileRow profiles={children} activeId={child.id} onSelect={profiles.select} label={t('children')} />
+        <div className="nudge-actions">
+          <button type="button" className="btn" onClick={() => setEditingChild(child)}>
+            ✎ {t('editChild')}
+          </button>
+          {children.length < MAX_PROFILES && (
+            <button type="button" className="btn ghost" onClick={profiles.add}>
+              + {t('addChild')}
+            </button>
+          )}
+        </div>
+        <p className="hint">{children.length > 1 ? t('childrenHintMany') : t('childrenHintOne')}</p>
+      </section>
 
       <section className="card">
         {byName && <p className="hint">{t('nameOnlyPack')}</p>}
@@ -180,6 +181,8 @@ export function SettingsScreen({
           />
         </Row>
       </section>
+
+      {__ALLOW_PLACEHOLDERS__ && <VoicesCard />}
 
       <section className="card">
         <Row
@@ -580,7 +583,6 @@ function PackThumb({ pack }: { pack: LoadedPack }) {
   );
 }
 
-/** A tiny picture of how 2, 3 or 4 pictures sit on a phone held upright. */
 /** A phone held upright with the pictures as the game lays them out (2 stacked ... 10 in pairs). */
 function LayoutPreview({ count }: { count: number }) {
   const rows = layoutRows(count, 'portrait');
