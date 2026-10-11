@@ -64,8 +64,8 @@ Drop files into `public/assets/` using the names in the manifest; a real file al
 placeholder, no code changes needed.
 
 - Pictures: every built-in picture is a real drawing now: Microsoft Fluent Emoji (MIT licence, see
-  `public/assets/licenses/`), plus colours, shapes, counting, feelings, dates, beehive, vacuum cleaner and oud
-  drawn for this app. To change one, replace `public/assets/packs/animals/cat.svg` (any of
+  `public/assets/licenses/`), plus colours, shapes, counting, feelings, body parts, family, jobs, dates, beehive, vacuum
+  cleaner and oud drawn for this app. To change one, replace `public/assets/packs/animals/cat.svg` (any of
   svg/webp/png/jpg works if the manifest says so)
 - Several pictures of one item: use `"images": ["counting/count_3_dots.svg", ...]` in the manifest;
   one is picked at random each time (all items in a question use the same one when they have the same

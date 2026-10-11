@@ -179,6 +179,17 @@ Chosen for a 1.5-year-old (the main player): games she can play now, and a word 
 - Names of the 42 new pictures, in Arabic and English: Clothes (قميص، فستان، بنطال، شورت، معطف، وشاح، قفازات، نظارة، جزمة), Toys (طائرة ورقية، أحجية، دمية، روبوت، قلم تلوين، زحليقة، سكوتر، لوح تزلج، نرد، يويو), Weather (شمس، قمر، نجمة، غيمة، مطر، رعد، ريح، ثلج، قوس قزح، أمواج، نار، شجرة، وردة), Jobs (طبيب، شرطي، إطفائي، طبّاخ، مزارع، طيّار، عامل بناء، معلّم، رائد فضاء، ميكانيكي)
 - The studio lists them all
 
+## Added on 11 October 2026 (second round): clearer pictures
+
+| Pack | Decision |
+|---|---|
+| Body parts | Redrawn for the app: one child, each picture zoomed in on its part through a round window (a big eye with its eyebrow, the nose in the middle of the face, closed lips, a smile with both rows of teeth, the tongue sticking out, an ear beside the hair, an open hand, one finger pointing up, a whole arm, a bare foot with five toes, a leg with shorts and a shoe, a heart held against the chest, the whole face). Used by the matching game and Where's your nose? |
+| Family | Redrawn as whole people, each on its own coloured circle and with one big difference: Mama (long hair, pink dress), Baba (beard, blue shirt), Grandma (grey bun, glasses), Grandpa (grey beard, glasses, walking stick), brother (red T-shirt with a star), sister (pigtails with bows), a baby in a nappy with a bottle, uncle (curly hair, moustache), aunt (short hair, headband). No hijab, as chosen. Your own photos (My packs → Your voice and photos) still replace any of them |
+| Jobs and helpers | Redrawn as one big man per picture (the Arabic words are masculine) in the clearest uniform with a big tool: doctor (white coat, stethoscope, red cross), police officer (cap, badge, hand up), firefighter (red helmet, yellow suit, hose and water), cook (tall white hat, frying pan with an egg), farmer (straw hat, basket of carrots), pilot (cap, plane), builder (hard hat, hammer, bricks), teacher (board with A B C and أ ب ت), astronaut (helmet, stars), mechanic (spanner, tyre) |
+| Animal babies | 10 new Pixabay photos where the baby fills the picture, alone: calf, lamb, kid, foal, puppy, kitten, chick, lion cub, camel calf and duckling. Listed in sources.csv |
+
+The old pictures are in `dev-assets/replaced`.
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.
