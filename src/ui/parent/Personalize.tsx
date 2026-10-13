@@ -538,10 +538,10 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
       ],
     });
   }
-  // "Where's your nose?": each body part, for a girl (and a boy, once a child is one) and in English.
+  // "Where's your nose?" and "Do it with me": each line for a girl (and a boy, once a child is one) and in English.
   const boys = loadProfiles().profiles.some((p) => p.arGender === 'm');
-  const pointLines = packs.flatMap((p) =>
-    p.items.flatMap((i): Line[] => {
+  for (const p of packs) {
+    const lines = p.items.flatMap((i): Line[] => {
       const point = i.point;
       if (!point) return [];
       const one = (voice: 'ar_f' | 'ar_m' | 'en', label: string): Line[] => {
@@ -549,8 +549,8 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
         return l ? [{ path: l.audio.path, original: l.audio, label: `${i.name[lang]} · ${label}`, say: l.text, lang: voice === 'en' ? 'en' : 'ar', category: 'feedback' }] : [];
       };
       return [...one('ar_f', t('lineForGirl')), ...(boys ? one('ar_m', t('lineForBoy')) : []), ...one('en', t('langEnglish'))];
-    }),
-  );
-  if (pointLines.length) sections.push({ title: t('pointGame'), lines: pointLines });
+    });
+    if (lines.length) sections.push({ title: p.ownGame ? p.name[lang] : t('pointGame'), lines });
+  }
   return sections.filter((s) => s.lines.length);
 }
