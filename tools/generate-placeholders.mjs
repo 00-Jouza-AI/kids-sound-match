@@ -203,7 +203,7 @@ for (const packId of packIds) {
     for (const lang of ['en', 'ar']) {
       if (item.name_audio?.[lang]) count += write(`packs/${item.name_audio[lang]}`, wav(nameTone(index, lang)));
     }
-    // "Where's your nose?" lines (body parts): the question tone.
+    // "Where's your nose?" and "Do it with me" lines: the question tone.
     for (const line of Object.values(item.point ?? {})) {
       if (line?.audio) count += write(`packs/${line.audio}`, wav(questionTone()));
     }
@@ -218,6 +218,7 @@ for (const packId of packIds) {
       fb.session_end.ar,
       ...Object.values(fb.odd_question ?? {}),
       ...Object.values(fb.peekaboo ?? {}),
+      ...Object.values(fb.rest ?? {}),
     ];
     for (const p of feedbackPaths) count += write(p, wav(feedbackTone(p)));
   }

@@ -1,0 +1,579 @@
+{
+  "pack_id": "actions",
+  "pack_version": 1,
+  "schema_version": 1,
+  "order": 6.5,
+  "name": {
+    "en": "Do it with me",
+    "ar": "اعمل متلي"
+  },
+  "own_game": true,
+  "in_mix": false,
+  "groups": [
+    {
+      "id": "moving",
+      "name": {
+        "en": "Moving",
+        "ar": "حركة"
+      },
+      "items": [
+        "clap",
+        "jump",
+        "wave",
+        "dance",
+        "spin",
+        "stamp"
+      ]
+    },
+    {
+      "id": "daily",
+      "name": {
+        "en": "Daily life",
+        "ar": "كل يوم"
+      },
+      "items": [
+        "eat",
+        "drink",
+        "sleep",
+        "wash_hands",
+        "brush_teeth"
+      ]
+    },
+    {
+      "id": "love",
+      "name": {
+        "en": "Love",
+        "ar": "حب"
+      },
+      "items": [
+        "kiss",
+        "hug",
+        "high_five"
+      ]
+    },
+    {
+      "id": "calm",
+      "name": {
+        "en": "Calm",
+        "ar": "هدوء"
+      },
+      "items": [
+        "sit",
+        "lie_down",
+        "shh",
+        "cover_eyes"
+      ]
+    }
+  ],
+  "items": [
+    {
+      "item_key": "clap",
+      "name": {
+        "en": "Clap",
+        "ar": "سقّف"
+      },
+      "image": "actions/clap.svg",
+      "name_audio": {
+        "en": "actions/clap_name_en.mp3",
+        "ar": "actions/clap_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Clap your hands!",
+          "audio": "actions/clap_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "سقّفي!",
+          "audio": "actions/clap_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "سقّف!",
+          "audio": "actions/clap_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "jump",
+      "name": {
+        "en": "Jump",
+        "ar": "نُطّ"
+      },
+      "image": "actions/jump.svg",
+      "name_audio": {
+        "en": "actions/jump_name_en.mp3",
+        "ar": "actions/jump_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Jump!",
+          "audio": "actions/jump_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "نُطّي!",
+          "audio": "actions/jump_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "نُطّ!",
+          "audio": "actions/jump_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "wave",
+      "name": {
+        "en": "Wave bye-bye",
+        "ar": "باي باي"
+      },
+      "image": "actions/wave.svg",
+      "name_audio": {
+        "en": "actions/wave_name_en.mp3",
+        "ar": "actions/wave_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Wave bye-bye!",
+          "audio": "actions/wave_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "باي باي!",
+          "audio": "actions/wave_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "باي باي!",
+          "audio": "actions/wave_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "dance",
+      "name": {
+        "en": "Dance",
+        "ar": "ارقص"
+      },
+      "image": "actions/dance.svg",
+      "name_audio": {
+        "en": "actions/dance_name_en.mp3",
+        "ar": "actions/dance_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Dance!",
+          "audio": "actions/dance_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "ارقصي!",
+          "audio": "actions/dance_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "ارقص!",
+          "audio": "actions/dance_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "spin",
+      "name": {
+        "en": "Spin round",
+        "ar": "دور"
+      },
+      "image": "actions/spin.svg",
+      "name_audio": {
+        "en": "actions/spin_name_en.mp3",
+        "ar": "actions/spin_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Spin round!",
+          "audio": "actions/spin_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "دوري!",
+          "audio": "actions/spin_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "دور!",
+          "audio": "actions/spin_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "stamp",
+      "name": {
+        "en": "Stamp your feet",
+        "ar": "دبّك"
+      },
+      "image": "actions/stamp.svg",
+      "name_audio": {
+        "en": "actions/stamp_name_en.mp3",
+        "ar": "actions/stamp_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Stamp your feet!",
+          "audio": "actions/stamp_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "دبّكي!",
+          "audio": "actions/stamp_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "دبّك!",
+          "audio": "actions/stamp_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "eat",
+      "name": {
+        "en": "Eat",
+        "ar": "كُل"
+      },
+      "image": "actions/eat.svg",
+      "name_audio": {
+        "en": "actions/eat_name_en.mp3",
+        "ar": "actions/eat_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Eat!",
+          "audio": "actions/eat_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "كُلي!",
+          "audio": "actions/eat_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "كُل!",
+          "audio": "actions/eat_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "drink",
+      "name": {
+        "en": "Drink",
+        "ar": "اشرب"
+      },
+      "image": "actions/drink.svg",
+      "name_audio": {
+        "en": "actions/drink_name_en.mp3",
+        "ar": "actions/drink_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Drink!",
+          "audio": "actions/drink_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "اشربي!",
+          "audio": "actions/drink_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "اشرب!",
+          "audio": "actions/drink_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "sleep",
+      "name": {
+        "en": "Sleep",
+        "ar": "نام"
+      },
+      "image": "actions/sleep.svg",
+      "name_audio": {
+        "en": "actions/sleep_name_en.mp3",
+        "ar": "actions/sleep_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Go to sleep!",
+          "audio": "actions/sleep_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "نامي!",
+          "audio": "actions/sleep_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "نام!",
+          "audio": "actions/sleep_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "wash_hands",
+      "name": {
+        "en": "Wash your hands",
+        "ar": "اغسل إيديك"
+      },
+      "image": "actions/wash_hands.svg",
+      "name_audio": {
+        "en": "actions/wash_hands_name_en.mp3",
+        "ar": "actions/wash_hands_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Wash your hands!",
+          "audio": "actions/wash_hands_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "اغسلي إيديكِ!",
+          "audio": "actions/wash_hands_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "اغسل إيديكَ!",
+          "audio": "actions/wash_hands_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "brush_teeth",
+      "name": {
+        "en": "Brush your teeth",
+        "ar": "فرّش سنانك"
+      },
+      "image": "actions/brush_teeth.svg",
+      "name_audio": {
+        "en": "actions/brush_teeth_name_en.mp3",
+        "ar": "actions/brush_teeth_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Brush your teeth!",
+          "audio": "actions/brush_teeth_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "فرّشي سنانِك!",
+          "audio": "actions/brush_teeth_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "فرّش سنانَك!",
+          "audio": "actions/brush_teeth_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "kiss",
+      "name": {
+        "en": "Kiss",
+        "ar": "بوسة"
+      },
+      "image": "actions/kiss.svg",
+      "name_audio": {
+        "en": "actions/kiss_name_en.mp3",
+        "ar": "actions/kiss_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Give me a kiss!",
+          "audio": "actions/kiss_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "بوسيني!",
+          "audio": "actions/kiss_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "بوسني!",
+          "audio": "actions/kiss_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "hug",
+      "name": {
+        "en": "Hug",
+        "ar": "عبطة"
+      },
+      "image": "actions/hug.svg",
+      "name_audio": {
+        "en": "actions/hug_name_en.mp3",
+        "ar": "actions/hug_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Give me a hug!",
+          "audio": "actions/hug_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "عبطيني!",
+          "audio": "actions/hug_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "عبطني!",
+          "audio": "actions/hug_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "high_five",
+      "name": {
+        "en": "High five",
+        "ar": "كفّك"
+      },
+      "image": "actions/high_five.svg",
+      "name_audio": {
+        "en": "actions/high_five_name_en.mp3",
+        "ar": "actions/high_five_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "High five!",
+          "audio": "actions/high_five_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "كفِّك!",
+          "audio": "actions/high_five_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "كفَّك!",
+          "audio": "actions/high_five_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "sit",
+      "name": {
+        "en": "Sit down",
+        "ar": "اقعد"
+      },
+      "image": "actions/sit.svg",
+      "name_audio": {
+        "en": "actions/sit_name_en.mp3",
+        "ar": "actions/sit_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Sit down!",
+          "audio": "actions/sit_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "اقعدي!",
+          "audio": "actions/sit_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "اقعد!",
+          "audio": "actions/sit_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "lie_down",
+      "name": {
+        "en": "Lie down",
+        "ar": "تمدّد"
+      },
+      "image": "actions/lie_down.svg",
+      "name_audio": {
+        "en": "actions/lie_down_name_en.mp3",
+        "ar": "actions/lie_down_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Lie down!",
+          "audio": "actions/lie_down_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "تمدّدي!",
+          "audio": "actions/lie_down_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "تمدّد!",
+          "audio": "actions/lie_down_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "shh",
+      "name": {
+        "en": "Shh",
+        "ar": "ششش"
+      },
+      "image": "actions/shh.svg",
+      "name_audio": {
+        "en": "actions/shh_name_en.mp3",
+        "ar": "actions/shh_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Shh!",
+          "audio": "actions/shh_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "ششش!",
+          "audio": "actions/shh_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "ششش!",
+          "audio": "actions/shh_do_ar_m.mp3"
+        }
+      }
+    },
+    {
+      "item_key": "cover_eyes",
+      "name": {
+        "en": "Cover your eyes",
+        "ar": "خبّي عيونك"
+      },
+      "image": "actions/cover_eyes.svg",
+      "name_audio": {
+        "en": "actions/cover_eyes_name_en.mp3",
+        "ar": "actions/cover_eyes_name_ar.mp3"
+      },
+      "confusable_with": [],
+      "point": {
+        "en": {
+          "text": "Cover your eyes!",
+          "audio": "actions/cover_eyes_do_en.mp3"
+        },
+        "ar_f": {
+          "text": "خبّي عيونِك!",
+          "audio": "actions/cover_eyes_do_ar_f.mp3"
+        },
+        "ar_m": {
+          "text": "خبّي عيونَك!",
+          "audio": "actions/cover_eyes_do_ar_m.mp3"
+        }
+      }
+    }
+  ],
+  "feedback_audio": {
+    "correct": {
+      "en": [
+        "feedback/correct_en_1.mp3",
+        "feedback/correct_en_2.mp3",
+        "feedback/correct_en_3.mp3",
+        "feedback/correct_en_4.mp3",
+        "feedback/correct_en_5.mp3"
+      ],
+      "ar": [
+        "feedback/correct_ar_1.mp3",
+        "feedback/correct_ar_2.mp3",
+        "feedback/correct_ar_3.mp3",
+        "feedback/correct_ar_4.mp3",
+        "feedback/correct_ar_5.mp3"
+      ]
+    },
+    "incorrect_tone": "feedback/incorrect_tone.mp3",
+    "session_end": {
+      "en": "feedback/session_end_en.mp3",
+      "ar": "feedback/session_end_ar.mp3"
+    }
+  }
+}

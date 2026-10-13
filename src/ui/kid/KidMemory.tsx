@@ -11,6 +11,7 @@ import { spokenLanguages } from '../../settings/settings';
 import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
+import { questionDone } from './sitting';
 import { choosePictures, fitSquares, useBoxSize, type Orientation } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
@@ -152,12 +153,15 @@ export function KidMemory({
     if (event === 'opened' || event === 'miss') void audio.explore(item);
     if (event === 'miss') {
       window.setTimeout(() => {
-        if (alive.current) setState(closeMiss(stateRef.current));
+        if (!alive.current) return;
+        setState(closeMiss(stateRef.current));
+        questionDone();
       }, MISS_SHOW_MS);
     }
     if (event === 'match' || event === 'done') {
       setLastMatch(card.key);
       const praise = audio.named(item);
+      if (event === 'match') void praise.then(questionDone);
       if (event === 'done') {
         void praise.then(() => {
           if (alive.current) void finish(next);

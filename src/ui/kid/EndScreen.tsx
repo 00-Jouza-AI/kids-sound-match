@@ -3,7 +3,7 @@ import type { LoadedPack } from '../../content/types';
 import { useI18n } from '../../i18n/I18n';
 import { activeGroup, groupPlayable, pickPatch } from '../../settings/quickPick';
 import type { Settings } from '../../settings/settings';
-import { ExploreIcon, MemoryIcon, OddIcon, PeekabooIcon, PlayIcon, PointIcon, SceneIcon } from './icons';
+import { ActionsIcon, ExploreIcon, MemoryIcon, OddIcon, PeekabooIcon, PlayIcon, PointIcon, SceneIcon } from './icons';
 import type { KidKind } from './kidSnapshot';
 import { choosePictures } from './layout';
 import { AlbumIcon } from './Stickers';
@@ -96,6 +96,7 @@ function QuickPicker({ packs, settings, kind, available, onPlay, onClose }: Pick
     { id: 'explore', label: t('explore'), icon: <ExploreIcon /> },
     { id: 'scene', label: t('sceneGame'), icon: <SceneIcon /> },
     { id: 'point', label: t('pointGame'), icon: <PointIcon /> },
+    { id: 'actions', label: t('actionsGame'), icon: <ActionsIcon /> },
     { id: 'memory', label: t('memoryGame'), icon: <MemoryIcon /> },
     { id: 'odd', label: t('oddOneOut'), icon: <OddIcon /> },
   ];

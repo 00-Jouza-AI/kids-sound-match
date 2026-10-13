@@ -2936,6 +2936,11 @@ html.kid-locked body {
   background: radial-gradient(circle at 50% 28%, #fbfff6 0%, #edf8e2 55%, #d9efc7 100%);
 }
 
+/* Do it with me: the same game, on a warm background. */
+.kid.stage-actions {
+  background: radial-gradient(circle at 50% 28%, #fffaf2 0%, #ffeedb 55%, #ffd9b5 100%);
+}
+
 .point-area {
   display: grid;
   flex: 1;
@@ -3545,4 +3550,121 @@ html.kid-locked body {
 .voice-pick .btn {
   flex: none;
   white-space: nowrap;
+}
+
+/* Play-time timer: the rest screen (only the parent's corner circle stays on top). */
+.rest-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 40%, #3b4a8c, #1c2350 70%);
+  animation: rest-in 1.2s ease;
+}
+
+.kid.resting > .kid-top {
+  position: relative;
+  z-index: 41;
+}
+
+.rest-art {
+  width: min(78vmin, 520px);
+  height: auto;
+}
+
+.rest-star {
+  animation: rest-twinkle 2.4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.rest-z {
+  animation: rest-float 3s ease-in-out infinite;
+}
+
+@keyframes rest-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rest-twinkle {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+}
+
+@keyframes rest-float {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-screen,
+  .rest-star,
+  .rest-z {
+    animation: none;
+  }
+}
+
+/* Your voice: the recording session */
+.session-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 4px 2px 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.session-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.session-dots .dot {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+}
+
+.session-dots .dot.on {
+  background: var(--primary);
+}
+
+.session-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.session-picture {
+  width: min(56vw, 240px);
+  height: min(56vw, 240px);
+  object-fit: contain;
+}
+
+.session-word {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.session-done {
+  margin: 12px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.card.center {
+  text-align: center;
 }

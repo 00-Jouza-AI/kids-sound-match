@@ -42,6 +42,8 @@ export const FEEDBACK_SPEECH: Record<string, string> = {
   // Peekaboo, as the blanket comes off
   'feedback/peekaboo_ar.mp3': 'بَخ!',
   'feedback/peekaboo_en.mp3': 'Peekaboo!',
+  'feedback/rest_ar.mp3': 'وقت الراحة',
+  'feedback/rest_en.mp3': 'Time to rest',
 };
 
 /** Peekaboo's "بَخ!" lines, which live with the shared game lines (the Animals pack). */

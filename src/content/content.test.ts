@@ -203,7 +203,7 @@ describe('all packs', () => {
     expect(content.issues.filter((i) => i.level === 'error')).toEqual([]);
     expect(content.packs.map((p) => p.id)).toEqual([
       'animals', 'first-words', 'home', 'clothes', 'toys', 'vehicles', 'weather', 'instruments', 'food', 'body',
-      'family', 'jobs', 'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
+      'actions', 'family', 'jobs', 'colors', 'shapes', 'feelings', 'counting', 'who-eats-what', 'where-lives', 'animal-babies',
     ]);
     const whoEats = content.packs.find((p) => p.id === 'who-eats-what')!;
     expect(whoEats.kind).toBe('association');
@@ -240,10 +240,10 @@ describe('all packs', () => {
 
     const settings = defaultSettings('ar');
     // Sound modes: the 44 animals that make a sound, plus every home, vehicle, weather, instrument and feeling sound.
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(44 + 15 + 14 + 5 + 11 + 6);
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(44 + 21 + 14 + 5 + 11 + 6);
     settings.mode = 'NAME_ONLY';
     // ...and by name: clothes 9, toys 10, weather 13 and jobs 10 join in.
-    expect(enabledItemKeys(mixed, settings)).toHaveLength(54 + 14 + 15 + 9 + 10 + 14 + 13 + 11 + 25 + 13 + 9 + 10 + 6 + 6 + 6);
+    expect(enabledItemKeys(mixed, settings)).toHaveLength(54 + 14 + 21 + 9 + 10 + 14 + 13 + 11 + 25 + 13 + 9 + 10 + 6 + 6 + 6);
     settings.mixedExcluded = [
       'animals', 'first-words', 'home', 'clothes', 'toys', 'vehicles', 'weather', 'instruments', 'body', 'family', 'jobs',
       'colors', 'shapes', 'feelings',
@@ -275,6 +275,21 @@ describe('all packs', () => {
     expect(chick.prompts!.map((p) => p.key)).toEqual(['hen']);
     expect(chick.images[0].path).toBe('packs/animal-babies/chick.jpg'); // a photo, like every other baby
     expect(babies.items.find((i) => i.key === 'calf')!.name.ar).toBe('عِجل');
+  });
+
+  it('make Do it with me: 18 actions said to a girl, to a boy and in English, kept to their own game', async () => {
+    const content = await load();
+    const actions = content.packs.find((p) => p.id === 'actions')!;
+    expect(actions.ownGame).toBe(true);
+    expect(actions.inMix).toBe(false);
+    expect(actions.items).toHaveLength(18);
+    expect(actions.groups.map((g) => g.items.length)).toEqual([6, 5, 3, 4]);
+    for (const item of actions.items) expect(Object.keys(item.point ?? {}).sort(), item.key).toEqual(['ar_f', 'ar_m', 'en']);
+    const clap = actions.items.find((i) => i.key === 'clap')!;
+    expect([clap.point!.ar_f!.text, clap.point!.ar_m!.text, clap.point!.en!.text]).toEqual(['سقّفي!', 'سقّف!', 'Clap your hands!']);
+    expect(buildMixedPack(content.packs, content.packs[0].feedback)!.parts!.map((p) => p.id)).not.toContain('actions');
+    // The play-time timer's "Time to rest" lives with the shared lines.
+    expect(content.packs[0].feedback.rest?.ar?.path).toBe('feedback/rest_ar.mp3');
   });
 
   it('make Odd one out from the packs of things: packs when easy, groups inside a pack when harder', async () => {

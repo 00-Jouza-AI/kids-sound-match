@@ -30,6 +30,12 @@ live?** (tap its home), a **Mixed** game, and the parent's own packs. Parents ca
 voice and photos into the built-in packs. Brothers and sisters each get a profile (an animal on a
 colour) with their own settings and Report, and the Report can be shared as a picture.
 
+Games: the matching game, Peekaboo, Explore, Find it in the picture, Where's your nose?, **Do it with
+me** (the app says "سقّفي!" or "Clap your hands!" and shows it; the parent ticks when the child does it),
+Memory and Odd one out. Settings → **Play time** ends a sitting after 5 to 30 minutes with a calm "time
+to rest" screen that only the lock closes. With both languages, Settings → **Which first** chooses
+Arabic or English first.
+
 ## Run it
 
 ```bash
@@ -125,7 +131,9 @@ Wi-Fi you can choose a recorded audio file instead.
 
 **Your voice and photos** (in My packs): record any name in the built-in packs in your own voice, plus
 the praise lines, or swap a picture for your own photo, like Grandma's photo for "Grandma" in Family.
-Anything you don't change keeps the original.
+Anything you don't change keeps the original. **Record the words** there is the quick way: one word at a
+time with its picture (every Arabic word still read by the phone first, then the English ones), 5 a day
+suggested.
 
 ### Optional cloud backup (Google sign-in)
 

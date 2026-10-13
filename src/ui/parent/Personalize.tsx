@@ -9,6 +9,8 @@ import { blobUrl } from '../../custom/toLoaded';
 import type { AssetOverride } from '../../custom/types';
 import { useI18n } from '../../i18n/I18n';
 import { loadProfiles } from '../../settings/profiles';
+import { local } from '../../settings/storage';
+import { wordsToRecord } from './recordQueue';
 import { choosePictures } from '../kid/layout';
 import { ChevronIcon, Screen } from './components';
 import { PictureCropper } from './PictureCropper';
@@ -28,7 +30,23 @@ interface Line {
   category: ClipCategory;
 }
 
-type Editing = { kind: 'item'; key: string } | { kind: 'lines' } | null;
+type Editing = { kind: 'item'; key: string } | { kind: 'lines' } | { kind: 'session' } | null;
+
+/** The recording session suggests this many words a day. */
+const SESSION_DAILY = 5;
+const SESSION_DAY_KEY = 'ksm.recordSession.v1';
+
+/** A name still read by the phone's voice, with its picture. */
+interface SessionWord {
+  item: LoadedItem;
+  line: Line;
+}
+
+const today = () => new Date().toDateString();
+const recordedToday = () => {
+  const saved = local.getJson<{ day: string; n: number }>(SESSION_DAY_KEY);
+  return saved?.day === today() ? saved.n : 0;
+};
 
 /**
  * "Your voice and photos": the parent records the names in the built-in packs (and the praise)
@@ -63,6 +81,9 @@ export function Personalize({
     ...(item.sound ? [{ path: item.sound.path, original: item.sound, label: t('soundLabel'), lang, category: 'sound' as const }] : []),
   ];
   const gameLines = useMemo(() => buildGameLines(packs, t, lang), [packs, t, lang]);
+  const nameLine = (item: LoadedItem, l: Lang): Line => itemLines(item).find((x) => x.lang === l && x.category === 'name')!;
+  const toRecord = wordsToRecord(packs, (path) => mine.has(path));
+  const leftAr = toRecord.filter((w) => w.lang === 'ar').length;
 
   const editingItem = editing?.kind === 'item' ? pack?.items.find((i) => i.key === editing.key) : undefined;
   if (editingItem) {
@@ -72,6 +93,21 @@ export function Personalize({
         picture={pictureOf(editingItem)}
         photoIsMine={Boolean(editingItem.picturePath && mine.has(editingItem.picturePath))}
         lines={itemLines(editingItem)}
+        mine={mine}
+        onChanged={onChanged}
+        onBack={() => setEditing(null)}
+      />
+    );
+  }
+  if (editing?.kind === 'session') {
+    return (
+      <RecordSession
+        // Fixed when the session opens, so the order doesn't jump as words get recorded.
+        words={toRecord.map((w) => {
+          const item = packs[w.pack].items[w.item];
+          return { item, line: nameLine(item, w.lang) };
+        })}
+        pictureOf={pictureOf}
         mine={mine}
         onChanged={onChanged}
         onBack={() => setEditing(null)}
@@ -97,6 +133,18 @@ export function Personalize({
   return (
     <Screen title={t('personalizeTitle')} onBack={onBack}>
       <p className="hint">{t('personalizeIntro')}</p>
+      <button type="button" className="card pack-card featured" onClick={() => setEditing({ kind: 'session' })} disabled={!toRecord.length}>
+        <span className="link-icon big" aria-hidden="true">
+          🎙️
+        </span>
+        <span className="pack-text">
+          <strong>{t('recSession')}</strong>
+          <span className="hint">
+            {toRecord.length ? t('recSessionHint', { ar: leftAr, en: toRecord.length - leftAr, n: SESSION_DAILY }) : t('recSessionAll')}
+          </span>
+        </span>
+        <ChevronIcon />
+      </button>
       <button type="button" className="card pack-card" onClick={() => setEditing({ kind: 'lines' })}>
         <span className="link-icon big" aria-hidden="true">
           🎉
@@ -261,6 +309,114 @@ function ItemVoice({
   );
 }
 
+/**
+ * The recording session: one word at a time, big picture and big word. Record (it stops by itself
+ * after the word, then trim), and the next word comes up. 5 a day is the suggestion; stop any time.
+ */
+function RecordSession({
+  words,
+  pictureOf,
+  mine,
+  onChanged,
+  onBack,
+}: {
+  words: readonly SessionWord[];
+  pictureOf: (item: LoadedItem) => string;
+  mine: ReadonlyMap<string, Blob>;
+  onChanged: () => Promise<void>;
+  onBack: () => void;
+}) {
+  const { t } = useI18n();
+  const [skipped, setSkipped] = useState<ReadonlySet<string>>(new Set());
+  const [recording, setRecording] = useState(false);
+  const [todayCount, setTodayCount] = useState(recordedToday);
+  const [paused, setPaused] = useState(false);
+  const left = words.filter((w) => !mine.has(w.line.path));
+  const word = left.find((w) => !skipped.has(w.line.path)) ?? left[0];
+
+  const hear = () => {
+    if (!word) return;
+    audioEngine.unlock();
+    audioEngine.stopAll();
+    void audioEngine.play(voicedClip(word.line.original, word.line.say, word.line.lang, 'name', 'session-original'), () => false);
+  };
+
+  const saved = async (clip: Blob) => {
+    if (!word) return;
+    setRecording(false);
+    await ops.save(word.line.path, clip);
+    const n = recordedToday() + 1;
+    local.setJson(SESSION_DAY_KEY, { day: today(), n });
+    setTodayCount(n);
+    if (n === SESSION_DAILY) setPaused(true);
+    await onChanged();
+  };
+
+  const body = !word ? (
+    <section className="card center">
+      <p className="session-done">🎉 {t('recSessionAll')}</p>
+    </section>
+  ) : paused ? (
+    <section className="card center">
+      <p className="session-done">🌟 {t('recSessionFive', { n: SESSION_DAILY })}</p>
+      <div className="nudge-actions">
+        <button type="button" className="btn primary" onClick={() => setPaused(false)}>
+          {t('recSessionMore')}
+        </button>
+        <button type="button" className="btn" onClick={onBack}>
+          {t('recSessionStop')}
+        </button>
+      </div>
+    </section>
+  ) : (
+    <section className="card session-card">
+      <span className="tag">{word.line.lang === 'ar' ? t('langArabic') : t('langEnglish')}</span>
+      <img className="session-picture" src={pictureOf(word.item)} alt="" draggable={false} />
+      <p className="session-word" dir={word.line.lang === 'ar' ? 'rtl' : 'ltr'} lang={word.line.lang}>
+        {word.line.say}
+      </p>
+      <button type="button" className="btn primary big wide" onClick={() => setRecording(true)}>
+        ● {t('record')}
+      </button>
+      <div className="nudge-actions">
+        <button type="button" className="btn" onClick={hear}>
+          ▶ {t('recSessionHear')}
+        </button>
+        <button type="button" className="btn ghost" onClick={() => {
+            // Skipping every word left starts the round again.
+            const next = new Set([...skipped, word.line.path]);
+            setSkipped(left.every((w) => next.has(w.line.path)) ? new Set() : next);
+          }}>
+          {t('recSessionSkip')}
+        </button>
+      </div>
+    </section>
+  );
+
+  return (
+    <Screen title={t('recSession')} onBack={onBack}>
+      <div className="session-progress">
+        <span>{t('recSessionLeft', { n: left.length })}</span>
+        <span className="session-dots" aria-label={t('recSessionToday', { n: Math.min(todayCount, SESSION_DAILY), m: SESSION_DAILY })}>
+          {Array.from({ length: SESSION_DAILY }, (_, i) => (
+            <span key={i} className={i < todayCount ? 'dot on' : 'dot'} />
+          ))}
+        </span>
+      </div>
+      {body}
+      <p className="hint">{t('recSessionTip')}</p>
+      {recording && word && (
+        <SoundEditor
+          title={`${word.line.label}: «${word.line.say}»`}
+          existing={null}
+          onClose={() => setRecording(false)}
+          onUse={(clip) => void saved(clip)}
+        />
+      )}
+    </Screen>
+  );
+}
+
 /** Rows of recordings: play (the parent's version, else the original), record or trim, back to the original. */
 function Lines({ lines, mine, onChanged }: { lines: readonly Line[]; mine: ReadonlyMap<string, Blob>; onChanged: () => Promise<void> }) {
   const { t } = useI18n();
@@ -352,6 +508,13 @@ function buildGameLines(packs: readonly LoadedPack[], t: ReturnType<typeof useI1
       sections.push({
         title: t('peekaboo'),
         lines: (['ar', 'en'] as const).flatMap((lang) => line(peekaboo[lang], lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
+      });
+    }
+    const rest = feedback.rest;
+    if (rest) {
+      sections.push({
+        title: t('restLine'),
+        lines: (['ar', 'en'] as const).flatMap((lang) => line(rest[lang], lang, lang === 'ar' ? t('langArabic') : t('langEnglish'))),
       });
     }
     sections.push({

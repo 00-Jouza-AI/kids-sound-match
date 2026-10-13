@@ -58,7 +58,7 @@
         "en": "home/tap_name_en.mp3",
         "ar": "home/tap_name_ar.mp3"
       },
-      "confusable_with": ["shower", "frying_pan"]
+      "confusable_with": ["shower", "frying_pan", "toilet"]
     },
     {
       "item_key": "shower",
@@ -69,7 +69,7 @@
         "en": "home/shower_name_en.mp3",
         "ar": "home/shower_name_ar.mp3"
       },
-      "confusable_with": ["tap", "frying_pan"]
+      "confusable_with": ["tap", "frying_pan", "toilet"]
     },
     {
       "item_key": "kettle",
@@ -124,7 +124,7 @@
         "en": "home/vacuum_name_en.mp3",
         "ar": "home/vacuum_name_ar.mp3"
       },
-      "confusable_with": []
+      "confusable_with": ["hair_dryer", "blender"]
     },
     {
       "item_key": "toothbrush",
@@ -169,6 +169,90 @@
         "ar": "home/hammer_name_ar.mp3"
       },
       "confusable_with": ["door"]
+    },
+    {
+      "item_key": "baby_cry",
+      "name": {
+        "en": "Crying baby",
+        "ar": "طفل يبكي"
+      },
+      "image": "home/baby_cry.svg",
+      "sound": "home/baby_cry_sound.mp3",
+      "name_audio": {
+        "en": "home/baby_cry_name_en.mp3",
+        "ar": "home/baby_cry_name_ar.mp3"
+      },
+      "confusable_with": []
+    },
+    {
+      "item_key": "washing_machine",
+      "name": {
+        "en": "Washing machine",
+        "ar": "غسّالة"
+      },
+      "image": "home/washing_machine.svg",
+      "sound": "home/washing_machine_sound.mp3",
+      "name_audio": {
+        "en": "home/washing_machine_name_en.mp3",
+        "ar": "home/washing_machine_name_ar.mp3"
+      },
+      "confusable_with": ["microwave"]
+    },
+    {
+      "item_key": "microwave",
+      "name": {
+        "en": "Microwave",
+        "ar": "ميكروويف"
+      },
+      "image": "home/microwave.svg",
+      "sound": "home/microwave_sound.mp3",
+      "name_audio": {
+        "en": "home/microwave_name_en.mp3",
+        "ar": "home/microwave_name_ar.mp3"
+      },
+      "confusable_with": ["washing_machine"]
+    },
+    {
+      "item_key": "toilet",
+      "name": {
+        "en": "Toilet",
+        "ar": "تواليت"
+      },
+      "image": "home/toilet.svg",
+      "sound": "home/toilet_sound.mp3",
+      "name_audio": {
+        "en": "home/toilet_name_en.mp3",
+        "ar": "home/toilet_name_ar.mp3"
+      },
+      "confusable_with": ["tap", "shower"]
+    },
+    {
+      "item_key": "hair_dryer",
+      "name": {
+        "en": "Hair dryer",
+        "ar": "مجفّف شعر"
+      },
+      "image": "home/hair_dryer.svg",
+      "sound": "home/hair_dryer_sound.mp3",
+      "name_audio": {
+        "en": "home/hair_dryer_name_en.mp3",
+        "ar": "home/hair_dryer_name_ar.mp3"
+      },
+      "confusable_with": ["vacuum", "blender"]
+    },
+    {
+      "item_key": "blender",
+      "name": {
+        "en": "Blender",
+        "ar": "خلّاط"
+      },
+      "image": "home/blender.svg",
+      "sound": "home/blender_sound.mp3",
+      "name_audio": {
+        "en": "home/blender_name_en.mp3",
+        "ar": "home/blender_name_ar.mp3"
+      },
+      "confusable_with": ["vacuum", "hair_dryer"]
     }
   ],
   "feedback_audio": {

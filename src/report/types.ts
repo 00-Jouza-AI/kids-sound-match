@@ -23,7 +23,7 @@ export interface SessionEntity {
   turns?: number;
 }
 
-export type GameKind = 'match' | 'memory' | 'odd' | 'peekaboo' | 'scene' | 'point';
+export type GameKind = 'match' | 'memory' | 'odd' | 'peekaboo' | 'scene' | 'point' | 'actions';
 
 /** The matching game feeds the per-picture Report and practice; Memory and Odd one out don't. */
 export function isMatchGame(s: Pick<SessionEntity, 'game'>): boolean {

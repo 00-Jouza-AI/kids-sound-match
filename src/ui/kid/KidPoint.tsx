@@ -11,6 +11,7 @@ import { spokenLanguages } from '../../settings/settings';
 import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
+import { questionDone } from './sitting';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
@@ -39,6 +40,9 @@ export function pointItems(pack: LoadedPack | undefined, languages: readonly Lan
  * Where's your nose? Played together, away from the screen: the app shows a nose and asks
  * "أين أنفُكِ؟"; the child points at her own nose and the parent taps the big tick (or skips).
  * Tapping the picture asks again. Each tick counts towards "Words I know".
+ *
+ * Do it with me is the same game with actions: the app shows clapping and says "سقّفي!"; she
+ * claps, the parent ticks.
  */
 export function KidPoint({
   pack,
@@ -57,6 +61,14 @@ export function KidPoint({
 }) {
   const { t } = useI18n();
   const gender: ArGender = config.arGender ?? 'f';
+  const actions = config.kind === 'actions';
+  /** On an action's picture, what to do ("Clap your hands!", "سقّفي!") rather than its name. */
+  const cardName = (item: LoadedItem) => {
+    if (!actions) return item.name;
+    const en = item.point?.en?.text ?? item.name.en;
+    const ar = item.point?.[gender === 'm' ? 'ar_m' : 'ar_f']?.text ?? item.name.ar;
+    return { en, ar };
+  };
   const items = useMemo(() => {
     const allowed = new Set(config.itemKeys);
     return pointItems(pack, spokenLanguages(config.language), gender).filter((i) => allowed.has(i.key));
@@ -135,7 +147,7 @@ export function KidPoint({
           mode: config.mode,
           completed: true,
           profileId: config.profileId,
-          game: 'point',
+          game: actions ? 'actions' : 'point',
         },
         foundKeys.current.map((key) => ({ itemKey: key, packId: pack.id, firstTryCorrect: true, attempts: 1, choiceCount: 1 })),
       );
@@ -177,6 +189,7 @@ export function KidPoint({
     indexRef.current++;
     setIndex(indexRef.current);
     present();
+    questionDone();
   };
 
   /** The parent's tick: she found it on herself. */
@@ -249,7 +262,7 @@ export function KidPoint({
 
   return (
     <KidFrame
-      stage={stage === 'playing' ? 'point' : stage}
+      stage={stage === 'playing' ? config.kind : stage}
       onGateOpen={() => {
         gateRef.current = true;
         audio.stop();
@@ -276,7 +289,7 @@ export function KidPoint({
                 }}
               >
                 <img src={pictures[key]} alt="" draggable={false} />
-                {config.cardNames && <CardNames name={items.find((i) => i.key === key)!.name} />}
+                {config.cardNames && <CardNames name={cardName(items.find((i) => i.key === key)!)} />}
                 {found && <Burst size={size} />}
               </button>
             )}

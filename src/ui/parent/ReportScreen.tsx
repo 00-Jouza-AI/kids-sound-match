@@ -89,6 +89,7 @@ export function ReportScreen({
   const gameLine = (g: SessionEntity, pct: number | null) => {
     if (g.game === 'peekaboo') return `${t('peekaboo')} · ${packName(g.packId)} · ${t('peekabooRow', { n: g.questionCount })}`;
     if (g.game === 'point') return `${t('pointGame')} · ${t('pointRow', { n: g.questionCount })}`;
+    if (g.game === 'actions') return `${t('actionsGame')} · ${t('actionsRow', { n: g.questionCount })}`;
     if (g.game === 'scene') {
       const where = g.variant === 'house' ? t('sceneHouse') : t('sceneFarm');
       return `${t('sceneGame')} · ${where} · ${t('gameQuestions', { n: g.questionCount })} · ${pct === null ? '—' : t('gameFirstTry', { p: pct })}`;

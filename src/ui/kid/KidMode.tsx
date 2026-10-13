@@ -20,7 +20,7 @@ interface Props {
   onExit: () => void;
 }
 
-/** Kid Mode: the question game (also Odd one out), Explore, Memory, Peekaboo, a scene, or Where's your nose? */
+/** Kid Mode: the question game (also Odd one out), Explore, Memory, Peekaboo, a scene, Where's your nose? or Do it with me. */
 export function KidMode(props: Props) {
   const { pack, packs, config, snapshot, picker, onExit } = props;
   switch (config.kind) {
@@ -44,6 +44,7 @@ export function KidMode(props: Props) {
     case 'scene':
       return <KidScene pack={pack} packs={packs} config={config} snapshot={snapshot} picker={picker} onExit={onExit} />;
     case 'point':
+    case 'actions':
       return <KidPoint pack={pack} packs={packs} config={config} snapshot={snapshot} picker={picker} onExit={onExit} />;
     default:
       return <KidGame {...props} />;

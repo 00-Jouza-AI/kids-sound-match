@@ -8,7 +8,8 @@ import { local } from './storage';
 /** What the child hears as the question: the animal sound, its name, or both. */
 export type GameMode = 'SOUND_AND_NAME' | 'SOUND_ONLY' | 'NAME_ONLY';
 /** Language the game speaks. "both" says every name in Arabic, then English. */
-export type GameLanguage = Lang | 'both';
+/** "both": Arabic, then English. "both_en": English, then Arabic. */
+export type GameLanguage = Lang | 'both' | 'both_en';
 export type UiLanguageOverride = 'system' | Lang;
 export type RepeatInterval = 1 | 2 | 3;
 export type QuestionsPerSession = 5 | 10 | 15;
@@ -38,13 +39,17 @@ export interface Settings {
   memoryPairs: MemoryPairs;
   /** The names on the pictures in the games: English top left, Arabic bottom right. */
   cardNames: boolean;
+  /** Play-time timer: minutes per sitting, then a "time to rest" screen. 0 = off. */
+  playMinutes: PlayMinutes;
 }
 
 export const CHOICE_COUNTS = [2, 3, 4, 5, 6, 7, 8, 10] as const;
 export const REPEAT_INTERVALS = [1, 2, 3] as const;
 export const QUESTIONS_PER_SESSION = [5, 10, 15] as const;
 export const MODES = ['SOUND_AND_NAME', 'SOUND_ONLY', 'NAME_ONLY'] as const;
-export const GAME_LANGUAGES = ['ar', 'en', 'both'] as const;
+export const GAME_LANGUAGES = ['ar', 'en', 'both', 'both_en'] as const;
+export const PLAY_MINUTES = [0, 5, 10, 15, 20, 30] as const;
+export type PlayMinutes = (typeof PLAY_MINUTES)[number];
 const UI_LANGUAGES = ['system', 'ar', 'en'] as const;
 
 const STORAGE_KEY = 'ksm.settings.v1';
@@ -64,9 +69,15 @@ export function browserLanguages(): string[] {
   return navigator.languages?.length ? [...navigator.languages] : [navigator.language];
 }
 
-/** The languages spoken, in order. "Both" is Arabic first, then English. */
+/** The languages spoken, in order: "Both" is Arabic first unless the parent chose English first. */
 export function spokenLanguages(language: GameLanguage): Lang[] {
-  return language === 'both' ? ['ar', 'en'] : [language];
+  if (language === 'both') return ['ar', 'en'];
+  if (language === 'both_en') return ['en', 'ar'];
+  return [language];
+}
+
+export function isBoth(language: GameLanguage): boolean {
+  return language === 'both' || language === 'both_en';
 }
 
 export function defaultSettings(device: Lang): Settings {
@@ -87,6 +98,7 @@ export function defaultSettings(device: Lang): Settings {
     mixedExcluded: [],
     memoryPairs: 3,
     cardNames: true,
+    playMinutes: 0,
   };
 }
 
@@ -124,6 +136,7 @@ export function sanitizeSettings(raw: unknown, device: Lang): Settings {
     mixedExcluded: Array.isArray(r.mixedExcluded) ? r.mixedExcluded.filter((k): k is string => typeof k === 'string') : [],
     memoryPairs: pick(r.memoryPairs, MEMORY_PAIRS, d.memoryPairs),
     cardNames: bool(r.cardNames, d.cardNames),
+    playMinutes: pick(r.playMinutes, PLAY_MINUTES, d.playMinutes),
   };
 }
 

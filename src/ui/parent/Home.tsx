@@ -5,7 +5,7 @@ import type { MemoryNext } from '../../report/levels';
 import type { NextLevel } from '../../report/practice';
 import type { ProfileState } from '../../settings/profiles';
 import { effectiveMode, enabledItemKeys, type Settings } from '../../settings/settings';
-import { ExploreIcon, MemoryIcon, OddIcon, PeekabooIcon, PointIcon, SceneIcon } from '../kid/icons';
+import { ActionsIcon, ExploreIcon, MemoryIcon, OddIcon, PeekabooIcon, PointIcon, SceneIcon } from '../kid/icons';
 import { ChevronIcon } from './components';
 import { ProfileRow } from './ProfileRow';
 
@@ -25,6 +25,7 @@ export function Home({
   canOdd,
   canScene,
   canPoint,
+  canActions,
   onStart,
   onExplore,
   onMemory,
@@ -32,6 +33,7 @@ export function Home({
   onPeekaboo,
   onScene,
   onPoint,
+  onActions,
   onOpen,
   onNudgeAccept,
   onNudgeDismiss,
@@ -54,6 +56,7 @@ export function Home({
   canScene: boolean;
   /** Where's your nose?: the body-part questions exist in the game's language. */
   canPoint: boolean;
+  canActions: boolean;
   onStart: () => void;
   onExplore: () => void;
   onMemory: () => void;
@@ -61,6 +64,7 @@ export function Home({
   onPeekaboo: () => void;
   onScene: () => void;
   onPoint: () => void;
+  onActions: () => void;
   onOpen: (link: HomeLink) => void;
   onNudgeAccept: (to: ChoiceCount) => void;
   onNudgeDismiss: (nudge: NextLevel) => void;
@@ -71,7 +75,7 @@ export function Home({
   const modeLabel = { SOUND_AND_NAME: t('modeSoundAndName'), SOUND_ONLY: t('modeSoundOnly'), NAME_ONLY: t('modeNameOnly') }[
     pack ? effectiveMode(pack, settings.mode) : settings.mode
   ];
-  const languageLabel = { ar: 'العربية', en: 'English', both: 'العربية + English' }[settings.language];
+  const languageLabel = { ar: 'العربية', en: 'English', both: 'العربية + English', both_en: 'English + العربية' }[settings.language];
   // "Who eats what?" always asks about the animal, and has no Toddler mode.
   const association = pack?.kind === 'association';
   const summary = pack
@@ -137,6 +141,11 @@ export function Home({
           <PointIcon />
           <strong>{t('pointGame')}</strong>
           <small>{t('pointSub')}</small>
+        </button>
+        <button type="button" className="game-tile" onClick={onActions} disabled={!canActions}>
+          <ActionsIcon />
+          <strong>{t('actionsGame')}</strong>
+          <small>{t('actionsSub')}</small>
         </button>
         <button type="button" className="game-tile" onClick={onMemory} disabled={!canExplore}>
           <MemoryIcon />

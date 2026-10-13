@@ -16,6 +16,7 @@ import { EndScreen, type PickerOptions } from './EndScreen';
 import { awardSticker, StickerAlbum, stickerPicture, StickerReveal } from './Stickers';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
+import { questionDone } from './sitting';
 import { choosePictures, useBoxSize } from './layout';
 import { OptionGrid } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
@@ -255,6 +256,7 @@ export function KidGame({ pack, packs, config, snapshot, telemetryEnabled, picke
     if (r === 'next') {
       persist('playing');
       presentQuestion();
+      questionDone();
     } else if (r === 'end') {
       finishSession();
     }

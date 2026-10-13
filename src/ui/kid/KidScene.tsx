@@ -20,6 +20,7 @@ import { spokenLanguages } from '../../settings/settings';
 import { SpeakerIcon } from './icons';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
+import { questionDone } from './sitting';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { SceneArt, spotPlaces } from './sceneArt';
@@ -271,6 +272,7 @@ export function KidScene({
       indexRef.current++;
       setIndex(indexRef.current);
       present();
+      questionDone();
     });
   };
 

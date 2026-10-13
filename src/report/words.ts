@@ -22,7 +22,8 @@ export interface WordEvidence {
 
 /**
  * The answers that say whether a child understands a word: the matching game (not Toddler mode,
- * where every tap is right), Find it in the picture, and Where's your nose? (the parent's tick).
+ * where every tap is right), Find it in the picture, and Where's your nose? and Do it with me (the
+ * parent's tick).
  * Games about something else (Who eats what? asks what the animal eats) are left out by `isWordPack`.
  * A hint without a wrong tap says nothing either way.
  */
@@ -33,7 +34,7 @@ export function wordEvidence(
 ): WordEvidence[] {
   const counted = new Map(
     sessions
-      .filter((s) => !s.toddlerMode && (isMatchGame(s) || s.game === 'scene' || s.game === 'point'))
+      .filter((s) => !s.toddlerMode && (isMatchGame(s) || s.game === 'scene' || s.game === 'point' || s.game === 'actions'))
       .map((s) => [s.id, s]),
   );
   const out: WordEvidence[] = [];

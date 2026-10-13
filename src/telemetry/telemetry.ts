@@ -12,7 +12,7 @@ export interface TelemetryEvent {
   pack: string;
   item: string;
   choices: number;
-  lang: GameLanguage;
+  lang: Exclude<GameLanguage, 'both_en'>;
   mode: 'sound_name' | 'sound_only' | 'name_only';
   first_try_correct: boolean;
   app_version: string;
@@ -42,7 +42,8 @@ export function buildEvents(result: SessionResult, ctx: TelemetryContext, appVer
     pack: ctx.packId,
     item: q.itemKey,
     choices: q.choiceCount,
-    lang: ctx.lang,
+    // The statistics keep the three agreed values: the order of 'Both' doesn't matter there.
+    lang: ctx.lang === 'both_en' ? 'both' : ctx.lang,
     mode: ({ SOUND_AND_NAME: 'sound_name', SOUND_ONLY: 'sound_only', NAME_ONLY: 'name_only' } as const)[ctx.mode],
     first_try_correct: q.firstTryCorrect,
     app_version: appVersion,

@@ -190,6 +190,23 @@ Chosen for a 1.5-year-old (the main player): games she can play now, and a word 
 
 The old pictures are in `dev-assets/replaced`.
 
+## Added on 13 October 2026
+
+| Feature | Decision |
+|---|---|
+| Record the words | My packs → Your voice and photos → **Record the words**: one word at a time, big picture and big word, Record (stops by itself after the word, then trim), and the next one comes up; "Hear it now" plays the phone's voice; Skip moves on. Order: every Arabic name still read by the phone's voice (no real recording and none of yours), pack by pack, then the English ones; a name two packs share is asked once. 5 a day suggested (five dots), stop any time. Saved like the other recordings of your voice (this phone, plus the backup if signed in) |
+| Play time | Settings → Play time: Off (default), 5, 10, 15, 20 or 30 minutes, per child. A sitting starts with the first game from Home and goes on through play-agains and the end screen's picker; leaving to Home ends it. When the time is up, the question being played finishes (at most 30 more seconds), then a sleepy moon among the stars says "وقت الراحة" / "Time to rest". The game is paused underneath; tapping says it again; only the corner circle and the PIN (or pictures) lead out, to Home. On the end screen, after a reload or in Explore it starts straight away |
+| Do it with me | A new game, played like Where's your nose?: one action at a time, said in Levantine Arabic for a girl or a boy (from the child's profile; asked once if unknown) and in English, and the parent taps ✓ when the child does it (or skips). 18 actions: moving (clap سقّفي، jump نُطّي، wave باي باي، dance ارقصي، spin round دوري، stamp دبّكي), daily life (eat كُلي، drink اشربي، sleep نامي، wash your hands اغسلي إيديكِ، brush your teeth فرّشي سنانِك), love (kiss بوسيني، hug عبطيني، high five كفِّك) and calm (sit down اقعدي، lie down تمدّدي، shh ششش، cover your eyes خبّي عيونِك). Pictures drawn for the app: one toddler doing each action. Ticks count towards Words I know. The actions are only in this game (not in the pack list, the Mixed game or Odd one out) |
+| Which language first | With both languages, Settings → Which first: Arabic first (as before) or English first, everywhere both are spoken. The anonymous statistics still just say "both" |
+| Things at home | 6 more real sounds (Pixabay, about 3 seconds each): crying baby, washing machine, microwave beeps, toilet flush, hair dryer and blender. The door already plays a knock, so a blender came instead of knocking. Pictures drawn for the app in the Fluent style, the toilet from Fluent Emoji. Never asked together: vacuum, hair dryer and blender (motor sounds); tap, shower and toilet (water); washing machine and microwave (boxes with a round window) |
+
+### More clips for the voice session (eighth round)
+
+- "Time to rest": `feedback/rest_ar.mp3` **وقت الراحة**, `feedback/rest_en.mp3` **Time to rest**
+- Do it with me: `packs/actions/<action>_do_ar_f.mp3` (girl), `_do_ar_m.mp3` (boy, only once a child is a boy), `_do_en.mp3`, with the words above; plus the 18 action names
+- Things at home: the names of the 6 new sounds (طفل يبكي، غسّالة، ميكروويف، تواليت، مجفّف شعر، خلّاط)
+- The studio lists them all
+
 ## Fixes applied by default
 
 1. Feedback paths (`feedback/...`) resolve from the assets root, matching spec 3.1; item paths resolve from `packs/`. `asset_root` is ignored because the item paths already include the pack folder.

@@ -34,6 +34,7 @@ describe('settings', () => {
   it('turns hints and adaptive practice on by default, and speaks Arabic first for Both', () => {
     expect(defaultSettings('en')).toMatchObject({ hints: true, adaptive: true });
     expect(spokenLanguages('both')).toEqual(['ar', 'en']);
+    expect(spokenLanguages('both_en')).toEqual(['en', 'ar']);
     expect(spokenLanguages('en')).toEqual(['en']);
     expect(sanitizeSettings({ mode: 'NAME_ONLY', language: 'both', hints: false }, 'ar')).toMatchObject({
       mode: 'NAME_ONLY',
@@ -54,6 +55,12 @@ describe('settings', () => {
     expect(s.toddlerMode).toBe(false);
     expect(s.enabledItems).toEqual({ animals: ['cat'] });
     expect(sanitizeSettings('garbage', 'ar')).toEqual(defaultSettings('ar'));
+  });
+
+  it('keeps the play-time timer off unless a known number of minutes was chosen', () => {
+    expect(defaultSettings('ar').playMinutes).toBe(0);
+    expect(sanitizeSettings({ playMinutes: 15, language: 'both_en' }, 'ar')).toMatchObject({ playMinutes: 15, language: 'both_en' });
+    expect(sanitizeSettings({ playMinutes: 12 }, 'ar').playMinutes).toBe(0);
   });
 });
 

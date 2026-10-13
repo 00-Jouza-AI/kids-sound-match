@@ -81,6 +81,23 @@ export function SceneIcon() {
 }
 
 /** A face with a finger pointing at its nose. */
+/** Do it with me: a little person jumping with arms up. */
+export function ActionsIcon() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="4.5" r="2.4" fill="currentColor" />
+      <path
+        d="M4.5 6.5l7.5 3.5 7.5-3.5M12 10v5.5M12 15.5l-4 5M12 15.5l4 5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function PointIcon() {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">

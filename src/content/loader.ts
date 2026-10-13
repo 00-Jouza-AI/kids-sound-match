@@ -134,6 +134,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       sessionEnd: perLang((lang) => feedbackAsset(fb?.session_end?.[lang])),
       ...(fb?.odd_question ? { oddQuestion: perLang((lang) => feedbackAsset(fb.odd_question?.[lang])) } : {}),
       ...(fb?.peekaboo ? { peekaboo: perLang((lang) => feedbackAsset(fb.peekaboo?.[lang])) } : {}),
+      ...(fb?.rest ? { rest: perLang((lang) => feedbackAsset(fb.rest?.[lang])) } : {}),
     };
 
     const assoc = manifest.association;
@@ -160,6 +161,7 @@ export async function loadContent(opts: LoadOptions): Promise<LoadedContent> {
       order: typeof manifest.order === 'number' ? manifest.order : DEFAULT_ORDER,
       inMix: manifest.in_mix !== false,
       mixAlone: manifest.mix_alone === true,
+      ...(manifest.own_game === true ? { ownGame: true, inMix: false } : {}),
       ...(association ? { association } : {}),
       items,
       groups: (manifest.groups ?? []).map((g) => ({ ...g, items: g.items.filter((k) => validation.validKeys.has(k)) })),

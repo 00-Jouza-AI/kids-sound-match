@@ -11,6 +11,7 @@ import { spokenLanguages } from '../../settings/settings';
 import { CardNames } from './CardNames';
 import { KidFrame, PausedScreen } from './KidFrame';
 import { clearKidSnapshot, saveKidSnapshot, type KidConfig, type KidSnapshot } from './kidSnapshot';
+import { questionDone } from './sitting';
 import { choosePictures, useBoxSize } from './layout';
 import { Burst } from './OptionGrid';
 import { IdleScene, SessionEndScene } from './scenes';
@@ -182,6 +183,7 @@ export function KidPeekaboo({
     indexRef.current++;
     setIndex(indexRef.current);
     hide();
+    questionDone();
   };
 
   const start = (fresh: boolean) => {

@@ -56,6 +56,8 @@ export interface ManifestFeedback {
   odd_question?: Record<Lang, string>;
   /** Peekaboo: "بَخ!" / "Peekaboo!", said as the blanket comes off. */
   peekaboo?: Record<Lang, string>;
+  /** The play-time timer: "وقت الراحة" / "Time to rest", when a sitting ends. */
+  rest?: Record<Lang, string>;
 }
 
 /**
@@ -92,6 +94,11 @@ export interface PackManifest {
    * a banana, and "Where is happy?" must not show a smiling Mama.
    */
   mix_alone?: boolean;
+  /**
+   * Only played in its own game ("Do it with me"): left out of the pack list, the Mixed game, Odd
+   * one out and the end screen's picker.
+   */
+  own_game?: boolean;
   kind?: PackKind;
   association?: ManifestAssociation;
   name: LocalizedText;
@@ -151,6 +158,8 @@ export interface LoadedFeedback {
   readonly oddQuestion?: Readonly<Record<Lang, ResolvedAsset | null>>;
   /** Peekaboo: "بَخ!" / "Peekaboo!". Missing in packs without it. */
   readonly peekaboo?: Readonly<Record<Lang, ResolvedAsset | null>>;
+  /** The play-time timer: "Time to rest". Missing in packs without it. */
+  readonly rest?: Readonly<Record<Lang, ResolvedAsset | null>>;
 }
 
 export interface LoadedAssociation {
@@ -177,6 +186,8 @@ export interface LoadedPack {
   readonly inMix?: boolean;
   /** See PackManifest.mix_alone. */
   readonly mixAlone?: boolean;
+  /** See PackManifest.own_game. */
+  readonly ownGame?: boolean;
   /** Odd one out: the pools of pictures for an easy and a harder game. */
   readonly odd?: { readonly easy: OddConfig; readonly hard: OddConfig };
   /** Only items whose every asset resolved. */

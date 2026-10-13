@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { audioEngine } from './audio/audioEngine';
+import { FEEDBACK_SPEECH, voicedClip } from './audio/clips';
 import { placeholderPictureUsable } from './content/emojiSupport';
 import { loadContent } from './content/loader';
 import { buildMixedPack } from './content/mixed';
@@ -45,6 +46,7 @@ import { local } from './settings/storage';
 import { telemetry } from './telemetry/telemetry';
 import { KidMode } from './ui/kid/KidMode';
 import { pointItems } from './ui/kid/KidPoint';
+import { restTime, SittingContext } from './ui/kid/sitting';
 import { clearKidSnapshot, loadKidSnapshot, type KidConfig, type KidKind, type KidSnapshot } from './ui/kid/kidSnapshot';
 import { FirstRun } from './ui/parent/FirstRun';
 import { Flashcards } from './ui/parent/Flashcards';
@@ -209,7 +211,8 @@ function Shell({
   const [startStep, setStartStep] = useState<StartStep>('soundCheck');
   const [startKind, setStartKind] = useState<KidKind>('game');
   // Where's your nose?: asking a parent once whether the child is a girl or a boy (Arabic grammar).
-  const [askGender, setAskGender] = useState(false);
+  // Where's your nose? and Do it with me ask once whether the child is a girl or a boy (Arabic grammar).
+  const [askGender, setAskGender] = useState<'point' | 'actions' | null>(null);
   const pendingGender = useRef<ArGender | null>(null);
   const [nudge, setNudge] = useState<NextLevel | null>(null);
   const [memoryNudge, setMemoryNudge] = useState<MemoryNext | null>(null);
@@ -217,7 +220,8 @@ function Shell({
 
   const { customViews, allPacks, oddPack } = useMemo(() => composePacks(builtin?.packs ?? [], custom), [builtin, custom]);
   // Packs with enough finished items to play.
-  const playablePacks = useMemo(() => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK), [allPacks]);
+  // "Do it with me" has its own game: it isn't one of the packs to choose from.
+  const playablePacks = useMemo(() => allPacks.filter((p) => p.items.length >= MIN_ITEMS_PER_PACK && !p.ownGame), [allPacks]);
   const content: LoadedContent = { packs: playablePacks, issues: builtin?.issues ?? [] };
   const pack = playablePacks.find((p) => p.id === settings.packId) ?? playablePacks[0];
   const profile = profiles.state.profiles.find((p) => p.id === profileId);
@@ -238,6 +242,10 @@ function Shell({
   });
   const bodyPack = allPacks.find((p) => p.id === 'body');
   const canPoint = pointItems(bodyPack, languages, profile?.arGender ?? 'f').length >= MIN_POINT_ITEMS;
+  const actionsPack = allPacks.find((p) => p.id === 'actions');
+  const canActions = pointItems(actionsPack, languages, profile?.arGender ?? 'f').length >= MIN_POINT_ITEMS;
+  /** The play-time timer: when this sitting began (the first game played from Home), null at Home. */
+  const sittingStart = useRef<number | null>(null);
 
   const refreshCustom = useCallback(async () => {
     try {
@@ -257,6 +265,7 @@ function Shell({
     const snapPack = snap && packs.find((p) => p.id === snap.config.packId);
     if (snap && snapPack) {
       setKid({ config: snap.config, snapshot: snap, pack: snapPack, run: ++runs.current });
+      sittingStart.current = Date.now();
       setScreen('kid');
       return;
     }
@@ -369,7 +378,7 @@ function Shell({
     const arGender = pendingGender.current ?? profile?.arGender ?? 'f';
     pendingGender.current = null;
     // Odd one out plays with every pack of things, a scene with its own packs, Where's your nose?
-    // with the body parts; the other games with the chosen pack.
+    // with the body parts, Do it with me with the actions; the other games with the chosen pack.
     const gamePack =
       kind === 'odd'
         ? oddPack
@@ -377,7 +386,9 @@ function Shell({
           ? scene?.packs.map((id) => allPacks.find((p) => p.id === id)).find((p) => p !== undefined)
           : kind === 'point'
             ? bodyPack
-            : (playablePacks.find((p) => p.id === s.packId) ?? playablePacks[0]);
+            : kind === 'actions'
+              ? actionsPack
+              : (playablePacks.find((p) => p.id === s.packId) ?? playablePacks[0]);
     if (!gamePack) return;
     // Toddler mode is for the matching game: the others have a right answer even for the youngest.
     const toddlerMode = s.toddlerMode && kind === 'game' && gamePack.kind !== 'association';
@@ -394,6 +405,8 @@ function Shell({
     } catch {
       // No history available: every animal equally often, and an easy Odd one out.
     }
+    // The first game from Home starts the sitting; play-agains and the end screen's picker continue it.
+    if (sittingStart.current === null) sittingStart.current = Date.now();
     setKid({
       pack: gamePack,
       run: ++runs.current,
@@ -406,7 +419,7 @@ function Shell({
             ? gamePack.items.map((i) => i.key)
             : kind === 'scene' && scene
               ? sceneKeys(scene, s)
-              : kind === 'point'
+              : kind === 'point' || kind === 'actions'
                 ? pointItems(gamePack, spoken, arGender).map((i) => i.key)
                 : enabledItemKeys(gamePack, s),
         // Odd one out shows 3 or 4: two or three alike and the different one.
@@ -419,7 +432,7 @@ function Shell({
         // mixes packs, so it keeps the setting (things without a sound are asked for by name).
         mode: kind === 'scene' ? s.mode : effectiveMode(gamePack, s.mode),
         ...(scene ? { sceneId: scene.id } : {}),
-        ...(kind === 'point' ? { arGender } : {}),
+        ...(kind === 'point' || kind === 'actions' ? { arGender } : {}),
         language: s.language,
         repeatIntervalSec: s.repeatIntervalSec,
         hints: s.hints,
@@ -441,13 +454,15 @@ function Shell({
     if (Object.keys(patch).length) update(patch);
     void startKid(kind, { ...settings, ...patch });
   };
-  // What the picker offers: Where's your nose? only once the child's Arabic grammar is known.
+  // What the picker offers: Where's your nose? and Do it with me only once the child's Arabic grammar is known.
+  const genderKnown = !(languages.includes('ar') && !profile?.arGender);
   const pickerKinds: KidKind[] = [
     'game',
     'peekaboo',
     'explore',
     ...(playableScenes.length ? (['scene'] as const) : []),
-    ...(canPoint && !(languages.includes('ar') && !profile?.arGender) ? (['point'] as const) : []),
+    ...(canPoint && genderKnown ? (['point'] as const) : []),
+    ...(canActions && genderKnown ? (['actions'] as const) : []),
     'memory',
     ...(oddPack ? (['odd'] as const) : []),
   ];
@@ -472,6 +487,12 @@ function Shell({
       setStartStep('soundCheck');
       setScreen('start');
     }
+  };
+
+  /** Arabic needs to know: "أين أنفُكِ؟" and "سقّفي!" for a girl, "أين أنفُكَ؟" and "سقّف!" for a boy. */
+  const beginWithGender = (kind: 'point' | 'actions') => {
+    if (genderKnown) begin(kind);
+    else setAskGender(kind);
   };
 
   const onCustomChanged = async () => {
@@ -561,8 +582,16 @@ function Shell({
         />
       );
       break;
-    case 'kid':
+    case 'kid': {
+      const restLines = allPacks.find((p) => p.feedback.rest)?.feedback.rest;
+      const restClips = kid
+        ? spokenLanguages(kid.config.language).flatMap((lang) => {
+            const asset = restLines?.[lang];
+            return asset ? [voicedClip(asset, FEEDBACK_SPEECH[asset.path], lang, 'feedback', `rest:${lang}`)] : [];
+          })
+        : [];
       body = kid && (
+        <SittingContext.Provider value={{ restAt: restTime(sittingStart.current, settings.playMinutes), restClips }}>
         <KidMode
           key={kid.run}
           pack={kid.pack}
@@ -573,11 +602,14 @@ function Shell({
           picker={{ packs: playablePacks, settings, kind: kid.config.kind, available: pickerKinds, onPlay: restartKid }}
           onExit={() => {
             setKid(null);
+            sittingStart.current = null;
             setScreen('home');
           }}
         />
+        </SittingContext.Provider>
       );
       break;
+    }
     default:
       body = (
         <Home
@@ -598,12 +630,10 @@ function Shell({
           onPeekaboo={() => begin('peekaboo')}
           onScene={() => begin('scene')}
           canScene={playableScenes.length > 0}
-          onPoint={() => {
-            // Arabic needs to know: "أين أنفُكِ؟" for a girl, "أين أنفُكَ؟" for a boy.
-            if (languages.includes('ar') && !profile?.arGender) setAskGender(true);
-            else begin('point');
-          }}
+          onPoint={() => beginWithGender('point')}
           canPoint={canPoint}
+          onActions={() => beginWithGender('actions')}
+          canActions={canActions}
           memoryNudge={memoryNudge}
           onMemoryNudgeAccept={(to) => {
             update({ memoryPairs: to as MemoryPairs });
@@ -630,7 +660,7 @@ function Shell({
     <>
       {body}
       {askGender && profile && (
-        <Overlay label={t('genderTitle')} onDismiss={() => setAskGender(false)}>
+        <Overlay label={t('genderTitle')} onDismiss={() => setAskGender(null)}>
           <h2>{t('genderTitle')}</h2>
           <p>{t('genderBody')}</p>
           <div className="gender-pick">
@@ -642,8 +672,8 @@ function Shell({
                 onClick={() => {
                   profiles.edit({ ...profile, arGender: g });
                   pendingGender.current = g;
-                  setAskGender(false);
-                  begin('point');
+                  setAskGender(null);
+                  begin(askGender);
                 }}
               >
                 {g === 'f' ? `👧 ${t('girl')}` : `👦 ${t('boy')}`}

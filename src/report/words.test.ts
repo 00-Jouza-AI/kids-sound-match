@@ -73,10 +73,14 @@ describe('Words I know', () => {
     expect(wordEvidence(sessions, questions)).toEqual([]);
   });
 
-  it('counts Find it in the picture and Where\'s your nose? (the parent\'s tick)', () => {
-    const sessions = [game(1, t0, { game: 'scene', packId: 'animals' }), game(2, t0 + DAY, { game: 'point', packId: 'body' })];
-    const questions = [answer(1, 'cow', true), answer(2, 'nose', true, { packId: 'body' })];
-    expect(wordEvidence(sessions, questions).map((e) => e.word)).toEqual(['animals/cow', 'body/nose']);
+  it('counts Find it in the picture, Where\'s your nose? and Do it with me (the parent\'s tick)', () => {
+    const sessions = [
+      game(1, t0, { game: 'scene', packId: 'animals' }),
+      game(2, t0 + DAY, { game: 'point', packId: 'body' }),
+      game(3, t0 + 2 * DAY, { game: 'actions', packId: 'actions' }),
+    ];
+    const questions = [answer(1, 'cow', true), answer(2, 'nose', true, { packId: 'body' }), answer(3, 'clap', true, { packId: 'actions' })];
+    expect(wordEvidence(sessions, questions).map((e) => e.word)).toEqual(['animals/cow', 'body/nose', 'actions/clap']);
   });
 
   it('counts a Mixed game answer for the pack its picture came from, and skips games about something else', () => {

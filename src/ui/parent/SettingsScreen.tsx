@@ -14,6 +14,8 @@ import {
   CHOICE_COUNTS,
   effectiveMode,
   enabledItemKeys,
+  isBoth,
+  PLAY_MINUTES,
   QUESTIONS_PER_SESSION,
   REPEAT_INTERVALS,
   soundModesAvailable,
@@ -155,21 +157,43 @@ export function SettingsScreen({
         <Row label={t('settingsLanguage')}>
           <Segmented
             label={t('settingsLanguage')}
-            value={settings.language}
+            value={isBoth(settings.language) ? 'both' : settings.language}
             options={[
               { value: 'ar', label: 'العربية' },
               { value: 'en', label: 'English' },
               { value: 'both', label: t('langBoth') },
             ]}
-            onChange={(language) => update({ language })}
+            // Choosing "Both" again keeps the order already chosen.
+            onChange={(language) => update({ language: language === 'both' && isBoth(settings.language) ? settings.language : language })}
           />
         </Row>
+        {isBoth(settings.language) && (
+          <Row label={t('settingsLangOrder')} hint={t('settingsLangOrderHint')}>
+            <Segmented
+              label={t('settingsLangOrder')}
+              value={settings.language}
+              options={[
+                { value: 'both', label: t('langArFirst') },
+                { value: 'both_en', label: t('langEnFirst') },
+              ]}
+              onChange={(language) => update({ language })}
+            />
+          </Row>
+        )}
         <Row label={t('settingsQuestions')}>
           <Segmented
             label={t('settingsQuestions')}
             value={settings.questionsPerSession}
             options={QUESTIONS_PER_SESSION.map((n) => ({ value: n, label: String(n) }))}
             onChange={(questionsPerSession) => update({ questionsPerSession })}
+          />
+        </Row>
+        <Row label={t('settingsPlayTime')} hint={t('settingsPlayTimeHint')}>
+          <Segmented
+            label={t('settingsPlayTime')}
+            value={settings.playMinutes}
+            options={PLAY_MINUTES.map((n) => ({ value: n as number, label: n === 0 ? t('off') : t('minutesShort', { n }) }))}
+            onChange={(playMinutes) => update({ playMinutes: playMinutes as Settings['playMinutes'] })}
           />
         </Row>
         <Row label={t('settingsRepeat')}>
